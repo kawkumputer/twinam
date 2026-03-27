@@ -5,7 +5,7 @@
     <key>method</key>
     <string>app-store</string>
     <key>teamID</key>
-    <string>YOUR_TEAM_ID</string>
+    <string>94VW99RYDQ</string>
     <key>uploadBitcode</key>
     <false/>
     <key>uploadSymbols</key>
@@ -16,8 +16,8 @@
     <string>manual</string>
     <key>provisioningProfiles</key>
     <dict>
-        <key>com.twinam.tap_track</key>
-        <string>YOUR_PROVISIONING_PROFILE_NAME</string>
+        <key>com.twinam.twinam</key>
+        <string>TwinAm App</string>
     </dict>
 </dict>
 </plist>

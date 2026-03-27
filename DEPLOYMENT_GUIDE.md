@@ -34,7 +34,7 @@ APP_STORE_CONNECT_API_KEY_BASE64 # Clé API .p8 encodée en base64
    - Encodez-le en base64 : `base64 -i certificate.p12 | pbcopy`
 
 3. **Provisioning Profile** :
-   - Créez un provisioning profile "App Store" pour `com.twinam.twin_am`
+   - Créez un provisioning profile "App Store" pour `com.twinam.twinam`
    - Téléchargez-le et encodez-le en base64
 
 ## 📋 Déploiement
@@ -67,7 +67,7 @@ Le workflow se déclenche automatiquement sur les tags `v*` ou manuellement via 
 ### Bundle Identifier
 Assurez-vous que `ios/Runner.xcodeproj/project.pbxproj` contient :
 ```
-PRODUCT_BUNDLE_IDENTIFIER = com.twinam.twin_am
+PRODUCT_BUNDLE_IDENTIFIER = com.twinam.twinam
 ```
 
 ### Info.plist
