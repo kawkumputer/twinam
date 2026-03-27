@@ -19,9 +19,9 @@ class NotificationService {
     if (_initialized) return;
 
     tzdata.initializeTimeZones();
-    final String tzInfo = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(tzInfo));
-    debugPrint('[Notif] Timezone set to: $tzInfo');
+    final tzInfo = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(tzInfo.identifier));
+    debugPrint('[Notif] Timezone set to: ${tzInfo.identifier}');
 
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
     const darwinSettings = DarwinInitializationSettings(
@@ -50,8 +50,10 @@ class NotificationService {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       if (android != null) {
-        final granted = await android.requestPermission();
-        debugPrint('[Notif] Notification permission: $granted');
+        final granted = await android.requestNotificationsPermission();
+        debugPrint('[Notif] POST_NOTIFICATIONS permission: $granted');
+        final exactAlarm = await android.requestExactAlarmsPermission();
+        debugPrint('[Notif] Exact alarm permission: $exactAlarm');
         return granted ?? false;
       }
     }
