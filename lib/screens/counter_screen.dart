@@ -418,7 +418,7 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
         '$goalText'
         '$streakText'
         "\n\n— Twin'Am";
-    SharePlus.instance.share(ShareParams(text: text));
+    Share.share(text);
   }
 
   void _showResetDialog(BuildContext context, CounterProvider provider, AppLocalizations l10n) {
