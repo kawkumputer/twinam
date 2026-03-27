@@ -80,7 +80,7 @@ jobs:
           PP_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< $(/usr/bin/security cms -D -i $PP_PATH))
           echo "Using provisioning profile UUID: $PP_UUID"
 
-          # Step 3: Archive with manual signing only for Runner target
+          # Step 3: Archive - Pods signing handled by Podfile post-install hook
           cd ios
           xcodebuild -workspace Runner.xcworkspace \
             -scheme Runner \
@@ -91,9 +91,7 @@ jobs:
             DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" \
             CODE_SIGN_STYLE="Manual" \
             CODE_SIGN_IDENTITY="Apple Distribution" \
-            PROVISIONING_PROFILE="$PP_UUID" \
-            SKIP_INSTALL=NO \
-            2>&1 | grep -E "(error:|warning:|ARCHIVE|Signing)"
+            PROVISIONING_PROFILE="$PP_UUID"
 
           echo "=== Archive created ==="
           ls -la /tmp/Runner.xcarchive/ || echo "Archive not found"
