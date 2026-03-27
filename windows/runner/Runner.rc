@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "Twin'Am" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "tap_track" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.taptrack. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.twinam. All rights reserved." "\0"
             VALUE "OriginalFilename", "tap_track.exe" "\0"
             VALUE "ProductName", "Twin'Am" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

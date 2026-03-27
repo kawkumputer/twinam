@@ -1,4 +1,4 @@
-package com.taptrack.tap_track
+package com.twinam.twinam
 
 import io.flutter.embedding.android.FlutterActivity
 

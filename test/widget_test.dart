@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tap_track/models/counter.dart';
+import 'package:twinam/models/counter.dart';
 
 void main() {
   test('Counter increment works', () {
