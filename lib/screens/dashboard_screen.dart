@@ -6,6 +6,7 @@ import '../providers/achievement_provider.dart';
 import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/counter_card.dart';
+import '../widgets/twin_avatar_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -24,6 +25,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (hour >= 12 && hour < 18) return '${l10n.translate('greetingAfternoon').replaceAll(' !', '').replaceAll('!', '')}$name!';
     if (hour >= 18 && hour < 23) return '${l10n.translate('greetingEvening').replaceAll(' !', '').replaceAll('!', '')}$name!';
     return '${l10n.translate('greetingNight').replaceAll(' ?', '').replaceAll('?', '')}$name?';
+  }
+
+  double _getDailyScore(List counters) {
+    if (counters.isEmpty) return 0;
+    final withGoal = counters.where((c) => c.goal != null).toList();
+    if (withGoal.isEmpty) {
+      final total = counters.fold<int>(0, (sum, c) => sum + (c.value as int));
+      return total > 0 ? 1.0 : 0.0;
+    }
+    final reached = withGoal.where((c) => c.goalReached).length;
+    return reached / withGoal.length;
   }
 
   String _getDailyMotivation(AppLocalizations l10n) {
@@ -163,6 +175,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
             ),
+            // Twin Avatar card
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+              sliver: SliverToBoxAdapter(
+                child: _TwinCard(
+                  score: _getDailyScore(counters),
+                  counters: counters,
+                  onTap: () => Navigator.of(context).pushNamed('/verdict'),
+                ),
+              ),
+            ),
+
             // Motivation banner
             if (counters.isNotEmpty)
               SliverPadding(
@@ -610,6 +634,106 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TwinCard extends StatelessWidget {
+  final double score;
+  final List counters;
+  final VoidCallback? onTap;
+
+  const _TwinCard({required this.score, required this.counters, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = TwinAvatarWidget.fromScore(score);
+    final color = TwinAvatarWidget.colorForState(state);
+    final message = TwinAvatarWidget.messageForState(state);
+    final total = counters.length;
+    final withGoal = counters.where((c) => c.goal != null).toList();
+    final reached = withGoal.where((c) => c.goalReached).length;
+    final scorePercent = (score * 100).toInt();
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardTheme.color,
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: color.withValues(alpha: 0.2),
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            children: [
+              TwinAvatarWidget(
+                state: state,
+                size: 72,
+                message: '',
+              ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      message,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: color,
+                          ),
+                    ),
+                    const SizedBox(height: 6),
+                    if (withGoal.isNotEmpty) ...[
+                      Text(
+                        '$reached / ${withGoal.length} goals reached',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: LinearProgressIndicator(
+                          value: score,
+                          minHeight: 7,
+                          backgroundColor: color.withValues(alpha: 0.12),
+                          valueColor: AlwaysStoppedAnimation<Color>(color),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '$scorePercent% today',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: color,
+                            ),
+                      ),
+                    ] else ...[
+                      Text(
+                        total > 0 ? 'Keep tracking your habits!' : 'Add your first habit!',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                            ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
+              ),
+            ],
+          ),
         ),
       ),
     );
