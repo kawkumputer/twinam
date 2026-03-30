@@ -12,6 +12,7 @@ import 'screens/achievements_screen.dart';
 import 'screens/daily_verdict_screen.dart';
 import 'screens/stats_screen.dart';
 import 'services/storage_service.dart';
+import 'services/twin_notification_service.dart';
 import 'theme/app_theme.dart';
 
 class TwinAmApp extends StatelessWidget {
@@ -35,6 +36,10 @@ class TwinAmApp extends StatelessWidget {
       ],
       child: Consumer<SettingsProvider>(
         builder: (context, settings, _) {
+          // Initialize Twin notifications
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            TwinNotificationService().init();
+          });
           final isDark = settings.themeMode == ThemeMode.dark;
           SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,

@@ -7,6 +7,8 @@ import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/counter_card.dart';
 import '../widgets/twin_avatar_widget.dart';
+import '../services/twin_notification_service.dart';
+import '../services/notification_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,6 +19,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _welcomeChecked = false;
+  bool _notificationPermissionChecked = false;
 
   String _getGreeting(AppLocalizations l10n, String userName) {
     final name = userName.isNotEmpty ? ', $userName' : '';
@@ -59,6 +62,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (!settings.hasUserName && mounted) {
           _showWelcomeDialog(context, settings, l10n);
         }
+        // Request notification permission after welcome
+        if (!_notificationPermissionChecked && mounted) {
+          _notificationPermissionChecked = true;
+          _requestNotificationPermission();
+        }
       }
       if (achievementProvider.didLevelUp && mounted) {
         achievementProvider.clearLevelUp();
@@ -79,6 +87,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // Check counter-count and streak achievements
     achievementProvider.checkCounterCount(counters.length);
     achievementProvider.checkStreaks(counters);
+
+    // Schedule Twin notifications based on current state
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final bestStreak = counters.map((c) => c.currentStreak).fold(0, (a, b) => a > b ? a : b);
+      TwinNotificationService().scheduleNotificationsIfNeeded(
+        counters: counters,
+        bestStreak: bestStreak,
+      );
+    });
 
     return Scaffold(
       body: SafeArea(
@@ -556,6 +573,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _requestNotificationPermission() async {
+    try {
+      final granted = await NotificationService().requestPermission();
+      if (!granted) {
+        // Could show a dialog explaining why notifications are useful
+        debugPrint('[Twin] Notification permission denied');
+      } else {
+        debugPrint('[Twin] Notification permission granted');
+      }
+    } catch (e) {
+      debugPrint('[Twin] Error requesting notification permission: $e');
+    }
   }
 
   void _showAchievementUnlock(

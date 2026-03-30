@@ -1,5 +1,5 @@
 import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
@@ -118,5 +118,166 @@ class NotificationService {
 
   int notificationIdFromCounterId(String counterId) {
     return counterId.hashCode.abs() % 100000;
+  }
+
+  // ── Twin Notifications ─────────────────────────────────────────────────────
+
+  Future<void> scheduleTwinEveningCheck({
+    required double dailyScore,
+  }) async {
+    final id = 9991; // Fixed ID for evening check
+    await cancelReminder(id); // Cancel previous if exists
+
+    final (title, body) = _getEveningMessage(dailyScore);
+
+    await _plugin.zonedSchedule(
+      id,
+      title,
+      body,
+      _nextInstanceOfTime(21, 0), // 9 PM
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          'twin_evening',
+          'Twin Evening Check',
+          channelDescription: 'Daily evening Twin status check',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          color: _getTwinColor(dailyScore),
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+    debugPrint('[Twin] Evening check scheduled (score: ${(dailyScore * 100).toInt()}%)');
+  }
+
+  Future<void> scheduleTwinMorningMotivation({
+    required int bestStreak,
+    required int totalHabits,
+  }) async {
+    final id = 9992; // Fixed ID for morning motivation
+    await cancelReminder(id);
+
+    final (title, body) = _getMorningMessage(bestStreak, totalHabits);
+
+    await _plugin.zonedSchedule(
+      id,
+      title,
+      body,
+      _nextInstanceOfTime(8, 0), // 8 AM
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          'twin_morning',
+          'Twin Morning Motivation',
+          channelDescription: 'Daily morning Twin motivation',
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+          icon: '@mipmap/ic_launcher',
+          color: const Color(0xFF2196F3),
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+    debugPrint('[Twin] Morning motivation scheduled (streak: $bestStreak)');
+  }
+
+  Future<void> scheduleTwinInactivityWarning({
+    required int daysInactive,
+  }) async {
+    if (daysInactive < 3) return;
+
+    final id = 9993; // Fixed ID for inactivity warning
+    await cancelReminder(id);
+
+    final (title, body) = _getInactivityMessage(daysInactive);
+
+    await _plugin.zonedSchedule(
+      id,
+      title,
+      body,
+      _nextInstanceOfTime(19, 0), // 7 PM
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          'twin_inactivity',
+          'Twin Inactivity Warning',
+          channelDescription: 'Inactivity warnings from Twin',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          color: const Color(0xFFFF7043),
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+    debugPrint('[Twin] Inactivity warning scheduled (days: $daysInactive)');
+  }
+
+  (String, String) _getEveningMessage(double score) {
+    if (score >= 1.0) {
+      return ('🌟 Perfect Day!', 'Your Twin is so proud! Every goal crushed today!');
+    }
+    if (score >= 0.8) {
+      return ('💪 Almost There!', 'Your Twin says: "One more push and you\'re unstoppable!"');
+    }
+    if (score >= 0.6) {
+      return ('👍 Good Progress', 'Your Twin: "Keep going, you\'ve got this!"');
+    }
+    if (score >= 0.4) {
+      return ('💭 Halfway There', 'Your Twin: "Every action counts — start now!"');
+    }
+    if (score >= 0.2) {
+      return ('😔 Tough Day?', 'Your Twin: "That\'s okay. One habit done is better than zero."');
+    }
+    return ('😢 Twin Needs You', 'Your Twin: "I\'m waiting... come back and do just ONE habit!"');
+  }
+
+  (String, String) _getMorningMessage(int bestStreak, int totalHabits) {
+    if (bestStreak >= 7) {
+      return ('🔥 Week Warrior!', "Your Twin: \"Let's keep this fire burning today!\"");
+    }
+    if (bestStreak >= 3) {
+      return ('⚡ On a Roll!', "Your Twin: \"Three days strong! Let's make it four!\"");
+    }
+    if (bestStreak >= 1) {
+      return ('🌅 Fresh Start!', "Your Twin: \"Yesterday was great, today will be better!\"");
+    }
+    if (totalHabits == 0) {
+      return ('🌱 Begin Today', "Your Twin: \"Let's start your journey together!\"");
+    }
+    return ('☀️ New Day!', "Your Twin: \"Every day is a chance to grow!\"");
+  }
+
+  (String, String) _getInactivityMessage(int daysInactive) {
+    if (daysInactive == 3) {
+      return ('😢 Twin Misses You', 'Your Twin: "Where have you been? I miss our progress!"');
+    }
+    if (daysInactive == 7) {
+      return ('😡 Twin is Angry', 'Your Twin: "Who is this person? You\'re not the one I know!"');
+    }
+    return ('😤 Twin is Furious', 'Your Twin: "Enough! Open the app NOW and show me you care!"');
+  }
+
+  Color _getTwinColor(double score) {
+    if (score >= 0.8) return const Color(0xFF4CAF50);
+    if (score >= 0.4) return const Color(0xFF2196F3);
+    return const Color(0xFFFF7043);
+  }
+
+  void cancelTwinNotifications() {
+    cancelReminder(9991); // Evening check
+    cancelReminder(9992); // Morning motivation
+    cancelReminder(9993); // Inactivity warning
   }
 }
