@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import '../models/counter.dart';
 import '../providers/counter_provider.dart';
 import '../providers/achievement_provider.dart';
+import '../providers/task_provider.dart';
+import '../providers/settings_provider.dart';
+import '../l10n/app_localizations.dart';
 import '../widgets/twin_avatar_widget.dart';
 
 class DailyVerdictScreen extends StatefulWidget {
@@ -71,23 +74,23 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
     return reached / withGoal.length;
   }
 
-  String _getAdvice(List<Counter> counters, double score) {
+  String _getAdvice(List<Counter> counters, double score, AppLocalizations l10n) {
     if (counters.isEmpty) return "Add your first habit and start your journey!";
-    if (score >= 1.0) return "Perfect day! Every goal crushed. Keep this momentum tomorrow. 🚀";
-    if (score >= 0.8) return "Almost perfect! One more push and you'll be unstoppable.";
-    if (score >= 0.6) return "Good progress! Focus on your remaining habits this evening.";
-    if (score >= 0.4) return "You're halfway there. Every action counts — start now!";
-    if (score >= 0.2) return "Tough day? That's okay. One habit done is better than zero.";
-    return "Your Twin needs you. Open the app and do just ONE habit right now.";
+    if (score >= 1.0) return l10n.translate('perfectDay');
+    if (score >= 0.8) return l10n.translate('almostPerfect');
+    if (score >= 0.6) return l10n.translate('goodProgress');
+    if (score >= 0.4) return l10n.translate('halfwayThere');
+    if (score >= 0.2) return l10n.translate('toughDay');
+    return l10n.translate('twinNeedsYou');
   }
 
-  List<_HabitRow> _getHabitRows(List<Counter> counters) {
+  List<_HabitRow> _getHabitRows(List<Counter> counters, AppLocalizations l10n) {
     return counters.map((c) {
       if (c.goal == null) {
         return _HabitRow(
           emoji: c.emoji,
           name: c.name,
-          value: '${c.value} actions',
+          value: '${c.value} ${l10n.translate('actions')}',
           done: c.value > 0,
           progress: c.value > 0 ? 1.0 : 0.0,
         );
@@ -106,16 +109,19 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
   Widget build(BuildContext context) {
     final counters = context.watch<CounterProvider>().counters;
     final achievementProvider = context.watch<AchievementProvider>();
+    final taskProvider = context.watch<TaskProvider>();
+    final settings = context.watch<SettingsProvider>();
+    final l10n = AppLocalizations.of(settings.locale);
     final score = _computeScore(counters);
     final twinState = TwinAvatarWidget.fromScore(score);
     final twinColor = TwinAvatarWidget.colorForState(twinState);
-    final twinMessage = TwinAvatarWidget.messageForState(twinState);
-    final advice = _getAdvice(counters, score);
-    final habitRows = _getHabitRows(counters);
+    final twinMessage = TwinAvatarWidget.messageForState(twinState, settings.locale);
+    final advice = _getAdvice(counters, score, l10n);
+    final habitRows = _getHabitRows(counters, l10n);
     final scorePercent = (score * 100).round();
     final now = DateTime.now();
     final dateStr =
-        '${_weekday(now.weekday)}, ${now.day} ${_month(now.month)} ${now.year}';
+        '${_weekday(now.weekday, l10n)}, ${now.day} ${_month(now.month, l10n)} ${now.year}';
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -126,9 +132,9 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          "Daily Verdict",
-          style: TextStyle(fontWeight: FontWeight.w800),
+        title: Text(
+          l10n.translate('dailyVerdict'),
+          style: const TextStyle(fontWeight: FontWeight.w800),
         ),
         centerTitle: true,
       ),
@@ -243,21 +249,21 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
                 children: [
                   _StatChip(
                     icon: '🔥',
-                    label: 'Best streak',
-                    value: '${_bestStreak(counters)} days',
+                    label: l10n.translate('bestStreak'),
+                    value: '${_bestStreak(counters)} ${l10n.translate('daysLowercase')}',
                     color: const Color(0xFFFF7043),
                   ),
                   const SizedBox(width: 12),
                   _StatChip(
                     icon: '⚡',
-                    label: 'XP today',
+                    label: l10n.translate('xpToday'),
                     value: '+${achievementProvider.xp} XP',
                     color: const Color(0xFF2196F3),
                   ),
                   const SizedBox(width: 12),
                   _StatChip(
                     icon: '✅',
-                    label: 'Goals done',
+                    label: l10n.translate('goalsDone'),
                     value:
                         '${habitRows.where((h) => h.done).length}/${habitRows.length}',
                     color: const Color(0xFF4CAF50),
@@ -267,11 +273,60 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
 
               const SizedBox(height: 24),
 
+              // Tasks completed today
+              if (taskProvider.completedTodayCount > 0) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    l10n.translate('tasksCompletedTodayTitle'),
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.5),
+                          letterSpacing: 0.5,
+                        ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4CAF50).withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: const Color(0xFF4CAF50).withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.task_alt_rounded,
+                        color: Color(0xFF4CAF50),
+                        size: 24,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          '${taskProvider.completedTodayCount} ${taskProvider.completedTodayCount > 1 ? l10n.translate('tasksCompletedToday') : l10n.translate('taskCompletedToday')}',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF4CAF50),
+                              ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+
               // Habit breakdown
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Habit Breakdown',
+                  l10n.translate('habitBreakdown'),
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                         color: Theme.of(context)
@@ -313,8 +368,8 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
                   ),
                   label: Text(
                     scorePercent >= 80
-                        ? "Keep the momentum!"
-                        : "Go crush your habits!",
+                        ? l10n.translate('keepTheMomentum')
+                        : l10n.translate('crushYourHabits'),
                     style: const TextStyle(
                         fontWeight: FontWeight.w700, fontSize: 16),
                   ),
@@ -340,15 +395,33 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
     return counters.map((c) => c.currentStreak).fold(0, (a, b) => a > b ? a : b);
   }
 
-  String _weekday(int w) {
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  String _weekday(int w, AppLocalizations l10n) {
+    final days = [
+      l10n.translate('monday'),
+      l10n.translate('tuesday'),
+      l10n.translate('wednesday'),
+      l10n.translate('thursday'),
+      l10n.translate('friday'),
+      l10n.translate('saturday'),
+      l10n.translate('sunday'),
+    ];
     return days[(w - 1).clamp(0, 6)];
   }
 
-  String _month(int m) {
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  String _month(int m, AppLocalizations l10n) {
+    final months = [
+      l10n.translate('januaryMonth'),
+      l10n.translate('februaryMonth'),
+      l10n.translate('marchMonth'),
+      l10n.translate('aprilMonth'),
+      l10n.translate('mayMonth'),
+      l10n.translate('juneMonth'),
+      l10n.translate('julyMonth'),
+      l10n.translate('augustMonth'),
+      l10n.translate('septemberMonth'),
+      l10n.translate('octoberMonth'),
+      l10n.translate('novemberMonth'),
+      l10n.translate('decemberMonth'),
     ];
     return months[(m - 1).clamp(0, 11)];
   }

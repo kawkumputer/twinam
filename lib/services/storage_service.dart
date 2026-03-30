@@ -5,14 +5,17 @@ import '../models/counter.dart';
 class StorageService {
   static const String _countersBox = 'counters';
   static const String _settingsBox = 'settings';
+  static const String _tasksBox = 'tasks';
 
   late Box<String> _counters;
   late Box<dynamic> _settings;
+  late Box<String> _tasks;
 
   Future<void> init() async {
     await Hive.initFlutter();
     _counters = await Hive.openBox<String>(_countersBox);
     _settings = await Hive.openBox<dynamic>(_settingsBox);
+    _tasks = await Hive.openBox<String>(_tasksBox);
   }
 
   // Counters
@@ -99,5 +102,14 @@ class StorageService {
 
   set counterOrder(List<String> value) {
     _settings.put('counterOrder', jsonEncode(value));
+  }
+
+  // Tasks
+  String? getTasksData() {
+    return _tasks.get('tasks_data');
+  }
+
+  Future<void> saveTasksData(String data) async {
+    await _tasks.put('tasks_data', data);
   }
 }

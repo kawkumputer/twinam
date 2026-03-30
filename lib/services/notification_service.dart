@@ -280,4 +280,101 @@ class NotificationService {
     cancelReminder(9992); // Morning motivation
     cancelReminder(9993); // Inactivity warning
   }
+
+  // ── Task Notifications ─────────────────────────────────────────────────────
+
+  Future<void> scheduleTaskReminder({
+    required String taskId,
+    required String title,
+    required String description,
+    required DateTime deadline,
+    required int priority,
+  }) async {
+    final notificationId = taskId.hashCode.abs() % 100000 + 10000;
+    
+    // Schedule 1 hour before deadline
+    final reminderTime = deadline.subtract(const Duration(hours: 1));
+    
+    // Don't schedule if reminder time is in the past
+    if (reminderTime.isBefore(DateTime.now())) {
+      debugPrint('[Task] Skipping past reminder for: $title');
+      return;
+    }
+
+    final priorityEmoji = _getPriorityEmoji(priority);
+    final timeLeft = _formatTimeUntilDeadline(deadline);
+
+    await _plugin.zonedSchedule(
+      notificationId,
+      '$priorityEmoji Task Reminder',
+      '$title - Due in 1 hour ($timeLeft)',
+      _toTZDateTime(reminderTime),
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          'task_reminders',
+          'Task Reminders',
+          channelDescription: 'Reminders for upcoming tasks',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          color: _getTaskPriorityColor(priority),
+        ),
+        iOS: const DarwinNotificationDetails(),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+    );
+    
+    debugPrint('[Task] Reminder scheduled for: $title at ${reminderTime.toString()}');
+  }
+
+  Future<void> cancelTaskReminder(String taskId) async {
+    final notificationId = taskId.hashCode.abs() % 100000 + 10000;
+    await _plugin.cancel(notificationId);
+    debugPrint('[Task] Reminder cancelled for task: $taskId');
+  }
+
+  String _getPriorityEmoji(int priority) {
+    switch (priority) {
+      case 2: // High
+        return '🔴';
+      case 1: // Medium
+        return '🟡';
+      case 0: // Low
+        return '🟢';
+      default:
+        return '📋';
+    }
+  }
+
+  Color _getTaskPriorityColor(int priority) {
+    switch (priority) {
+      case 2: // High
+        return const Color(0xFFFF7043);
+      case 1: // Medium
+        return const Color(0xFFFF9800);
+      case 0: // Low
+        return const Color(0xFF4CAF50);
+      default:
+        return const Color(0xFF2196F3);
+    }
+  }
+
+  String _formatTimeUntilDeadline(DateTime deadline) {
+    final now = DateTime.now();
+    final diff = deadline.difference(now);
+    
+    if (diff.inDays > 0) {
+      return '${diff.inDays}d ${diff.inHours % 24}h';
+    }
+    if (diff.inHours > 0) {
+      return '${diff.inHours}h ${diff.inMinutes % 60}m';
+    }
+    return '${diff.inMinutes}m';
+  }
+
+  tz.TZDateTime _toTZDateTime(DateTime dateTime) {
+    return tz.TZDateTime.from(dateTime, tz.local);
+  }
 }

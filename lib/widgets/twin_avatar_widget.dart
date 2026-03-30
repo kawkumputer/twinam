@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 enum TwinState { happy, neutral, sad }
 
@@ -22,14 +23,15 @@ class TwinAvatarWidget extends StatefulWidget {
     return TwinState.sad;
   }
 
-  static String messageForState(TwinState state) {
+  static String messageForState(TwinState state, [String locale = 'en']) {
+    final l10n = AppLocalizations(locale);
     switch (state) {
       case TwinState.happy:
-        return "I'm proud of you! 🌟";
+        return l10n.translate('twinHappyMessage');
       case TwinState.neutral:
-        return "Keep going, you've got this 💪";
+        return l10n.translate('twinNeutralMessage');
       case TwinState.sad:
-        return "You can do better. Come on! 🔥";
+        return l10n.translate('twinSadMessage');
     }
   }
 

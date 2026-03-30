@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../providers/achievement_provider.dart';
 import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
+import '../providers/task_provider.dart';
 import '../widgets/counter_card.dart';
 import '../widgets/twin_avatar_widget.dart';
 import '../services/twin_notification_service.dart';
@@ -20,15 +21,6 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _welcomeChecked = false;
   bool _notificationPermissionChecked = false;
-
-  String _getGreeting(AppLocalizations l10n, String userName) {
-    final name = userName.isNotEmpty ? ', $userName' : '';
-    final hour = DateTime.now().hour;
-    if (hour >= 5 && hour < 12) return '${l10n.translate('greetingMorning').replaceAll(' !', '').replaceAll('!', '')}$name!';
-    if (hour >= 12 && hour < 18) return '${l10n.translate('greetingAfternoon').replaceAll(' !', '').replaceAll('!', '')}$name!';
-    if (hour >= 18 && hour < 23) return '${l10n.translate('greetingEvening').replaceAll(' !', '').replaceAll('!', '')}$name!';
-    return '${l10n.translate('greetingNight').replaceAll(' ?', '').replaceAll('?', '')}$name?';
-  }
 
   double _getDailyScore(List counters) {
     if (counters.isEmpty) return 0;
@@ -104,24 +96,62 @@ class _DashboardScreenState extends State<DashboardScreen> {
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               sliver: SliverToBoxAdapter(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _getGreeting(l10n, settings.userName),
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.3,
-                                ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                    // User name with Twin reference
+                    Row(
+                      children: [
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.5,
+                                  ),
+                              children: [
+                                if (settings.userName.isNotEmpty) ...[
+                                  TextSpan(
+                                    text: l10n.translate('myTwin'),
+                                    style: const TextStyle(
+                                      color: Color(0xFF2196F3),
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' ${settings.userName}',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' 🤝',
+                                    style: const TextStyle(fontSize: 20),
+                                  ),
+                                ] else ...[
+                                  TextSpan(
+                                    text: l10n.translate('twinAndYou'),
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  TextSpan(
+                                    text: ' 🤝',
+                                    style: const TextStyle(fontSize: 20),
+                                  ),
+                                ],
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 4),
-                          Row(
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // Level and XP bar
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Row(
                             children: [
                               Text(
                                 '${achievementProvider.levelEmoji} ${l10n.translate('level')} ${achievementProvider.level}',
@@ -152,39 +182,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pushNamed('/achievements');
-                          },
-                          icon: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFB74D).withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: const Text('🏆', style: TextStyle(fontSize: 20)),
-                          ),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pushNamed('/settings');
-                          },
-                          icon: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(14),
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                Navigator.of(context).pushNamed('/tasks');
+                              },
+                              icon: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF9800).withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: const Icon(
+                                  Icons.task_alt_rounded,
+                                  color: Color(0xFFFF9800),
+                                  size: 20,
+                                ),
+                              ),
                             ),
-                            child: Icon(
-                              Icons.settings_rounded,
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.of(context).pushNamed('/achievements');
+                              },
+                              icon: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFB74D).withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: const Text('🏆', style: TextStyle(fontSize: 20)),
+                              ),
                             ),
-                          ),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.of(context).pushNamed('/settings');
+                              },
+                              icon: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Icon(
+                                  Icons.settings_rounded,
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -199,9 +246,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: _TwinCard(
                   score: _getDailyScore(counters),
                   counters: counters,
+                  locale: settings.locale,
                   onTap: () => Navigator.of(context).pushNamed('/verdict'),
                 ),
               ),
+            ),
+
+            // Tasks section
+            Consumer<TaskProvider>(
+              builder: (context, taskProvider, _) {
+                final urgentTasks = [
+                  ...taskProvider.overdueTasks,
+                  ...taskProvider.todayTasks,
+                ].take(3).toList();
+
+                if (urgentTasks.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+
+                return SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                  sliver: SliverToBoxAdapter(
+                    child: _TasksQuickView(tasks: urgentTasks, taskProvider: taskProvider),
+                  ),
+                );
+              },
             ),
 
             // Motivation banner
@@ -674,15 +741,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
 class _TwinCard extends StatelessWidget {
   final double score;
   final List counters;
+  final String locale;
   final VoidCallback? onTap;
 
-  const _TwinCard({required this.score, required this.counters, this.onTap});
+  const _TwinCard({required this.score, required this.counters, required this.locale, this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations(locale);
     final state = TwinAvatarWidget.fromScore(score);
     final color = TwinAvatarWidget.colorForState(state);
-    final message = TwinAvatarWidget.messageForState(state);
+    final message = TwinAvatarWidget.messageForState(state, locale);
     final total = counters.length;
     final withGoal = counters.where((c) => c.goal != null).toList();
     final reached = withGoal.where((c) => c.goalReached).length;
@@ -725,7 +794,7 @@ class _TwinCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     if (withGoal.isNotEmpty) ...[
                       Text(
-                        '$reached / ${withGoal.length} goals reached',
+                        '$reached / ${withGoal.length} ${l10n.translate('goalsReachedPlural')}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                             ),
@@ -766,6 +835,119 @@ class _TwinCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _TasksQuickView extends StatelessWidget {
+  final List tasks;
+  final TaskProvider taskProvider;
+
+  const _TasksQuickView({required this.tasks, required this.taskProvider});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: const Color(0xFFFF9800).withValues(alpha: 0.2),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.task_alt_rounded, color: Color(0xFFFF9800), size: 20),
+              const SizedBox(width: 8),
+              Text(
+                'Urgent Tasks',
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFFFF9800),
+                    ),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () => Navigator.of(context).pushNamed('/tasks'),
+                child: const Text('View All', style: TextStyle(fontSize: 12)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...tasks.map((task) => _TaskQuickItem(task: task, taskProvider: taskProvider)),
+        ],
+      ),
+    );
+  }
+}
+
+class _TaskQuickItem extends StatelessWidget {
+  final dynamic task;
+  final TaskProvider taskProvider;
+
+  const _TaskQuickItem({required this.task, required this.taskProvider});
+
+  @override
+  Widget build(BuildContext context) {
+    final isOverdue = task.isOverdue;
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isOverdue
+            ? const Color(0xFFFF7043).withValues(alpha: 0.08)
+            : const Color(0xFF2196F3).withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isOverdue ? Icons.warning_rounded : Icons.schedule_rounded,
+            size: 16,
+            color: isOverdue ? const Color(0xFFFF7043) : const Color(0xFF2196F3),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  task.title,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (task.description.isNotEmpty)
+                  Text(
+                    task.description,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              ],
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check_circle_rounded, size: 20),
+            color: const Color(0xFF4CAF50),
+            onPressed: () {
+              HapticFeedback.mediumImpact();
+              taskProvider.markTaskAsDone(task.id);
+            },
+            tooltip: 'Mark as done',
+          ),
+        ],
       ),
     );
   }

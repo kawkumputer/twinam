@@ -11,6 +11,9 @@ import 'screens/settings_screen.dart';
 import 'screens/achievements_screen.dart';
 import 'screens/daily_verdict_screen.dart';
 import 'screens/stats_screen.dart';
+import 'screens/tasks_screen.dart';
+import 'screens/create_task_screen.dart';
+import 'providers/task_provider.dart';
 import 'services/storage_service.dart';
 import 'services/twin_notification_service.dart';
 import 'theme/app_theme.dart';
@@ -32,6 +35,9 @@ class TwinAmApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => AchievementProvider(storageService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TaskProvider(storageService),
         ),
       ],
       child: Consumer<SettingsProvider>(
@@ -72,6 +78,13 @@ class TwinAmApp extends StatelessWidget {
                   return _buildRoute(const AchievementsScreen());
                 case '/verdict':
                   return _buildRoute(const DailyVerdictScreen());
+                case '/tasks':
+                  return _buildRoute(const TasksScreen());
+                case '/create-task':
+                  return _buildRoute(const CreateTaskScreen());
+                case '/edit-task':
+                  final taskId = routeSettings.arguments as String;
+                  return _buildRoute(CreateTaskScreen(editTaskId: taskId));
                 default:
                   return _buildRoute(const DashboardScreen());
               }
