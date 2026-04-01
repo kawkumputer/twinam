@@ -1,8 +1,10 @@
 package com.twinam.twinam
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.content.Intent
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetPlugin
 
@@ -14,12 +16,22 @@ class TwinAmWidgetProvider : AppWidgetProvider() {
     ) {
         appWidgetIds.forEach { widgetId ->
             val views = RemoteViews(context.packageName, R.layout.widget_counter).apply {
+                // Set click action to open app
+                val intent = Intent(context, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                val pendingIntent = PendingIntent.getActivity(
+                    context, 
+                    0, 
+                    intent, 
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                setOnClickPendingIntent(R.id.widget_container, pendingIntent)
                 // Get data from HomeWidget
                 val widgetData = HomeWidgetPlugin.getData(context)
                 
                 // Update level
                 val level = widgetData.getInt("level", 1)
-                val levelTitle = widgetData.getString("levelTitle") ?: "Newbie"
+                val levelTitle = widgetData.getString("levelTitle", "Newbie")
                 setTextViewText(R.id.widget_level, "Lvl $level")
                 
                 // Update progress
@@ -35,7 +47,7 @@ class TwinAmWidgetProvider : AppWidgetProvider() {
                 
                 // Update top counters
                 for (i in 0..2) {
-                    val counterName = widgetData.getString("counter${i}_name")
+                    val counterName = widgetData.getString("counter${i}_name", null)
                     val counterValue = widgetData.getInt("counter${i}_value", 0)
                     
                     if (counterName != null) {
