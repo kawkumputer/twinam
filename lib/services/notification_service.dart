@@ -67,33 +67,40 @@ class NotificationService {
     required int hour,
     required int minute,
   }) async {
-    await _plugin.zonedSchedule(
-      id,
-      title,
-      body,
-      _nextInstanceOfTime(hour, minute),
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'daily_reminders',
-          'Daily Reminders',
-          channelDescription: 'Daily counter reminders',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
+    try {
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        _nextInstanceOfTime(hour, minute),
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'daily_reminders',
+            'Daily Reminders',
+            channelDescription: 'Daily counter reminders',
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+          ),
+          iOS: const DarwinNotificationDetails(),
         ),
-        iOS: const DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
-    debugPrint('[Notif] Scheduled daily reminder id=$id at $hour:$minute');
-    debugPrint('[Notif] Next fire: ${_nextInstanceOfTime(hour, minute)}');
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      debugPrint('[Notif] Scheduled daily reminder id=$id at $hour:$minute');
+    } catch (e) {
+      debugPrint('[Notif] Failed to schedule daily reminder $id: $e');
+    }
   }
 
   Future<void> cancelReminder(int id) async {
-    await _plugin.cancel(id);
+    try {
+      await _plugin.cancel(id);
+    } catch (e) {
+      debugPrint('[Notif] Failed to cancel reminder $id: $e');
+    }
   }
 
   Future<void> cancelAllReminders() async {
@@ -126,34 +133,38 @@ class NotificationService {
     required double dailyScore,
     required Function(String) translate,
   }) async {
-    final id = 9991; // Fixed ID for evening check
-    await cancelReminder(id); // Cancel previous if exists
+    try {
+      final id = 9991; // Fixed ID for evening check
+      await cancelReminder(id); // Cancel previous if exists
 
-    final (title, body) = _getEveningMessage(dailyScore, translate);
+      final (title, body) = _getEveningMessage(dailyScore, translate);
 
-    await _plugin.zonedSchedule(
-      id,
-      title,
-      body,
-      _nextInstanceOfTime(21, 0), // 9 PM
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'twin_evening',
-          'Twin Evening Check',
-          channelDescription: 'Daily evening Twin status check',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-          color: _getTwinColor(dailyScore),
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        _nextInstanceOfTime(21, 0), // 9 PM
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'twin_evening',
+            'Twin Evening Check',
+            channelDescription: 'Daily evening Twin status check',
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+            color: _getTwinColor(dailyScore),
+          ),
+          iOS: const DarwinNotificationDetails(),
         ),
-        iOS: const DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
-    debugPrint('[Twin] Evening check scheduled (score: ${(dailyScore * 100).toInt()}%)');
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      debugPrint('[Twin] Evening check scheduled (score: ${(dailyScore * 100).toInt()}%)');
+    } catch (e) {
+      debugPrint('[Twin] Failed to schedule evening check: $e');
+    }
   }
 
   Future<void> scheduleTwinMorningMotivation({
@@ -161,34 +172,38 @@ class NotificationService {
     required int totalHabits,
     required Function(String) translate,
   }) async {
-    final id = 9992; // Fixed ID for morning motivation
-    await cancelReminder(id);
+    try {
+      final id = 9992; // Fixed ID for morning motivation
+      await cancelReminder(id);
 
-    final (title, body) = _getMorningMessage(bestStreak, totalHabits, translate);
+      final (title, body) = _getMorningMessage(bestStreak, totalHabits, translate);
 
-    await _plugin.zonedSchedule(
-      id,
-      title,
-      body,
-      _nextInstanceOfTime(8, 0), // 8 AM
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'twin_morning',
-          'Twin Morning Motivation',
-          channelDescription: 'Daily morning Twin motivation',
-          importance: Importance.defaultImportance,
-          priority: Priority.defaultPriority,
-          icon: '@mipmap/ic_launcher',
-          color: const Color(0xFF2196F3),
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        _nextInstanceOfTime(8, 0), // 8 AM
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'twin_morning',
+            'Twin Morning Motivation',
+            channelDescription: 'Daily morning Twin motivation',
+            importance: Importance.defaultImportance,
+            priority: Priority.defaultPriority,
+            icon: '@mipmap/ic_launcher',
+            color: const Color(0xFF2196F3),
+          ),
+          iOS: const DarwinNotificationDetails(),
         ),
-        iOS: const DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
-    debugPrint('[Twin] Morning motivation scheduled (streak: $bestStreak)');
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      debugPrint('[Twin] Morning motivation scheduled (streak: $bestStreak)');
+    } catch (e) {
+      debugPrint('[Twin] Failed to schedule morning motivation: $e');
+    }
   }
 
   Future<void> scheduleTwinInactivityWarning({
@@ -197,34 +212,38 @@ class NotificationService {
   }) async {
     if (daysInactive < 3) return;
 
-    final id = 9993; // Fixed ID for inactivity warning
-    await cancelReminder(id);
+    try {
+      final id = 9993; // Fixed ID for inactivity warning
+      await cancelReminder(id);
 
-    final (title, body) = _getInactivityMessage(daysInactive, translate);
+      final (title, body) = _getInactivityMessage(daysInactive, translate);
 
-    await _plugin.zonedSchedule(
-      id,
-      title,
-      body,
-      _nextInstanceOfTime(19, 0), // 7 PM
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'twin_inactivity',
-          'Twin Inactivity Warning',
-          channelDescription: 'Inactivity warnings from Twin',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-          color: const Color(0xFFFF7043),
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        _nextInstanceOfTime(19, 0), // 7 PM
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'twin_inactivity',
+            'Twin Inactivity Warning',
+            channelDescription: 'Inactivity warnings from Twin',
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+            color: const Color(0xFFFF7043),
+          ),
+          iOS: const DarwinNotificationDetails(),
         ),
-        iOS: const DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
-    debugPrint('[Twin] Inactivity warning scheduled (days: $daysInactive)');
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      debugPrint('[Twin] Inactivity warning scheduled (days: $daysInactive)');
+    } catch (e) {
+      debugPrint('[Twin] Failed to schedule inactivity warning: $e');
+    }
   }
 
   (String, String) _getEveningMessage(double score, Function(String) translate) {

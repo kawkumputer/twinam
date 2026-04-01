@@ -43,6 +43,14 @@ class AdMobService {
 
   Future<void> initialize() async {
     await MobileAds.instance.initialize();
+    
+    // Configure for halal-compliant ads (family-friendly, no sensitive content)
+    final requestConfiguration = RequestConfiguration(
+      tagForChildDirectedTreatment: TagForChildDirectedTreatment.yes,
+      maxAdContentRating: MaxAdContentRating.g, // General audiences only
+    );
+    MobileAds.instance.updateRequestConfiguration(requestConfiguration);
+    
     _loadInterstitialAd();
     _loadRewardedAd();
   }
