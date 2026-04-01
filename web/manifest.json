@@ -3,12 +3,17 @@
     "short_name": "Twin'Am",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "Twin'Am - Your daily digital companion",
+    "background_color": "#2196F3",
+    "theme_color": "#2196F3",
+    "description": "Twin'Am - Ton compagnon digital pour de meilleures habitudes",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
+        {
+            "src": "favicon.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
         {
             "src": "icons/Icon-192.png",
             "sizes": "192x192",
