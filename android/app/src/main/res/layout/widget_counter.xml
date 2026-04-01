@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/widget_background">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Twin'Am"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/widget_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lvl 1"
+            android:textSize="14sp"
+            android:textColor="#FFB74D"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@drawable/level_badge" />
+    </LinearLayout>
+
+    <!-- Progress Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="12dp">
+
+        <TextView
+            android:id="@+id/widget_progress_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Today's Progress"
+            android:textSize="12sp"
+            android:textColor="#B0BEC5"
+            android:paddingBottom="4dp" />
+
+        <ProgressBar
+            android:id="@+id/widget_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:max="100"
+            android:progress="0"
+            android:progressTint="#4CAF50"
+            android:progressBackgroundTint="#37474F" />
+
+        <TextView
+            android:id="@+id/widget_progress_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0%"
+            android:textSize="12sp"
+            android:textColor="#4CAF50"
+            android:paddingTop="4dp" />
+    </LinearLayout>
+
+    <!-- Stats -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/widget_counters_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#2196F3" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Counters"
+                android:textSize="10sp"
+                android:textColor="#B0BEC5" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/widget_goals_reached"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#4CAF50" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Goals"
+                android:textSize="10sp"
+                android:textColor="#B0BEC5" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Top Counters -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Top Counters"
+        android:textSize="12sp"
+        android:textColor="#B0BEC5"
+        android:paddingBottom="8dp" />
+
+    <LinearLayout
+        android:id="@+id/widget_counter_0"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/widget_counter_0_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Counter"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/widget_counter_0_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#2196F3" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_counter_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/widget_counter_1_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Counter"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/widget_counter_1_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#2196F3" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_counter_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/widget_counter_2_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Counter"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/widget_counter_2_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#2196F3" />
+    </LinearLayout>
+
+</LinearLayout>

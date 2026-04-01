@@ -22,6 +22,11 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Setup iOS Widget Extension
+        run: |
+          chmod +x scripts/setup_ios_widget.sh
+          ./scripts/setup_ios_widget.sh
+
       - name: Install Apple certificate and provisioning profile
         env:
           P12_BASE64: ${{ secrets.P12_BASE64 }}

@@ -106,6 +106,21 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
 
+          const SizedBox(height: 12),
+
+          // Widget Settings
+          GestureDetector(
+            onTap: () => Navigator.of(context).pushNamed('/widget-settings'),
+            child: _buildSettingsTile(
+              context,
+              icon: Icons.widgets_rounded,
+              iconColor: const Color(0xFF9C27B0),
+              title: l10n.translate('widgetSettings'),
+              subtitle: l10n.translate('widgetSettingsDesc'),
+              trailing: const Icon(Icons.chevron_right_rounded, size: 24),
+            ),
+          ),
+
           const SizedBox(height: 32),
 
           // About

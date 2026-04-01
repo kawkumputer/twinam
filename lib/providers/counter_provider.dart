@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/counter.dart';
 import '../services/storage_service.dart';
 import '../services/audio_service.dart';
+import '../services/widget_service.dart';
 
 class CounterProvider extends ChangeNotifier {
   final StorageService _storage;
@@ -62,6 +63,7 @@ class CounterProvider extends ChangeNotifier {
     }
     
     await _storage.saveCounter(counter);
+    _updateWidgets();
     notifyListeners();
   }
 
@@ -69,6 +71,7 @@ class CounterProvider extends ChangeNotifier {
     final counter = _counters.firstWhere((c) => c.id == id);
     counter.decrement();
     await _storage.saveCounter(counter);
+    _updateWidgets();
     notifyListeners();
   }
 
@@ -76,7 +79,35 @@ class CounterProvider extends ChangeNotifier {
     final counter = _counters.firstWhere((c) => c.id == id);
     counter.resetValue();
     await _storage.saveCounter(counter);
+    _updateWidgets();
     notifyListeners();
+  }
+
+  void _updateWidgets() {
+    // Calculate score for widget
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    double score = 0.0;
+    int totalWithGoals = 0;
+    
+    for (final counter in _counters) {
+      if (counter.goal != null) {
+        totalWithGoals++;
+        if (counter.goalReached) score += 1.0;
+      }
+    }
+    
+    if (totalWithGoals > 0) {
+      score = score / totalWithGoals;
+    }
+    
+    // Update widget with current data
+    WidgetService().updateCounterWidget(
+      counters: _counters,
+      score: score,
+      level: 1, // Will be updated with actual level from AchievementProvider
+      levelTitle: 'Newbie',
+    );
   }
 
   Future<void> reorderCounters(int oldIndex, int newIndex) async {

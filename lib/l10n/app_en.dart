@@ -2,6 +2,18 @@ const Map<String, String> en = {
   'appName': "Twin'Am",
   'dashboard': 'Dashboard',
   'settings': 'Settings',
+  
+  // Widgets
+  'widgetSettings': 'Widget Settings',
+  'homeScreenWidgets': 'Home Screen Widgets',
+  'widgetSettingsDesc': 'Configure and update your Twin\'Am widgets',
+  'counterWidget': 'Counter Widget',
+  'counterWidgetDesc': 'Display your counters and progress',
+  'howToAddWidget': 'How to add a widget',
+  'widgetStep1': 'Long press on your home screen',
+  'widgetStep2': 'Select "Widgets" and find Twin\'Am',
+  'widgetStep3': 'Drag the widget to your home screen',
+  
   'newCounter': 'New Counter',
   'editCounter': 'Edit Counter',
   'counterName': 'Counter name',

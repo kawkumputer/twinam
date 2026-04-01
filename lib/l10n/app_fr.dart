@@ -2,6 +2,18 @@ const Map<String, String> fr = {
   'appName': "Twin'Am",
   'dashboard': 'Tableau de bord',
   'settings': 'Paramètres',
+  
+  // Widgets
+  'widgetSettings': 'Paramètres des Widgets',
+  'homeScreenWidgets': 'Widgets d\'écran d\'accueil',
+  'widgetSettingsDesc': 'Configurez et mettez à jour vos widgets Twin\'Am',
+  'counterWidget': 'Widget Compteurs',
+  'counterWidgetDesc': 'Affichez vos compteurs et votre progression',
+  'howToAddWidget': 'Comment ajouter un widget',
+  'widgetStep1': 'Appuyez longuement sur votre écran d\'accueil',
+  'widgetStep2': 'Sélectionnez "Widgets" puis trouvez Twin\'Am',
+  'widgetStep3': 'Faites glisser le widget sur votre écran d\'accueil',
+  
   'newCounter': 'Nouveau compteur',
   'editCounter': 'Modifier le compteur',
   'counterName': 'Nom du compteur',

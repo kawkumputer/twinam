@@ -8,6 +8,7 @@ import 'screens/counter_screen.dart';
 import 'screens/create_counter_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/widget_settings_screen.dart';
 import 'screens/achievements_screen.dart';
 import 'screens/daily_verdict_screen.dart';
 import 'screens/stats_screen.dart';
@@ -74,6 +75,8 @@ class TwinAmApp extends StatelessWidget {
                   return _buildRoute(StatsScreen(counterId: counterId));
                 case '/settings':
                   return _buildRoute(const SettingsScreen());
+                case '/widget-settings':
+                  return _buildRoute(const WidgetSettingsScreen());
                 case '/achievements':
                   return _buildRoute(const AchievementsScreen());
                 case '/verdict':
