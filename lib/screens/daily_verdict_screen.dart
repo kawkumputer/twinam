@@ -383,6 +383,8 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
                   ),
                 ),
               ),
+              
+              const SizedBox(height: 35),
             ],
           ),
         ),

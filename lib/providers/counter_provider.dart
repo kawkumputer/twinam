@@ -61,13 +61,12 @@ class CounterProvider extends ChangeNotifier {
     // Play celebration sound if goal just reached
     if (!wasGoalReached && counter.goalReached) {
       AudioService().playCelebration();
+      // Show interstitial ad when goal is reached
+      AdMobService().showInterstitialAdOnGoalReached();
     }
     
     await _storage.saveCounter(counter);
     _updateWidgets();
-    
-    // Show interstitial ad every 10 increments
-    AdMobService().showInterstitialAdIfReady();
     
     notifyListeners();
   }

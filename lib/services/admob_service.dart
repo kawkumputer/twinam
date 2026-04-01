@@ -9,9 +9,6 @@ class AdMobService {
   BannerAd? _bannerAd;
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
-  
-  int _counterIncrementsSinceLastAd = 0;
-  static const int _interstitialFrequency = 10;
 
   // Test Ad Unit IDs - Replace with real IDs in production
   static String get bannerAdUnitId {
@@ -99,27 +96,36 @@ class AdMobService {
   }
 
   void showInterstitialAdIfReady() {
-    _counterIncrementsSinceLastAd++;
-    
-    if (_counterIncrementsSinceLastAd >= _interstitialFrequency) {
-      if (_interstitialAd != null) {
-        _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-          onAdDismissedFullScreenContent: (ad) {
-            ad.dispose();
-            _loadInterstitialAd();
-            _counterIncrementsSinceLastAd = 0;
-          },
-          onAdFailedToShowFullScreenContent: (ad, error) {
-            print('[AdMob] Interstitial ad failed to show: $error');
-            ad.dispose();
-            _loadInterstitialAd();
-          },
-        );
-        _interstitialAd!.show();
-      } else {
-        print('[AdMob] Interstitial ad not ready yet');
-        _loadInterstitialAd();
-      }
+    // Removed - ads will now show only on goal reached or screen exit
+  }
+
+  void showInterstitialAdOnGoalReached() {
+    _showInterstitialAd('goal reached');
+  }
+
+  void showInterstitialAdOnScreenExit() {
+    _showInterstitialAd('screen exit');
+  }
+
+  void _showInterstitialAd(String trigger) {
+    if (_interstitialAd != null) {
+      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+        onAdDismissedFullScreenContent: (ad) {
+          ad.dispose();
+          _loadInterstitialAd();
+          print('[AdMob] Interstitial ad dismissed after $trigger');
+        },
+        onAdFailedToShowFullScreenContent: (ad, error) {
+          print('[AdMob] Interstitial ad failed to show: $error');
+          ad.dispose();
+          _loadInterstitialAd();
+        },
+      );
+      _interstitialAd!.show();
+      print('[AdMob] Interstitial ad shown on $trigger');
+    } else {
+      print('[AdMob] Interstitial ad not ready for $trigger');
+      _loadInterstitialAd();
     }
   }
 

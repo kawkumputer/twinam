@@ -175,6 +175,9 @@ class SettingsScreen extends StatelessWidget {
             title: l10n.translate('about'),
             subtitle: '${l10n.translate('version')} 1.0.0',
           ),
+          
+          // Add bottom padding to ensure About button is fully visible
+          const SizedBox(height: 35),
         ],
       ),
     );

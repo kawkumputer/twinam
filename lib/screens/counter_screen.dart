@@ -8,6 +8,7 @@ import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
 import '../models/counter.dart';
 import '../widgets/animated_counter.dart';
+import '../services/admob_service.dart';
 import 'package:share_plus/share_plus.dart';
 
 class CounterScreen extends StatefulWidget {
@@ -48,6 +49,9 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
 
   @override
   void dispose() {
+    // Show interstitial ad when exiting counter screen
+    AdMobService().showInterstitialAdOnScreenExit();
+    
     _pulseController.dispose();
     _confettiController.dispose();
     super.dispose();
