@@ -69,23 +69,39 @@ fi
 
 echo "✅ iOS Widget files setup complete!"
 echo ""
-echo "🔧 Adding Widget Extension to Xcode project..."
+echo "⚠️  iOS Widget Extension is currently DISABLED"
+echo ""
+echo "📋 Reason:"
+echo "   Widget Extension requires additional provisioning profile configuration"
+echo "   in Apple Developer Portal with App Groups capability."
+echo ""
+echo "📝 To enable iOS widgets:"
+echo "   1. Create App ID: com.twinam.twinam.TwinAmWidget in Apple Developer Portal"
+echo "   2. Enable App Groups capability for the widget App ID"
+echo "   3. Create Distribution Provisioning Profile for the widget"
+echo "   4. Add WIDGET_PROVISION_PROFILE_BASE64 secret to GitHub"
+echo "   5. Uncomment the widget setup code in this script"
+echo ""
+echo "✅ Android widgets are fully functional"
 
-# Run Python script to modify project.pbxproj
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-python3 "$SCRIPT_DIR/add_widget_to_xcode.py"
+# iOS Widget Extension setup is DISABLED for now
+# Uncomment below when provisioning profiles are configured
 
-if [ $? -eq 0 ]; then
-    echo ""
-    echo "✅ Widget Extension successfully added to Xcode project!"
-    echo ""
-    echo "📋 Next steps:"
-    echo "1. The widget code is ready in $WIDGET_DIR"
-    echo "2. App Groups are configured for data sharing"
-    echo "3. Widget Extension target is configured in Xcode"
-    echo "4. Build the iOS app to test the widget"
-else
-    echo ""
-    echo "⚠️  Warning: Could not automatically add Widget Extension to Xcode project"
-    echo "   This may need to be done manually in Xcode"
-fi
+# echo "🔧 Adding Widget Extension to Xcode project..."
+# SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# python3 "$SCRIPT_DIR/add_widget_to_xcode.py"
+# 
+# if [ $? -eq 0 ]; then
+#     echo ""
+#     echo "✅ Widget Extension successfully added to Xcode project!"
+#     echo ""
+#     echo "📋 Next steps:"
+#     echo "1. The widget code is ready in $WIDGET_DIR"
+#     echo "2. App Groups are configured for data sharing"
+#     echo "3. Widget Extension target is configured in Xcode"
+#     echo "4. Build the iOS app to test the widget"
+# else
+#     echo ""
+#     echo "⚠️  Warning: Could not automatically add Widget Extension to Xcode project"
+#     echo "   This may need to be done manually in Xcode"
+# fi
