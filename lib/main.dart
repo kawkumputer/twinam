@@ -12,6 +12,9 @@ void main() async {
 
   final storageService = StorageService();
   await storageService.init();
+  
+  // Force dark mode by default for all users
+  storageService.ensureDarkMode();
 
   final notificationService = NotificationService();
   await notificationService.init();

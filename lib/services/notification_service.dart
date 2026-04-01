@@ -311,11 +311,12 @@ class NotificationService {
     required String description,
     required DateTime deadline,
     required int priority,
+    int reminderMinutesBefore = 60,
   }) async {
     final notificationId = taskId.hashCode.abs() % 100000 + 10000;
     
-    // Schedule 1 hour before deadline
-    final reminderTime = deadline.subtract(const Duration(hours: 1));
+    // Schedule notification based on custom reminder time
+    final reminderTime = deadline.subtract(Duration(minutes: reminderMinutesBefore));
     
     // Don't schedule if reminder time is in the past
     if (reminderTime.isBefore(DateTime.now())) {
@@ -325,11 +326,12 @@ class NotificationService {
 
     final priorityEmoji = _getPriorityEmoji(priority);
     final timeLeft = _formatTimeUntilDeadline(deadline);
+    final reminderText = _formatReminderTime(reminderMinutesBefore);
 
     await _plugin.zonedSchedule(
       notificationId,
       '$priorityEmoji Task Reminder',
-      '$title - Due in 1 hour ($timeLeft)',
+      '$title - Due in $reminderText ($timeLeft)',
       _toTZDateTime(reminderTime),
       NotificationDetails(
         android: AndroidNotificationDetails(
@@ -394,6 +396,18 @@ class NotificationService {
       return '${diff.inHours}h ${diff.inMinutes % 60}m';
     }
     return '${diff.inMinutes}m';
+  }
+
+  String _formatReminderTime(int minutes) {
+    if (minutes >= 1440) {
+      final days = minutes ~/ 1440;
+      return '$days day${days > 1 ? 's' : ''}';
+    }
+    if (minutes >= 60) {
+      final hours = minutes ~/ 60;
+      return '$hours hour${hours > 1 ? 's' : ''}';
+    }
+    return '$minutes minute${minutes > 1 ? 's' : ''}';
   }
 
   tz.TZDateTime _toTZDateTime(DateTime dateTime) {

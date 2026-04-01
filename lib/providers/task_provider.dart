@@ -201,6 +201,7 @@ class TaskProvider with ChangeNotifier {
         description: task.description,
         deadline: task.deadline,
         priority: task.priority.index,
+        reminderMinutesBefore: task.reminderMinutesBefore,
       );
     } catch (e) {
       debugPrint('[TaskProvider] Error scheduling notification: $e');

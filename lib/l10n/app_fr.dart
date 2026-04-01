@@ -179,7 +179,8 @@ const Map<String, String> fr = {
   'clearCompletedMessage': 'Cette action est irréversible.',
   'taskCreated': 'Tâche créée',
   'taskUpdated': 'Tâche mise à jour',
-  'taskDeleted': 'Tâche supprimée !',
+  'taskDeleted': 'Tâche supprimée',
+  'taskReminderTime': 'Délai de rappel',
   'deleteTask': 'Supprimer la tâche ?',
   'deleteTaskMessage': 'Cette action ne peut pas être annulée.',
   'markAsDone': 'Marquer comme terminé',
@@ -227,6 +228,10 @@ const Map<String, String> fr = {
   'actions': 'actions',
   'day': 'jour',
   'daysLowercase': 'jours',
+  'hour': 'heure',
+  'hours': 'heures',
+  'minutes': 'minutes',
+  'reminderBefore': 'Rappel avant l\'échéance',
 
   // Date & Time
   'todayAt': 'Aujourd\'hui',

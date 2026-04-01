@@ -49,8 +49,15 @@ class StorageService {
   }
 
   // Settings
-  bool get isDarkMode => _settings.get('isDarkMode', defaultValue: false) as bool;
+  bool get isDarkMode => _settings.get('isDarkMode', defaultValue: true) as bool;
   set isDarkMode(bool value) => _settings.put('isDarkMode', value);
+
+  // Force dark mode by default for all users
+  void ensureDarkMode() {
+    if (!isDarkMode) {
+      isDarkMode = true;
+    }
+  }
 
   String get locale => _settings.get('locale', defaultValue: 'en') as String;
   set locale(String value) => _settings.put('locale', value);

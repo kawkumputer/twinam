@@ -180,6 +180,7 @@ const Map<String, String> en = {
   'taskCreated': 'Task created!',
   'taskUpdated': 'Task updated!',
   'taskDeleted': 'Task deleted!',
+  'taskReminderTime': 'Reminder time',
   'noTasksHere': 'No tasks here',
   'pleaseEnterTitle': 'Please enter a title',
   'clearCompleted': 'Clear completed',
@@ -221,6 +222,10 @@ const Map<String, String> en = {
   'actions': 'actions',
   'day': 'day',
   'daysLowercase': 'days',
+  'hour': 'hour',
+  'hours': 'hours',
+  'minutes': 'minutes',
+  'reminderBefore': 'Reminder before deadline',
 
   // Date & Time
   'todayAt': 'Today',

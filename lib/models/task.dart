@@ -22,6 +22,7 @@ class Task {
   final DateTime createdAt;
   final DateTime? completedAt;
   final String? linkedCounterId;
+  final int reminderMinutesBefore; // Minutes before deadline to send reminder
 
   Task({
     String? id,
@@ -33,6 +34,7 @@ class Task {
     DateTime? createdAt,
     this.completedAt,
     this.linkedCounterId,
+    this.reminderMinutesBefore = 60, // Default: 1 hour before
   })  : id = id ?? const Uuid().v4(),
         createdAt = createdAt ?? DateTime.now();
 
@@ -61,6 +63,7 @@ class Task {
     TaskPriority? priority,
     DateTime? completedAt,
     String? linkedCounterId,
+    int? reminderMinutesBefore,
   }) {
     return Task(
       id: id,
@@ -72,6 +75,7 @@ class Task {
       createdAt: createdAt,
       completedAt: completedAt ?? this.completedAt,
       linkedCounterId: linkedCounterId ?? this.linkedCounterId,
+      reminderMinutesBefore: reminderMinutesBefore ?? this.reminderMinutesBefore,
     );
   }
 
@@ -101,6 +105,7 @@ class Task {
       'createdAt': createdAt.toIso8601String(),
       'completedAt': completedAt?.toIso8601String(),
       'linkedCounterId': linkedCounterId,
+      'reminderMinutesBefore': reminderMinutesBefore,
     };
   }
 
@@ -117,6 +122,7 @@ class Task {
           ? DateTime.parse(json['completedAt'] as String)
           : null,
       linkedCounterId: json['linkedCounterId'] as String?,
+      reminderMinutesBefore: json['reminderMinutesBefore'] as int? ?? 60,
     );
   }
 

@@ -715,28 +715,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildEmptyState(BuildContext context, AppLocalizations l10n) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _PulsingIcon(color: Theme.of(context).colorScheme.primary),
-            const SizedBox(height: 32),
-            Text(
-              l10n.translate('noCounters'),
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              l10n.translate('noCountersMessage'),
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                  ),
-            ),
-          ],
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _PulsingIcon(color: Theme.of(context).colorScheme.primary),
+              const SizedBox(height: 32),
+              Text(
+                l10n.translate('noCounters'),
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                l10n.translate('noCountersMessage'),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -24,6 +24,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   DateTime _selectedDate = DateTime.now().add(const Duration(days: 1));
   TimeOfDay _selectedTime = const TimeOfDay(hour: 9, minute: 0);
   TaskPriority _selectedPriority = TaskPriority.medium;
+  int _reminderMinutesBefore = 60; // Default: 1 hour
   
   bool _isEditing = false;
   Task? _editingTask;
@@ -49,6 +50,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             minute: _editingTask!.deadline.minute,
           );
           _selectedPriority = _editingTask!.priority;
+          _reminderMinutesBefore = _editingTask!.reminderMinutesBefore;
           setState(() {});
         }
       });
@@ -249,6 +251,19 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               ),
             ),
 
+            const SizedBox(height: 24),
+
+            // Reminder time
+            Text(
+              l10n.translate('reminderBefore'),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+            ),
+            const SizedBox(height: 12),
+            _buildReminderSelector(l10n),
+
             const SizedBox(height: 32),
 
             // Save button
@@ -312,6 +327,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         description: _descriptionController.text.trim(),
         deadline: _deadline,
         priority: _selectedPriority,
+        reminderMinutesBefore: _reminderMinutesBefore,
       );
       await taskProvider.updateTask(updatedTask);
       if (mounted) {
@@ -327,6 +343,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         description: _descriptionController.text.trim(),
         deadline: _deadline,
         priority: _selectedPriority,
+        reminderMinutesBefore: _reminderMinutesBefore,
       );
       await taskProvider.addTask(newTask);
       if (mounted) {
@@ -370,6 +387,92 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         );
       }
     }
+  }
+
+  Widget _buildReminderSelector(AppLocalizations l10n) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        _ReminderChip(
+          label: '15 ${l10n.translate('minutes')}',
+          minutes: 15,
+          isSelected: _reminderMinutesBefore == 15,
+          onTap: () => setState(() => _reminderMinutesBefore = 15),
+        ),
+        _ReminderChip(
+          label: '30 ${l10n.translate('minutes')}',
+          minutes: 30,
+          isSelected: _reminderMinutesBefore == 30,
+          onTap: () => setState(() => _reminderMinutesBefore = 30),
+        ),
+        _ReminderChip(
+          label: '1 ${l10n.translate('hour')}',
+          minutes: 60,
+          isSelected: _reminderMinutesBefore == 60,
+          onTap: () => setState(() => _reminderMinutesBefore = 60),
+        ),
+        _ReminderChip(
+          label: '2 ${l10n.translate('hours')}',
+          minutes: 120,
+          isSelected: _reminderMinutesBefore == 120,
+          onTap: () => setState(() => _reminderMinutesBefore = 120),
+        ),
+        _ReminderChip(
+          label: '1 ${l10n.translate('day')}',
+          minutes: 1440,
+          isSelected: _reminderMinutesBefore == 1440,
+          onTap: () => setState(() => _reminderMinutesBefore = 1440),
+        ),
+      ],
+    );
+  }
+}
+
+class _ReminderChip extends StatelessWidget {
+  final String label;
+  final int minutes;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ReminderChip({
+    required this.label,
+    required this.minutes,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected 
+              ? const Color(0xFF2196F3).withValues(alpha: 0.15) 
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected 
+                ? const Color(0xFF2196F3) 
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected 
+                ? const Color(0xFF2196F3) 
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          ),
+        ),
+      ),
+    );
   }
 }
 
