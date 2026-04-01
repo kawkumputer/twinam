@@ -109,7 +109,7 @@ class HomePage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 60,
-        vertical: isMobile ? 60 : 100,
+        vertical: isMobile ? 40 : 60,
       ),
       child: Column(
         children: [
@@ -123,7 +123,7 @@ class HomePage extends StatelessWidget {
               height: 1.2,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Text(
             'construire de meilleures habitudes',
             textAlign: TextAlign.center,
@@ -134,7 +134,7 @@ class HomePage extends StatelessWidget {
               height: 1.2,
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           Text(
             'Avec Twin\'Am, ton Twin personnel t\'accompagne chaque jour pour atteindre tes objectifs et booster ta productivité.',
             textAlign: TextAlign.center,
@@ -143,28 +143,6 @@ class HomePage extends StatelessWidget {
               color: Colors.grey[600],
               height: 1.6,
             ),
-          ),
-          const SizedBox(height: 40),
-          
-          // Download Buttons
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            alignment: WrapAlignment.center,
-            children: [
-              _buildDownloadButton(
-                'App Store',
-                Icons.apple,
-                'https://apps.apple.com',
-                isMobile,
-              ),
-              _buildDownloadButton(
-                'Google Play',
-                Icons.android,
-                'https://play.google.com',
-                isMobile,
-              ),
-            ],
           ),
         ],
       ),
@@ -200,7 +178,7 @@ class HomePage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 60,
-        vertical: isMobile ? 60 : 80,
+        vertical: isMobile ? 40 : 60,
       ),
       child: Column(
         children: [
@@ -212,7 +190,7 @@ class HomePage extends StatelessWidget {
               color: Colors.grey[900],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             'Ton compagnon qui évolue avec toi',
             textAlign: TextAlign.center,
@@ -222,7 +200,7 @@ class HomePage extends StatelessWidget {
               height: 1.6,
             ),
           ),
-          const SizedBox(height: 48),
+          const SizedBox(height: 32),
           
           Wrap(
             spacing: 32,
@@ -316,7 +294,7 @@ class HomePage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 60,
-        vertical: isMobile ? 60 : 80,
+        vertical: isMobile ? 40 : 60,
       ),
       color: Colors.grey[50],
       child: Column(
@@ -329,7 +307,7 @@ class HomePage extends StatelessWidget {
               color: Colors.grey[900],
             ),
           ),
-          const SizedBox(height: 48),
+          const SizedBox(height: 32),
           
           Wrap(
             spacing: 32,
@@ -426,7 +404,7 @@ class HomePage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 60,
-        vertical: isMobile ? 60 : 80,
+        vertical: isMobile ? 40 : 60,
       ),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
