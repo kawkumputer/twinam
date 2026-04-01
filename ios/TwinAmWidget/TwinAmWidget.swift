@@ -86,7 +86,7 @@ struct TwinAmWidgetEntryView : View {
                         .foregroundColor(Color(white: 0.7))
                     
                     ProgressView(value: Double(entry.progress), total: 100)
-                        .tint(Color(red: 0.30, green: 0.69, blue: 0.31))
+                        .progressViewStyle(LinearProgressViewStyle(tint: Color(red: 0.30, green: 0.69, blue: 0.31)))
                     
                     Text("\(entry.progress)%")
                         .font(.system(size: 12))
