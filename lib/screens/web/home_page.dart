@@ -27,6 +27,9 @@ class HomePage extends StatelessWidget {
             // CTA Section
             _buildCTASection(context, isMobile),
             
+            // Support/Donate Section
+            _buildDonateSection(context, isMobile),
+            
             // Footer
             _buildFooter(context, isMobile),
           ],
@@ -458,6 +461,132 @@ class HomePage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildDonateSection(BuildContext context, bool isMobile) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 20 : 60,
+        vertical: isMobile ? 60 : 80,
+      ),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFFFDD57).withValues(alpha: 0.1),
+            const Color(0xFF0070BA).withValues(alpha: 0.1),
+          ],
+        ),
+      ),
+      child: Column(
+        children: [
+          Text(
+            '💝 Support Twin\'Am',
+            style: TextStyle(
+              fontSize: isMobile ? 28 : 36,
+              fontWeight: FontWeight.w800,
+              color: Colors.grey[900],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Help us keep Twin\'Am free and ad-free for everyone',
+            style: TextStyle(
+              fontSize: isMobile ? 14 : 16,
+              color: Colors.grey[700],
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 40),
+          Wrap(
+            spacing: 20,
+            runSpacing: 20,
+            alignment: WrapAlignment.center,
+            children: [
+              _buildDonateButton(
+                context,
+                'Buy Me a Coffee',
+                '☕',
+                const Color(0xFFFFDD57),
+                'https://buymeacoffee.com/hamathkane',
+                isMobile,
+              ),
+              _buildDonateButton(
+                context,
+                'PayPal',
+                '💙',
+                const Color(0xFF0070BA),
+                'https://paypal.me/HamathKane',
+                isMobile,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDonateButton(
+    BuildContext context,
+    String title,
+    String emoji,
+    Color color,
+    String url,
+    bool isMobile,
+  ) {
+    return InkWell(
+      onTap: () => _launchUrl(url),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 24 : 32,
+          vertical: isMobile ? 16 : 20,
+        ),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              emoji,
+              style: const TextStyle(fontSize: 24),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.open_in_new_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _launchUrl(String urlString) async {
+    final url = Uri.parse(urlString);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    }
   }
 
   Widget _buildFooter(BuildContext context, bool isMobile) {

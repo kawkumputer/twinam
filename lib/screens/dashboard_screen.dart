@@ -8,6 +8,7 @@ import '../providers/settings_provider.dart';
 import '../providers/task_provider.dart';
 import '../widgets/counter_card.dart';
 import '../widgets/twin_avatar_widget.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../services/twin_notification_service.dart';
 import '../services/notification_service.dart';
 
@@ -353,6 +354,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: const BannerAdWidget(),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.of(context).pushNamed('/create');

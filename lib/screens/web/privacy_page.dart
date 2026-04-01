@@ -45,7 +45,7 @@ class PrivacyPage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Last updated: March 31, 2026',
+                'Last updated: April 1, 2026',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[600],
@@ -105,7 +105,14 @@ class PrivacyPage extends StatelessWidget {
               
               _buildSection(
                 '5. Third-Party Services',
-                'Twin\'Am does not currently integrate with any third-party analytics or advertising services. The app functions entirely offline with local data storage.',
+                'Twin\'Am uses Google AdMob to display advertisements. AdMob may collect:\n\n'
+                '• Device identifiers (advertising ID)\n'
+                '• IP address\n'
+                '• Device information\n'
+                '• Ad interaction data\n\n'
+                'This data is used for ad personalization and analytics. You can opt out of personalized ads in your device settings.\n\n'
+                'AdMob Privacy Policy: https://policies.google.com/privacy\n\n'
+                'All other app data remains stored locally on your device.',
                 isMobile,
               ),
               

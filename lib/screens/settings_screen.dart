@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/achievement_provider.dart';
 import '../providers/settings_provider.dart';
@@ -118,6 +119,49 @@ class SettingsScreen extends StatelessWidget {
               title: l10n.translate('widgetSettings'),
               subtitle: l10n.translate('widgetSettingsDesc'),
               trailing: const Icon(Icons.chevron_right_rounded, size: 24),
+            ),
+          ),
+
+          const SizedBox(height: 32),
+
+          // Support Us section header
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 12),
+            child: Text(
+              '💝 Support Twin\'Am',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+            ),
+          ),
+
+          // Buy Me a Coffee
+          GestureDetector(
+            onTap: () => _launchUrl('https://buymeacoffee.com/hamathkane'),
+            child: _buildSettingsTile(
+              context,
+              icon: Icons.coffee_rounded,
+              iconColor: const Color(0xFFFFDD57),
+              title: 'Buy Me a Coffee',
+              subtitle: 'Support development ☕',
+              trailing: const Icon(Icons.open_in_new_rounded, size: 20),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // PayPal
+          GestureDetector(
+            onTap: () => _launchUrl('https://paypal.me/HamathKane'),
+            child: _buildSettingsTile(
+              context,
+              icon: Icons.payment_rounded,
+              iconColor: const Color(0xFF0070BA),
+              title: 'PayPal',
+              subtitle: 'One-time donation 💙',
+              trailing: const Icon(Icons.open_in_new_rounded, size: 20),
             ),
           ),
 
@@ -330,5 +374,12 @@ class SettingsScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _launchUrl(String urlString) async {
+    final url = Uri.parse(urlString);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    }
   }
 }

@@ -3,6 +3,7 @@ import '../models/counter.dart';
 import '../services/storage_service.dart';
 import '../services/audio_service.dart';
 import '../services/widget_service.dart';
+import '../services/admob_service.dart';
 
 class CounterProvider extends ChangeNotifier {
   final StorageService _storage;
@@ -64,6 +65,10 @@ class CounterProvider extends ChangeNotifier {
     
     await _storage.saveCounter(counter);
     _updateWidgets();
+    
+    // Show interstitial ad every 10 increments
+    AdMobService().showInterstitialAdIfReady();
+    
     notifyListeners();
   }
 

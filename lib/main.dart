@@ -4,6 +4,7 @@ import 'app.dart';
 import 'services/notification_service.dart';
 import 'services/storage_service.dart';
 import 'services/widget_service.dart';
+import 'services/admob_service.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -17,6 +18,9 @@ void main() async {
 
   final widgetService = WidgetService();
   await widgetService.initialize();
+
+  final adMobService = AdMobService();
+  await adMobService.initialize();
 
   FlutterNativeSplash.remove();
   runApp(TwinAmApp(storageService: storageService));
