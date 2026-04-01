@@ -28,6 +28,7 @@ class TwinNotificationService {
   void scheduleNotificationsIfNeeded({
     required List<Counter> counters,
     required int bestStreak,
+    required Function(String) translate,
   }) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -42,16 +43,23 @@ class TwinNotificationService {
     final daysInactive = _computeDaysInactive(counters);
 
     // Schedule evening check
-    _notifService.scheduleTwinEveningCheck(dailyScore: dailyScore);
+    _notifService.scheduleTwinEveningCheck(
+      dailyScore: dailyScore,
+      translate: translate,
+    );
 
     // Schedule morning motivation
     _notifService.scheduleTwinMorningMotivation(
       bestStreak: bestStreak,
       totalHabits: counters.length,
+      translate: translate,
     );
 
     // Schedule inactivity warning if needed
-    _notifService.scheduleTwinInactivityWarning(daysInactive: daysInactive);
+    _notifService.scheduleTwinInactivityWarning(
+      daysInactive: daysInactive,
+      translate: translate,
+    );
 
     debugPrint('[TwinNotif] Daily notifications scheduled');
     debugPrint('[TwinNotif] Score: ${(dailyScore * 100).toInt()}%');
@@ -102,6 +110,7 @@ class TwinNotificationService {
   void rescheduleAllNotifications({
     required List<Counter> counters,
     required int bestStreak,
+    required Function(String) translate,
   }) {
     // Cancel all existing Twin notifications
     _notifService.cancelTwinNotifications();
@@ -110,6 +119,7 @@ class TwinNotificationService {
     scheduleNotificationsIfNeeded(
       counters: counters,
       bestStreak: bestStreak,
+      translate: translate,
     );
     
     debugPrint('[TwinNotif] All Twin notifications rescheduled');

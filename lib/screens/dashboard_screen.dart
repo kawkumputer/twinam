@@ -86,6 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       TwinNotificationService().scheduleNotificationsIfNeeded(
         counters: counters,
         bestStreak: bestStreak,
+        translate: l10n.translate,
       );
     });
 
@@ -255,10 +256,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // Tasks section
             Consumer<TaskProvider>(
               builder: (context, taskProvider, _) {
-                final urgentTasks = [
+                // Remove duplicates by using Set to filter unique tasks
+                final allUrgentTasks = <dynamic>{
                   ...taskProvider.overdueTasks,
                   ...taskProvider.todayTasks,
-                ].take(3).toList();
+                };
+                final urgentTasks = allUrgentTasks.take(3).toList();
 
                 if (urgentTasks.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
 
@@ -848,6 +851,9 @@ class _TasksQuickView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context);
+    final l10n = AppLocalizations.of(settings.locale);
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -866,7 +872,7 @@ class _TasksQuickView extends StatelessWidget {
               const Icon(Icons.task_alt_rounded, color: Color(0xFFFF9800), size: 20),
               const SizedBox(width: 8),
               Text(
-                'Urgent Tasks',
+                l10n.translate('urgentTasks'),
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.w800,
                       color: const Color(0xFFFF9800),
@@ -875,7 +881,7 @@ class _TasksQuickView extends StatelessWidget {
               const Spacer(),
               TextButton(
                 onPressed: () => Navigator.of(context).pushNamed('/tasks'),
-                child: const Text('View All', style: TextStyle(fontSize: 12)),
+                child: Text(l10n.translate('viewAll'), style: TextStyle(fontSize: 12)),
               ),
             ],
           ),
@@ -887,17 +893,64 @@ class _TasksQuickView extends StatelessWidget {
   }
 }
 
-class _TaskQuickItem extends StatelessWidget {
+class _TaskQuickItem extends StatefulWidget {
   final dynamic task;
   final TaskProvider taskProvider;
 
   const _TaskQuickItem({required this.task, required this.taskProvider});
 
   @override
-  Widget build(BuildContext context) {
-    final isOverdue = task.isOverdue;
+  State<_TaskQuickItem> createState() => _TaskQuickItemState();
+}
+
+class _TaskQuickItemState extends State<_TaskQuickItem> with SingleTickerProviderStateMixin {
+  late AnimationController _shakeController;
+  late Animation<double> _shakeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _shakeController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
     
-    return Container(
+    _shakeAnimation = Tween<double>(begin: 0, end: 6).animate(
+      CurvedAnimation(
+        parent: _shakeController,
+        curve: Curves.elasticIn,
+      ),
+    );
+
+    // Start shake animation if task is overdue
+    if (widget.task.isOverdue) {
+      _shakeController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _shakeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context);
+    final l10n = AppLocalizations.of(settings.locale);
+    final isOverdue = widget.task.isOverdue;
+    
+    return AnimatedBuilder(
+      animation: _shakeAnimation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: isOverdue 
+            ? Offset(_shakeAnimation.value * (widget.task.hashCode % 2 == 0 ? 1 : -1), 0) 
+            : Offset.zero,
+          child: child,
+        );
+      },
+      child: Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -919,16 +972,16 @@ class _TaskQuickItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  task.title,
+                  widget.task.title,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                if (task.description.isNotEmpty)
+                if (widget.task.description.isNotEmpty)
                   Text(
-                    task.description,
+                    widget.task.description,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                         ),
@@ -943,12 +996,13 @@ class _TaskQuickItem extends StatelessWidget {
             color: const Color(0xFF4CAF50),
             onPressed: () {
               HapticFeedback.mediumImpact();
-              taskProvider.markTaskAsDone(task.id);
+              widget.taskProvider.markTaskAsDone(widget.task.id);
             },
-            tooltip: 'Mark as done',
+            tooltip: l10n.translate('markAsDone'),
           ),
         ],
       ),
+    ),
     );
   }
 }

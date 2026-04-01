@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/counter.dart';
 import '../services/storage_service.dart';
+import '../services/audio_service.dart';
 
 class CounterProvider extends ChangeNotifier {
   final StorageService _storage;
@@ -52,7 +53,14 @@ class CounterProvider extends ChangeNotifier {
 
   Future<void> incrementCounter(String id) async {
     final counter = _counters.firstWhere((c) => c.id == id);
+    final wasGoalReached = counter.goalReached;
     counter.increment();
+    
+    // Play celebration sound if goal just reached
+    if (!wasGoalReached && counter.goalReached) {
+      AudioService().playCelebration();
+    }
+    
     await _storage.saveCounter(counter);
     notifyListeners();
   }

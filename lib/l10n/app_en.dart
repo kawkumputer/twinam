@@ -161,6 +161,8 @@ const Map<String, String> en = {
   'statusDone': 'Done',
   'createTask': 'Create Task',
   'saveChanges': 'Save Changes',
+  'urgentTasks': 'Urgent Tasks',
+  'viewAll': 'View all',
   'deleteTask': 'Delete Task',
   'deleteTaskMessage': 'Are you sure you want to delete this task?',
   'taskCreated': 'Task created!',
@@ -232,4 +234,38 @@ const Map<String, String> en = {
   'octoberMonth': 'Oct',
   'novemberMonth': 'Nov',
   'decemberMonth': 'Dec',
+
+  // Notification Messages - Evening
+  'notifPerfectDay': 'Perfect Day!',
+  'notifPerfectDayBody': 'Your Twin is so proud! Every goal crushed today!',
+  'notifAlmostThere': 'Almost There!',
+  'notifAlmostThereBody': 'Your Twin says: "One more push and you\'re unstoppable!"',
+  'notifGoodProgress': 'Good Progress',
+  'notifGoodProgressBody': 'Your Twin: "Keep going, you\'ve got this!"',
+  'notifHalfwayThere': 'Halfway There',
+  'notifHalfwayThereBody': 'Your Twin: "Every action counts — start now!"',
+  'notifToughDay': 'Tough Day?',
+  'notifToughDayBody': 'Your Twin: "That\'s okay. One habit done is better than zero."',
+  'notifTwinNeedsYou': 'Twin Needs You',
+  'notifTwinNeedsYouBody': 'Your Twin: "I\'m waiting... come back and do just ONE habit!"',
+
+  // Notification Messages - Morning
+  'notifWeekWarrior': 'Week Warrior!',
+  'notifWeekWarriorBody': 'Your Twin: "Let\'s keep this fire burning today!"',
+  'notifOnARoll': 'On a Roll!',
+  'notifOnARollBody': 'Your Twin: "Three days strong! Let\'s make it four!"',
+  'notifFreshStart': 'Fresh Start!',
+  'notifFreshStartBody': 'Your Twin: "Yesterday was great, today will be better!"',
+  'notifBeginToday': 'Begin Today',
+  'notifBeginTodayBody': 'Your Twin: "Let\'s start your journey together!"',
+  'notifNewDay': 'New Day!',
+  'notifNewDayBody': 'Your Twin: "Every day is a chance to grow!"',
+
+  // Notification Messages - Inactivity
+  'notifTwinMissesYou': 'Twin Misses You',
+  'notifTwinMissesYouBody': 'Your Twin: "Where have you been? I miss our progress!"',
+  'notifTwinIsAngry': 'Twin is Angry',
+  'notifTwinIsAngryBody': 'Your Twin: "Who is this person? You\'re not the one I know!"',
+  'notifTwinIsFurious': 'Twin is Furious',
+  'notifTwinIsFuriousBody': 'Your Twin: "Enough! Open the app NOW and show me you care!"',
 };

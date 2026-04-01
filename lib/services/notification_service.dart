@@ -124,11 +124,12 @@ class NotificationService {
 
   Future<void> scheduleTwinEveningCheck({
     required double dailyScore,
+    required Function(String) translate,
   }) async {
     final id = 9991; // Fixed ID for evening check
     await cancelReminder(id); // Cancel previous if exists
 
-    final (title, body) = _getEveningMessage(dailyScore);
+    final (title, body) = _getEveningMessage(dailyScore, translate);
 
     await _plugin.zonedSchedule(
       id,
@@ -158,11 +159,12 @@ class NotificationService {
   Future<void> scheduleTwinMorningMotivation({
     required int bestStreak,
     required int totalHabits,
+    required Function(String) translate,
   }) async {
     final id = 9992; // Fixed ID for morning motivation
     await cancelReminder(id);
 
-    final (title, body) = _getMorningMessage(bestStreak, totalHabits);
+    final (title, body) = _getMorningMessage(bestStreak, totalHabits, translate);
 
     await _plugin.zonedSchedule(
       id,
@@ -191,13 +193,14 @@ class NotificationService {
 
   Future<void> scheduleTwinInactivityWarning({
     required int daysInactive,
+    required Function(String) translate,
   }) async {
     if (daysInactive < 3) return;
 
     final id = 9993; // Fixed ID for inactivity warning
     await cancelReminder(id);
 
-    final (title, body) = _getInactivityMessage(daysInactive);
+    final (title, body) = _getInactivityMessage(daysInactive, translate);
 
     await _plugin.zonedSchedule(
       id,
@@ -224,49 +227,49 @@ class NotificationService {
     debugPrint('[Twin] Inactivity warning scheduled (days: $daysInactive)');
   }
 
-  (String, String) _getEveningMessage(double score) {
+  (String, String) _getEveningMessage(double score, Function(String) translate) {
     if (score >= 1.0) {
-      return ('🌟 Perfect Day!', 'Your Twin is so proud! Every goal crushed today!');
+      return ('🌟 ${translate('notifPerfectDay')}', translate('notifPerfectDayBody'));
     }
     if (score >= 0.8) {
-      return ('💪 Almost There!', 'Your Twin says: "One more push and you\'re unstoppable!"');
+      return ('💪 ${translate('notifAlmostThere')}', translate('notifAlmostThereBody'));
     }
     if (score >= 0.6) {
-      return ('👍 Good Progress', 'Your Twin: "Keep going, you\'ve got this!"');
+      return ('👍 ${translate('notifGoodProgress')}', translate('notifGoodProgressBody'));
     }
     if (score >= 0.4) {
-      return ('💭 Halfway There', 'Your Twin: "Every action counts — start now!"');
+      return ('💭 ${translate('notifHalfwayThere')}', translate('notifHalfwayThereBody'));
     }
     if (score >= 0.2) {
-      return ('😔 Tough Day?', 'Your Twin: "That\'s okay. One habit done is better than zero."');
+      return ('😔 ${translate('notifToughDay')}', translate('notifToughDayBody'));
     }
-    return ('😢 Twin Needs You', 'Your Twin: "I\'m waiting... come back and do just ONE habit!"');
+    return ('😢 ${translate('notifTwinNeedsYou')}', translate('notifTwinNeedsYouBody'));
   }
 
-  (String, String) _getMorningMessage(int bestStreak, int totalHabits) {
+  (String, String) _getMorningMessage(int bestStreak, int totalHabits, Function(String) translate) {
     if (bestStreak >= 7) {
-      return ('🔥 Week Warrior!', "Your Twin: \"Let's keep this fire burning today!\"");
+      return ('🔥 ${translate('notifWeekWarrior')}', translate('notifWeekWarriorBody'));
     }
     if (bestStreak >= 3) {
-      return ('⚡ On a Roll!', "Your Twin: \"Three days strong! Let's make it four!\"");
+      return ('⚡ ${translate('notifOnARoll')}', translate('notifOnARollBody'));
     }
     if (bestStreak >= 1) {
-      return ('🌅 Fresh Start!', "Your Twin: \"Yesterday was great, today will be better!\"");
+      return ('🌅 ${translate('notifFreshStart')}', translate('notifFreshStartBody'));
     }
     if (totalHabits == 0) {
-      return ('🌱 Begin Today', "Your Twin: \"Let's start your journey together!\"");
+      return ('🌱 ${translate('notifBeginToday')}', translate('notifBeginTodayBody'));
     }
-    return ('☀️ New Day!', "Your Twin: \"Every day is a chance to grow!\"");
+    return ('☀️ ${translate('notifNewDay')}', translate('notifNewDayBody'));
   }
 
-  (String, String) _getInactivityMessage(int daysInactive) {
+  (String, String) _getInactivityMessage(int daysInactive, Function(String) translate) {
     if (daysInactive == 3) {
-      return ('😢 Twin Misses You', 'Your Twin: "Where have you been? I miss our progress!"');
+      return ('😢 ${translate('notifTwinMissesYou')}', translate('notifTwinMissesYouBody'));
     }
     if (daysInactive == 7) {
-      return ('😡 Twin is Angry', 'Your Twin: "Who is this person? You\'re not the one I know!"');
+      return ('😡 ${translate('notifTwinIsAngry')}', translate('notifTwinIsAngryBody'));
     }
-    return ('😤 Twin is Furious', 'Your Twin: "Enough! Open the app NOW and show me you care!"');
+    return ('😤 ${translate('notifTwinIsFurious')}', translate('notifTwinIsFuriousBody'));
   }
 
   Color _getTwinColor(double score) {

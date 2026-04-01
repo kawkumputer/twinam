@@ -222,36 +222,80 @@ class _TaskList extends StatelessWidget {
   }
 }
 
-class _TaskCard extends StatelessWidget {
+class _TaskCard extends StatefulWidget {
   final Task task;
 
   const _TaskCard({required this.task});
 
   @override
-  Widget build(BuildContext context) {
-    final taskProvider = context.read<TaskProvider>();
-    final settings = context.watch<SettingsProvider>();
-    final l10n = AppLocalizations.of(settings.locale);
-    final priorityColor = _getPriorityColor(task.priority);
-    final statusColor = _getStatusColor(task.status);
-    final isOverdue = task.isOverdue;
+  State<_TaskCard> createState() => _TaskCardState();
+}
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isOverdue
-              ? const Color(0xFFFF7043).withValues(alpha: 0.3)
-              : priorityColor.withValues(alpha: 0.2),
-          width: 1.5,
-        ),
+class _TaskCardState extends State<_TaskCard> with SingleTickerProviderStateMixin {
+  late AnimationController _shakeController;
+  late Animation<double> _shakeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _shakeController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    
+    _shakeAnimation = Tween<double>(begin: 0, end: 10).animate(
+      CurvedAnimation(
+        parent: _shakeController,
+        curve: Curves.elasticIn,
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => Navigator.of(context).pushNamed('/edit-task', arguments: task.id),
+    );
+
+    // Start shake animation if task is overdue
+    if (widget.task.isOverdue) {
+      _shakeController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _shakeController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context);
+    final l10n = AppLocalizations.of(settings.locale);
+    final priorityColor = _getPriorityColor(widget.task.priority);
+    final statusColor = _getStatusColor(widget.task.status);
+    final isOverdue = widget.task.isOverdue;
+
+    return AnimatedBuilder(
+      animation: _shakeAnimation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: isOverdue 
+            ? Offset(_shakeAnimation.value * (widget.task.hashCode % 2 == 0 ? 1 : -1), 0) 
+            : Offset.zero,
+          child: child,
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardTheme.color,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isOverdue
+                ? const Color(0xFFFF7043).withValues(alpha: 0.3)
+                : priorityColor.withValues(alpha: 0.2),
+            width: 1.5,
+          ),
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => Navigator.of(context).pushNamed('/edit-task', arguments: widget.task.id),
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -277,18 +321,18 @@ class _TaskCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            task.title,
+                            widget.task.title,
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.w700,
-                                  decoration: task.status == TaskStatus.done
+                                  decoration: widget.task.status == TaskStatus.done
                                       ? TextDecoration.lineThrough
                                       : null,
                                 ),
                           ),
-                          if (task.description.isNotEmpty) ...[
+                          if (widget.task.description.isNotEmpty) ...[
                             const SizedBox(height: 4),
                             Text(
-                              task.description,
+                              widget.task.description,
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                     color: Theme.of(context)
                                         .colorScheme
@@ -311,7 +355,7 @@ class _TaskCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        _getStatusText(task.status),
+                        _getStatusText(widget.task.status),
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
@@ -336,7 +380,7 @@ class _TaskCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      _formatDeadline(task.deadline, isOverdue, l10n),
+                      _formatDeadline(widget.task.deadline, isOverdue, l10n),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: isOverdue
                                 ? const Color(0xFFFF7043)
@@ -350,33 +394,34 @@ class _TaskCard extends StatelessWidget {
                     const Spacer(),
                     
                     // Quick actions
-                    if (task.status != TaskStatus.done)
+                    if (widget.task.status != TaskStatus.done)
                       IconButton(
                         icon: const Icon(Icons.check_circle_rounded, size: 20),
                         color: const Color(0xFF4CAF50),
                         onPressed: () {
-                          HapticFeedback.mediumImpact();
-                          taskProvider.markTaskAsDone(task.id);
+                          Provider.of<TaskProvider>(context, listen: false)
+                              .markTaskAsDone(widget.task.id);
                         },
                         tooltip: 'Mark as done',
                       ),
-                    if (task.status == TaskStatus.todo)
+                    if (widget.task.status == TaskStatus.todo)
                       IconButton(
                         icon: const Icon(Icons.play_circle_rounded, size: 20),
                         color: const Color(0xFFFF9800),
                         onPressed: () {
-                          HapticFeedback.lightImpact();
-                          taskProvider.markTaskAsInProgress(task.id);
+                          Provider.of<TaskProvider>(context, listen: false)
+                              .markTaskAsInProgress(widget.task.id);
                         },
                         tooltip: 'Start',
                       ),
-                    if (task.status == TaskStatus.done)
+                    if (widget.task.status == TaskStatus.done)
                       IconButton(
                         icon: const Icon(Icons.restart_alt_rounded, size: 20),
                         color: const Color(0xFF2196F3),
                         onPressed: () {
                           HapticFeedback.lightImpact();
-                          taskProvider.markTaskAsTodo(task.id);
+                          Provider.of<TaskProvider>(context, listen: false)
+                              .markTaskAsTodo(widget.task.id);
                         },
                         tooltip: 'Reopen',
                       ),
@@ -387,6 +432,7 @@ class _TaskCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 

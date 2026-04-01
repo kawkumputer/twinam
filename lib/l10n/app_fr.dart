@@ -240,4 +240,38 @@ const Map<String, String> fr = {
   'octoberMonth': 'Oct',
   'novemberMonth': 'Nov',
   'decemberMonth': 'Déc',
+
+  // Notification Messages - Evening
+  'notifPerfectDay': 'Journée Parfaite !',
+  'notifPerfectDayBody': 'Ton Twin est tellement fier ! Tous les objectifs écrasés aujourd\'hui !',
+  'notifAlmostThere': 'Presque Parfait !',
+  'notifAlmostThereBody': 'Ton Twin dit : "Encore un effort et tu seras inarrêtable !"',
+  'notifGoodProgress': 'Bon Progrès',
+  'notifGoodProgressBody': 'Ton Twin : "Continue, tu peux le faire !"',
+  'notifHalfwayThere': 'À Mi-Chemin',
+  'notifHalfwayThereBody': 'Ton Twin : "Chaque action compte — commence maintenant !"',
+  'notifToughDay': 'Journée Difficile ?',
+  'notifToughDayBody': 'Ton Twin : "C\'est ok. Une habitude faite vaut mieux que zéro."',
+  'notifTwinNeedsYou': 'Ton Twin a Besoin de Toi',
+  'notifTwinNeedsYouBody': 'Ton Twin : "J\'attends... reviens et fais juste UNE habitude !"',
+
+  // Notification Messages - Morning
+  'notifWeekWarrior': 'Guerrier de la Semaine !',
+  'notifWeekWarriorBody': 'Ton Twin : "Gardons ce feu allumé aujourd\'hui !"',
+  'notifOnARoll': 'Sur une Lancée !',
+  'notifOnARollBody': 'Ton Twin : "Trois jours de suite ! Faisons-en quatre !"',
+  'notifFreshStart': 'Nouveau Départ !',
+  'notifFreshStartBody': 'Ton Twin : "Hier était super, aujourd\'hui sera meilleur !"',
+  'notifBeginToday': 'Commence Aujourd\'hui',
+  'notifBeginTodayBody': 'Ton Twin : "Commençons ton voyage ensemble !"',
+  'notifNewDay': 'Nouveau Jour !',
+  'notifNewDayBody': 'Ton Twin : "Chaque jour est une chance de grandir !"',
+
+  // Notification Messages - Inactivity
+  'notifTwinMissesYou': 'Ton Twin te Manque',
+  'notifTwinMissesYouBody': 'Ton Twin : "Où étais-tu ? Nos progrès me manquent !"',
+  'notifTwinIsAngry': 'Ton Twin est en Colère',
+  'notifTwinIsAngryBody': 'Ton Twin : "C\'est qui cette personne ? Tu n\'es pas celui que je connais !"',
+  'notifTwinIsFurious': 'Ton Twin est Furieux',
+  'notifTwinIsFuriousBody': 'Ton Twin : "Ça suffit ! Ouvre l\'app MAINTENANT et montre-moi que tu tiens à moi !"',
 };
