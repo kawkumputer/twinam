@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../models/counter.dart';
 import '../services/storage_service.dart';
 import '../services/audio_service.dart';
@@ -61,12 +62,16 @@ class CounterProvider extends ChangeNotifier {
     // Play celebration sound if goal just reached
     if (!wasGoalReached && counter.goalReached) {
       AudioService().playCelebration();
-      // Show interstitial ad when goal is reached
-      AdMobService().showInterstitialAdOnGoalReached();
+      // Show interstitial ad when goal is reached (mobile only)
+      if (!kIsWeb) {
+        AdMobService().showInterstitialAdOnGoalReached();
+      }
     }
     
     await _storage.saveCounter(counter);
-    _updateWidgets();
+    if (!kIsWeb) {
+      _updateWidgets();
+    }
     
     notifyListeners();
   }
@@ -75,7 +80,9 @@ class CounterProvider extends ChangeNotifier {
     final counter = _counters.firstWhere((c) => c.id == id);
     counter.decrement();
     await _storage.saveCounter(counter);
-    _updateWidgets();
+    if (!kIsWeb) {
+      _updateWidgets();
+    }
     notifyListeners();
   }
 
@@ -83,7 +90,9 @@ class CounterProvider extends ChangeNotifier {
     final counter = _counters.firstWhere((c) => c.id == id);
     counter.resetValue();
     await _storage.saveCounter(counter);
-    _updateWidgets();
+    if (!kIsWeb) {
+      _updateWidgets();
+    }
     notifyListeners();
   }
 

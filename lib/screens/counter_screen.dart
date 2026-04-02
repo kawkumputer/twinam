@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/achievement_provider.dart';
@@ -49,8 +50,10 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
 
   @override
   void dispose() {
-    // Show interstitial ad when exiting counter screen
-    AdMobService().showInterstitialAdOnScreenExit();
+    // Show interstitial ad when exiting counter screen (mobile only)
+    if (!kIsWeb) {
+      AdMobService().showInterstitialAdOnScreenExit();
+    }
     
     _pulseController.dispose();
     _confettiController.dispose();
