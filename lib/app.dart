@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -5,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'providers/achievement_provider.dart';
 import 'providers/counter_provider.dart';
 import 'providers/settings_provider.dart';
+import 'providers/task_provider.dart';
 import 'screens/counter_screen.dart';
 import 'screens/create_counter_screen.dart';
 import 'screens/dashboard_screen.dart';
@@ -15,7 +17,6 @@ import 'screens/daily_verdict_screen.dart';
 import 'screens/stats_screen.dart';
 import 'screens/tasks_screen.dart';
 import 'screens/create_task_screen.dart';
-import 'providers/task_provider.dart';
 import 'services/storage_service.dart';
 import 'services/twin_notification_service.dart';
 import 'theme/app_theme.dart';
@@ -96,7 +97,10 @@ class TwinAmApp extends StatelessWidget {
                 case '/settings':
                   return _buildRoute(const SettingsScreen(), locale: locale);
                 case '/widget-settings':
-                  return _buildRoute(const WidgetSettingsScreen(), locale: locale);
+                  if (defaultTargetPlatform == TargetPlatform.android) {
+                    return _buildRoute(const WidgetSettingsScreen(), locale: locale);
+                  }
+                  return _buildRoute(const Scaffold(body: Center(child: Text('Feature not available on iOS'))), locale: locale);
                 case '/achievements':
                   return _buildRoute(const AchievementsScreen(), locale: locale);
                 case '/verdict':

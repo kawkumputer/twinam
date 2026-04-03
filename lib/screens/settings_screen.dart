@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -118,62 +119,65 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 12),
 
           // Widget Settings
-          GestureDetector(
-            onTap: () => Navigator.of(context).pushNamed('/widget-settings'),
-            child: _buildSettingsTile(
-              context,
-              icon: Icons.widgets_rounded,
-              iconColor: const Color(0xFF9C27B0),
-              title: l10n.translate('widgetSettings'),
-              subtitle: l10n.translate('widgetSettingsDesc'),
-              trailing: const Icon(Icons.chevron_right_rounded, size: 24),
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Support Us section header
-          Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 12),
-            child: Text(
-              l10n.translate('supportTwinAm'),
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+          if (defaultTargetPlatform == TargetPlatform.android) ...[
+            GestureDetector(
+              onTap: () => Navigator.of(context).pushNamed('/widget-settings'),
+              child: _buildSettingsTile(
+                context,
+                icon: Icons.widgets_rounded,
+                iconColor: const Color(0xFF9C27B0),
+                title: l10n.translate('widgetSettings'),
+                subtitle: l10n.translate('widgetSettingsDesc'),
+                trailing: const Icon(Icons.chevron_right_rounded, size: 24),
               ),
             ),
-          ),
+            const SizedBox(height: 32),
+          ],
 
-          // Buy Me a Coffee
-          GestureDetector(
-            onTap: () => _launchUrl('https://buymeacoffee.com/hamathkane'),
-            child: _buildSettingsTile(
-              context,
-              icon: Icons.coffee_rounded,
-              iconColor: const Color(0xFFFFDD57),
-              title: 'Buy Me a Coffee',
-              subtitle: 'Support development ☕',
-              trailing: const Icon(Icons.open_in_new_rounded, size: 20),
+          // Support Us section header (Android only)
+          if (defaultTargetPlatform == TargetPlatform.android) ...[
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 12),
+              child: Text(
+                l10n.translate('supportTwinAm'),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
             ),
-          ),
 
-          const SizedBox(height: 12),
-
-          // PayPal
-          GestureDetector(
-            onTap: () => _launchUrl('https://paypal.me/HamathKane'),
-            child: _buildSettingsTile(
-              context,
-              icon: Icons.payment_rounded,
-              iconColor: const Color(0xFF0070BA),
-              title: 'PayPal',
-              subtitle: 'One-time donation 💙',
-              trailing: const Icon(Icons.open_in_new_rounded, size: 20),
+            // Buy Me a Coffee
+            GestureDetector(
+              onTap: () => _launchUrl('https://buymeacoffee.com/hamathkane'),
+              child: _buildSettingsTile(
+                context,
+                icon: Icons.coffee_rounded,
+                iconColor: const Color(0xFFFFDD57),
+                title: 'Buy Me a Coffee',
+                subtitle: 'Support development ☕',
+                trailing: const Icon(Icons.open_in_new_rounded, size: 20),
+              ),
             ),
-          ),
 
-          const SizedBox(height: 32),
+            const SizedBox(height: 12),
+
+            // PayPal
+            GestureDetector(
+              onTap: () => _launchUrl('https://paypal.me/HamathKane'),
+              child: _buildSettingsTile(
+                context,
+                icon: Icons.payment_rounded,
+                iconColor: const Color(0xFF0070BA),
+                title: 'PayPal',
+                subtitle: 'One-time donation 💙',
+                trailing: const Icon(Icons.open_in_new_rounded, size: 20),
+              ),
+            ),
+
+            const SizedBox(height: 32),
+          ],
 
           // About
           _buildSettingsTile(
