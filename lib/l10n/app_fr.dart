@@ -214,6 +214,8 @@ const Map<String, String> fr = {
   'tasksCompletedTodayTitle': 'Tâches terminées aujourd\'hui',
   'keepTheMomentum': 'Garde le rythme !',
   'crushYourHabits': 'Va écraser tes habitudes !',
+  'noHabitsYet': 'Pas encore d\'habitudes. Ajoute ta première habitude !',
+  'supportTwinAm': '💝 Soutenez Twin\'Am',
 
   // Twin Avatar Messages
   'twinHappyMessage': 'Je suis fier de toi ! 🌟',
@@ -232,6 +234,11 @@ const Map<String, String> fr = {
   'hours': 'heures',
   'minutes': 'minutes',
   'reminderBefore': 'Rappel avant l\'échéance',
+
+  // Dashboard Messages
+  'keepTrackingHabits': 'Continuez à suivre vos habitudes!',
+  'addFirstHabit': 'Ajoutez votre première habitude!',
+  'addFirstHabitAndStart': 'Ajoutez votre première habitude et commencez votre voyage!',
 
   // Date & Time
   'todayAt': 'Aujourd\'hui',

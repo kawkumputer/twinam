@@ -47,6 +47,7 @@ class WidgetSettingsScreen extends StatelessWidget {
             description: l10n.translate('counterWidgetDesc'),
             onUpdate: () => _updateCounterWidget(context, counterProvider, achievementProvider),
             onPreview: () => _showWidgetPreview(context, 'counter'),
+            l10n: l10n,
           ),
 
           const SizedBox(height: 16),
@@ -98,6 +99,7 @@ class WidgetSettingsScreen extends StatelessWidget {
     required String description,
     required VoidCallback onUpdate,
     required VoidCallback onPreview,
+    required AppLocalizations l10n,
   }) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -151,7 +153,7 @@ class WidgetSettingsScreen extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: onUpdate,
                   icon: const Icon(Icons.refresh, size: 18),
-                  label: const Text('Update Widget'),
+                  label: Text(l10n.translate('updateWidget')),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -162,7 +164,7 @@ class WidgetSettingsScreen extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: onPreview,
                   icon: const Icon(Icons.visibility, size: 18),
-                  label: const Text('Preview'),
+                  label: Text(l10n.translate('preview')),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
@@ -249,10 +251,13 @@ class WidgetSettingsScreen extends StatelessWidget {
   }
 
   void _showWidgetPreview(BuildContext context, String widgetType) {
+    final settings = context.read<SettingsProvider>();
+    final l10n = AppLocalizations.of(settings.locale);
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Widget Preview'),
+        title: Text(l10n.translate('widgetPreview')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -298,8 +303,8 @@ class WidgetSettingsScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    "Today's Progress",
+                  Text(
+                    l10n.translate('todaysProgress'),
                     style: TextStyle(fontSize: 12, color: Color(0xFFB0BEC5)),
                   ),
                   const SizedBox(height: 8),
@@ -327,7 +332,7 @@ class WidgetSettingsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(l10n.translate('close')),
           ),
         ],
       ),

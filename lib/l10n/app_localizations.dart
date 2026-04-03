@@ -1,5 +1,7 @@
 import 'app_en.dart';
 import 'app_fr.dart';
+import 'app_es.dart';
+import 'app_ar.dart';
 
 class AppLocalizations {
   final String locale;
@@ -14,6 +16,10 @@ class AppLocalizations {
     switch (locale) {
       case 'fr':
         return fr;
+      case 'es':
+        return es;
+      case 'ar':
+        return ar;
       case 'en':
       default:
         return en;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'providers/achievement_provider.dart';
 import 'providers/counter_provider.dart';
@@ -59,37 +60,56 @@ class TwinAmApp extends StatelessWidget {
             theme: AppTheme.lightTheme(),
             darkTheme: AppTheme.darkTheme(),
             themeMode: settings.themeMode,
-            home: const DashboardScreen(),
+            // Add RTL support for Arabic
+            locale: Locale(settings.locale),
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'),
+              Locale('fr'),
+              Locale('es'),
+              Locale('ar'),
+            ],
+            home: Directionality(
+              textDirection: settings.locale == 'ar' 
+                  ? TextDirection.rtl 
+                  : TextDirection.ltr,
+              child: const DashboardScreen(),
+            ),
             onGenerateRoute: (routeSettings) {
+              final locale = settings.locale;
               switch (routeSettings.name) {
                 case '/counter':
                   final counterId = routeSettings.arguments as String;
-                  return _buildRoute(CounterScreen(counterId: counterId));
+                  return _buildRoute(CounterScreen(counterId: counterId), locale: locale);
                 case '/create':
-                  return _buildRoute(const CreateCounterScreen());
+                  return _buildRoute(const CreateCounterScreen(), locale: locale);
                 case '/edit':
                   final counterId = routeSettings.arguments as String;
-                  return _buildRoute(CreateCounterScreen(editCounterId: counterId));
+                  return _buildRoute(CreateCounterScreen(editCounterId: counterId), locale: locale);
                 case '/stats':
                   final counterId = routeSettings.arguments as String;
-                  return _buildRoute(StatsScreen(counterId: counterId));
+                  return _buildRoute(StatsScreen(counterId: counterId), locale: locale);
                 case '/settings':
-                  return _buildRoute(const SettingsScreen());
+                  return _buildRoute(const SettingsScreen(), locale: locale);
                 case '/widget-settings':
-                  return _buildRoute(const WidgetSettingsScreen());
+                  return _buildRoute(const WidgetSettingsScreen(), locale: locale);
                 case '/achievements':
-                  return _buildRoute(const AchievementsScreen());
+                  return _buildRoute(const AchievementsScreen(), locale: locale);
                 case '/verdict':
-                  return _buildRoute(const DailyVerdictScreen());
+                  return _buildRoute(const DailyVerdictScreen(), locale: locale);
                 case '/tasks':
-                  return _buildRoute(const TasksScreen());
+                  return _buildRoute(const TasksScreen(), locale: locale);
                 case '/create-task':
-                  return _buildRoute(const CreateTaskScreen());
+                  return _buildRoute(const CreateTaskScreen(), locale: locale);
                 case '/edit-task':
                   final taskId = routeSettings.arguments as String;
-                  return _buildRoute(CreateTaskScreen(editTaskId: taskId));
+                  return _buildRoute(CreateTaskScreen(editTaskId: taskId), locale: locale);
                 default:
-                  return _buildRoute(const DashboardScreen());
+                  return _buildRoute(const DashboardScreen(), locale: locale);
               }
             },
           );
@@ -98,22 +118,26 @@ class TwinAmApp extends StatelessWidget {
     );
   }
 
-  static PageRouteBuilder _buildRoute(Widget page) {
+  static PageRouteBuilder _buildRoute(Widget page, {String? locale}) {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => page,
+      pageBuilder: (context, animation, secondaryAnimation) => Directionality(
+        textDirection: locale == 'ar' 
+            ? TextDirection.rtl 
+            : TextDirection.ltr,
+        child: page,
+      ),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        const begin = Offset(0.03, 0);
-        const end = Offset.zero;
-        final tween = Tween(begin: begin, end: end)
-            .chain(CurveTween(curve: Curves.easeOutCubic));
-        final fadeTween = Tween(begin: 0.0, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeOut));
-        return FadeTransition(
-          opacity: animation.drive(fadeTween),
-          child: SlideTransition(
-            position: animation.drive(tween),
-            child: child,
-          ),
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: locale == 'ar' 
+                ? const Offset(-1.0, 0.0)  // Slide from right for RTL
+                : const Offset(1.0, 0.0),  // Slide from left for LTR
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeInOut,
+          )),
+          child: child,
         );
       },
       transitionDuration: const Duration(milliseconds: 300),

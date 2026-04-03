@@ -84,6 +84,14 @@ class SettingsScreen extends StatelessWidget {
                     value: 'fr',
                     child: Text(l10n.translate('french')),
                   ),
+                  DropdownMenuItem(
+                    value: 'es',
+                    child: Text(l10n.translate('spanish')),
+                  ),
+                  DropdownMenuItem(
+                    value: 'ar',
+                    child: Text(l10n.translate('arabic')),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) settings.setLocale(value);
@@ -128,7 +136,7 @@ class SettingsScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 4, bottom: 12),
             child: Text(
-              '💝 Support Twin\'Am',
+              l10n.translate('supportTwinAm'),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,

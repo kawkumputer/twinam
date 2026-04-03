@@ -75,7 +75,7 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
   }
 
   String _getAdvice(List<Counter> counters, double score, AppLocalizations l10n) {
-    if (counters.isEmpty) return "Add your first habit and start your journey!";
+    if (counters.isEmpty) return l10n.translate('addFirstHabitAndStart');
     if (score >= 1.0) return l10n.translate('perfectDay');
     if (score >= 0.8) return l10n.translate('almostPerfect');
     if (score >= 0.6) return l10n.translate('goodProgress');
@@ -343,7 +343,7 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24),
                   child: Text(
-                    'No habits yet. Add your first one!',
+                    l10n.translate('noHabitsYet'),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context)
                               .colorScheme

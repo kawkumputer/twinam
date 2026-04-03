@@ -9,9 +9,11 @@ class HomePage extends StatelessWidget {
     final isMobile = MediaQuery.of(context).size.width < 768;
     
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
+      body: Directionality(
+        textDirection: TextDirection.ltr, // Web pages typically remain LTR
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
             // Header/Navigation
             _buildHeader(context, isMobile),
             
@@ -648,6 +650,8 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ],
+          ),
+        ),
       ),
     );
   }

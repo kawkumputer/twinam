@@ -826,7 +826,7 @@ class _TwinCard extends StatelessWidget {
                       ),
                     ] else ...[
                       Text(
-                        total > 0 ? 'Keep tracking your habits!' : 'Add your first habit!',
+                        total > 0 ? l10n.translate('keepTrackingHabits') : l10n.translate('addFirstHabit'),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                             ),
