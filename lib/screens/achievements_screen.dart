@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 import '../models/achievement.dart';
 import '../providers/achievement_provider.dart';
 import '../providers/settings_provider.dart';
+import '../widgets/banner_ad_widget.dart';
 
 class AchievementsScreen extends StatelessWidget {
   const AchievementsScreen({super.key});
@@ -79,6 +80,7 @@ class AchievementsScreen extends StatelessWidget {
           ),
         ],
       ),
+      bottomNavigationBar: const BannerAdWidget(),
     );
   }
 

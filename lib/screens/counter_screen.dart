@@ -8,6 +8,7 @@ import '../providers/achievement_provider.dart';
 import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
 import '../models/counter.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../widgets/animated_counter.dart';
 import '../services/admob_service.dart';
 import 'package:share_plus/share_plus.dart';
@@ -409,6 +410,7 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
             ),
         ],
       ),
+      bottomNavigationBar: const BannerAdWidget(),
     );
   }
 

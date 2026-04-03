@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../models/counter.dart';
 import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../services/notification_service.dart';
 import '../theme/app_theme.dart';
 
@@ -378,6 +379,7 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: const BannerAdWidget(),
     );
   }
 

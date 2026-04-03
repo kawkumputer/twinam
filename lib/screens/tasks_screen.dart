@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/task.dart';
 import '../providers/task_provider.dart';
 import '../providers/settings_provider.dart';
+import '../widgets/banner_ad_widget.dart';
 import '../l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
@@ -151,6 +152,7 @@ class _TasksScreenState extends State<TasksScreen> with SingleTickerProviderStat
         label: Text(l10n.translate('newTask'), style: const TextStyle(fontWeight: FontWeight.w700)),
         backgroundColor: const Color(0xFF2196F3),
       ),
+      bottomNavigationBar: const BannerAdWidget(),
     );
   }
 

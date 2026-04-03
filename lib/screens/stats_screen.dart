@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../models/counter.dart';
 import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
+import '../widgets/banner_ad_widget.dart';
 
 class StatsScreen extends StatefulWidget {
   final String counterId;
@@ -206,6 +207,7 @@ class _StatsScreenState extends State<StatsScreen> {
           ],
         ),
       ),
+      bottomNavigationBar: const BannerAdWidget(),
     );
   }
 

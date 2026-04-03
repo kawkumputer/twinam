@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/achievement_provider.dart';
 import '../providers/settings_provider.dart';
+import '../widgets/banner_ad_widget.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -192,6 +193,7 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 35),
         ],
       ),
+      bottomNavigationBar: const BannerAdWidget(),
     );
   }
 
