@@ -7,6 +7,7 @@ import '../models/counter.dart';
 import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
 import '../widgets/banner_ad_widget.dart';
+import '../services/admob_service.dart';
 
 class StatsScreen extends StatefulWidget {
   final String counterId;
@@ -33,10 +34,18 @@ class _StatsScreenState extends State<StatsScreen> {
     final counterColor = Color(counter.colorValue);
     final chartData = _getChartData(counter);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('${counter.emoji} ${l10n.translate('stats')}'),
-      ),
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (didPop) {
+        if (didPop) {
+          // Show interstitial ad when leaving stats screen
+          AdMobService().showInterstitialAdOnScreenExit();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('${counter.emoji} ${l10n.translate('stats')}'),
+        ),
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + MediaQuery.of(context).padding.bottom),
         child: Column(
@@ -208,6 +217,7 @@ class _StatsScreenState extends State<StatsScreen> {
         ),
       ),
       bottomNavigationBar: const BannerAdWidget(),
+      ),
     );
   }
 
