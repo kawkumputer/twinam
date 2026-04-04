@@ -10,30 +10,30 @@ class AdMobService {
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
 
-  // Test Ad Unit IDs - Replace with real IDs in production
+  // Production Ad Unit IDs - Halal-compliant ads
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/6300978111'; // Test ID
+      return 'ca-app-pub-3940256099942544/6300978111'; // Test ID (Android)
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/2934735716'; // Test ID
+      return 'ca-app-pub-4086972652140089/5330932502'; // Production ID (iOS)
     }
     return '';
   }
 
   static String get interstitialAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/1033173712'; // Test ID
+      return 'ca-app-pub-3940256099942544/1033173712'; // Test ID (Android)
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/4411468910'; // Test ID
+      return 'ca-app-pub-4086972652140089/6031768525'; // Production ID (iOS)
     }
     return '';
   }
 
   static String get rewardedAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/5224354917'; // Test ID
+      return 'ca-app-pub-3940256099942544/5224354917'; // Test ID (Android)
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/1712485313'; // Test ID
+      return 'ca-app-pub-4086972652140089/2433306423'; // Production ID (iOS)
     }
     return '';
   }
