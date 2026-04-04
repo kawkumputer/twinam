@@ -55,7 +55,7 @@ class PrivacyPage extends StatelessWidget {
               
               _buildSection(
                 'Introduction',
-                'Twin\'Am mobile application ("Twin\'Am", "we", "our", or "us") developed and published by Twin\'Am Development is committed to protecting your privacy. This Privacy Policy explains how Twin\'Am collects, uses, and safeguards your information when you use our mobile application available on Google Play Store.',
+                'Twin\'Am mobile application ("Twin\'Am", "we", "our", or "us") developed and published by Hamath Kane is committed to protecting your privacy. This Privacy Policy explains how Twin\'Am collects, uses, and safeguards your information when you use our mobile application available on Google Play Store.',
                 isMobile,
               ),
               
@@ -141,7 +141,7 @@ class PrivacyPage extends StatelessWidget {
               _buildSection(
                 '9. Contact Us',
                 'If you have any questions about this Privacy Policy or Twin\'Am mobile application, please contact us at:\n\n'
-                'Developer: Twin\'Am Development\n'
+                'Developer: Hamath Kane\n'
                 'Application: Twin\'Am\n'
                 'Email: contact@twinam.app\n'
                 'Google Play Store: Twin\'Am mobile application',
