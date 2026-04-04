@@ -13,7 +13,7 @@ class AdMobService {
   // Production Ad Unit IDs - Halal-compliant ads
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/6300978111'; // Test ID (Android)
+      return 'ca-app-pub-4086972652140089/9656987068'; // Test ID (Android)
     } else if (Platform.isIOS) {
       return 'ca-app-pub-4086972652140089/5330932502'; // Production ID (iOS)
     }
@@ -22,7 +22,7 @@ class AdMobService {
 
   static String get interstitialAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/1033173712'; // Test ID (Android)
+      return 'ca-app-pub-4086972652140089/1447324559'; // Test ID (Android)
     } else if (Platform.isIOS) {
       return 'ca-app-pub-4086972652140089/6031768525'; // Production ID (iOS)
     }
@@ -31,7 +31,7 @@ class AdMobService {
 
   static String get rewardedAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/5224354917'; // Test ID (Android)
+      return 'ca-app-pub-4086972652140089/6996931064'; // Test ID (Android)
     } else if (Platform.isIOS) {
       return 'ca-app-pub-4086972652140089/2433306423'; // Production ID (iOS)
     }
