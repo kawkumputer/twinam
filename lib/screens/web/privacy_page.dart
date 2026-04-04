@@ -45,7 +45,7 @@ class PrivacyPage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Last updated: April 1, 2026',
+                'Last updated: April 4, 2026',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[600],
@@ -55,7 +55,7 @@ class PrivacyPage extends StatelessWidget {
               
               _buildSection(
                 'Introduction',
-                'Twin\'Am ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our mobile application.',
+                'Twin\'Am mobile application ("Twin\'Am", "we", "our", or "us") developed and published by Twin\'Am Development is committed to protecting your privacy. This Privacy Policy explains how Twin\'Am collects, uses, and safeguards your information when you use our mobile application available on Google Play Store.',
                 isMobile,
               ),
               
@@ -140,8 +140,11 @@ class PrivacyPage extends StatelessWidget {
               
               _buildSection(
                 '9. Contact Us',
-                'If you have any questions about this Privacy Policy, please contact us at:\n\n'
-                'Email: contact@twinam.app',
+                'If you have any questions about this Privacy Policy or Twin\'Am mobile application, please contact us at:\n\n'
+                'Developer: Twin\'Am Development\n'
+                'Application: Twin\'Am\n'
+                'Email: contact@twinam.app\n'
+                'Google Play Store: Twin\'Am mobile application',
                 isMobile,
               ),
               

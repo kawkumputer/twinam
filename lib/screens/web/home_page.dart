@@ -37,6 +37,7 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -650,10 +651,8 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ],
-          ),
-        ),
       ),
-    );
+    ); 
   }
 
   Widget _buildFooterLink(BuildContext context, String text, String route) {
