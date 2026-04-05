@@ -473,65 +473,150 @@ class _DashboardScreenState extends State<DashboardScreen> {
     AppLocalizations l10n,
   ) {
     final nameController = TextEditingController();
+    final languages = [
+      {'code': 'en', 'label': 'English', 'flag': '🇬🇧'},
+      {'code': 'fr', 'label': 'Français', 'flag': '🇫🇷'},
+      {'code': 'ar', 'label': 'العربية', 'flag': '🇸🇦'},
+      {'code': 'es', 'label': 'Español', 'flag': '🇪🇸'},
+    ];
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 8),
-            const Text('👋', style: TextStyle(fontSize: 48)),
-            const SizedBox(height: 16),
-            Text(
-              l10n.translate('welcomeTitle'),
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          final currentL10n = AppLocalizations.of(settings.locale);
+          return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 8),
+                  ClipOval(
+                    child: Image.asset(
+                      'assets/happy-avatar.jpeg',
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.translate('welcomeMessage'),
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  const SizedBox(height: 16),
+                  Text(
+                    currentL10n.translate('welcomeTitle'),
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                    textAlign: TextAlign.center,
                   ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: nameController,
-              autofocus: true,
-              textCapitalization: TextCapitalization.words,
-              decoration: InputDecoration(
-                hintText: l10n.translate('welcomeHint'),
-                prefixIcon: const Icon(Icons.person_rounded),
+                  const SizedBox(height: 8),
+                  Text(
+                    currentL10n.translate('welcomeSubtitle'),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: const Color(0xFF2196F3),
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w500,
+                          height: 1.5,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  // Language selector
+                  Text(
+                    currentL10n.translate('chooseLanguage'),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: languages.map((lang) {
+                      final isSelected = settings.locale == lang['code'];
+                      return GestureDetector(
+                        onTap: () {
+                          settings.setLocale(lang['code']!);
+                          setDialogState(() {});
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? const Color(0xFF2196F3).withValues(alpha: 0.15)
+                                : Theme.of(context).colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(12),
+                            border: isSelected
+                                ? Border.all(color: const Color(0xFF2196F3), width: 2)
+                                : null,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(lang['flag']!, style: const TextStyle(fontSize: 18)),
+                              const SizedBox(width: 6),
+                              Text(
+                                lang['label']!,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  color: isSelected
+                                      ? const Color(0xFF2196F3)
+                                      : Theme.of(context).colorScheme.onSurface,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    currentL10n.translate('welcomeMessage'),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: nameController,
+                    autofocus: false,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: InputDecoration(
+                      hintText: currentL10n.translate('welcomeHint'),
+                      prefixIcon: const Icon(Icons.person_rounded),
+                    ),
+                    onSubmitted: (_) {
+                      final name = nameController.text.trim();
+                      if (name.isNotEmpty) {
+                        settings.setUserName(name);
+                        Navigator.pop(ctx);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        final name = nameController.text.trim();
+                        if (name.isNotEmpty) {
+                          settings.setUserName(name);
+                        }
+                        Navigator.pop(ctx);
+                      },
+                      child: Text(currentL10n.translate('welcomeButton')),
+                    ),
+                  ),
+                ],
               ),
-              onSubmitted: (_) {
-                final name = nameController.text.trim();
-                if (name.isNotEmpty) {
-                  settings.setUserName(name);
-                  Navigator.pop(ctx);
-                }
-              },
             ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  final name = nameController.text.trim();
-                  if (name.isNotEmpty) {
-                    settings.setUserName(name);
-                  }
-                  Navigator.pop(ctx);
-                },
-                child: Text(l10n.translate('welcomeButton')),
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

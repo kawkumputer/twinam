@@ -134,7 +134,9 @@ const Map<String, String> fr = {
   'motivate7': 'Tu es là aujourd\'hui. C\'est ce qui compte.',
 
   // Personalization
-  'welcomeTitle': "Bienvenue sur Twin'Am !",
+  'chooseLanguage': 'Choisissez votre langue',
+  'welcomeTitle': 'Bienvenue, mon futur Jumeau ! 🌟',
+  'welcomeSubtitle': 'Ensemble, on va relever tous les défis et transformer notre vie. L\'aventure commence maintenant.',
   'welcomeMessage': 'Comment tu t\'appelles ?',
   'welcomeHint': 'Ton prénom',
   'welcomeButton': 'C\'est parti !',

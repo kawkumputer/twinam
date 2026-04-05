@@ -230,7 +230,9 @@ const Map<String, String> ar = {
   'motivate7': 'لقد حضرت اليوم. هذا مهم.',
 
   // Personalization
-  'welcomeTitle': "مرحباً بكم في Twin'Am!",
+  'chooseLanguage': 'اختر لغتك',
+  'welcomeTitle': 'مرحباً يا توأمي المستقبلي! 🌟',
+  'welcomeSubtitle': 'معاً سنتحدى أنفسنا ونغير حياتنا. رحلتنا تبدأ الآن.',
   'welcomeMessage': "ما اسمك؟",
   'welcomeHint': 'اسمك الأول',
   'welcomeButton': "لنبدأ!",

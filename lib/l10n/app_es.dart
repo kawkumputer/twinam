@@ -227,8 +227,10 @@ const Map<String, String> es = {
   'motivate7': 'Hoy estás aquí. Eso es lo que importa.',
 
   // Personalization
-  'welcomeTitle': "Bienvenido a Twin'Am!",
-  'welcomeMessage': "¿Cuál es tu nombre?",
+  'chooseLanguage': 'Elige tu idioma',
+  'welcomeTitle': '¡Bienvenido, mi futuro Gemelo! 🌟',
+  'welcomeSubtitle': 'Juntos, vamos a superar todos los desafíos y transformar nuestra vida. La aventura empieza ahora.',
+  'welcomeMessage': "¿Cómo te llamas?",
   'welcomeHint': 'Tu nombre',
   'welcomeButton': "Vamos!",
   'reminderBodyPersonal': ", no olvides registrar tu contador!",
