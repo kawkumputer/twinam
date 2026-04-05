@@ -234,7 +234,7 @@ const Map<String, String> ar = {
   'welcomeTitle': 'مرحباً يا توأمي المستقبلي! 🌟',
   'welcomeSubtitle': 'معاً سنتحدى أنفسنا ونغير حياتنا. رحلتنا تبدأ الآن.',
   'welcomeMessage': "ما اسمك؟",
-  'welcomeHint': 'اسمك الأول',
+  'welcomeHint': 'اسمك',
   'welcomeButton': "لنبدأ!",
   'reminderBodyPersonal': ", لا تنسى تسجيل حسابك!",
   'congratsPersonal': ', مبروك!',

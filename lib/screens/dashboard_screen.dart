@@ -574,14 +574,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     }).toList(),
                   ),
                   const SizedBox(height: 20),
-                  Text(
-                    currentL10n.translate('welcomeMessage'),
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                        ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
                   TextField(
                     controller: nameController,
                     autofocus: false,

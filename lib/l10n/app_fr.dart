@@ -138,7 +138,7 @@ const Map<String, String> fr = {
   'welcomeTitle': 'Bienvenue, mon futur Jumeau ! 🌟',
   'welcomeSubtitle': 'Ensemble, on va relever tous les défis et transformer notre vie. L\'aventure commence maintenant.',
   'welcomeMessage': 'Comment tu t\'appelles ?',
-  'welcomeHint': 'Ton prénom',
+  'welcomeHint': 'Ton nom',
   'welcomeButton': 'C\'est parti !',
   'yourName': 'Ton nom',
   'nameHint': 'Entre ton prénom',

@@ -138,7 +138,7 @@ const Map<String, String> en = {
   'welcomeTitle': 'Welcome, my future Twin! 🌟',
   'welcomeSubtitle': 'Together, we will conquer our goals and transform our lives. Your journey starts now.',
   'welcomeMessage': "What's your name?",
-  'welcomeHint': 'Your first name',
+  'welcomeHint': 'Your name',
   'welcomeButton': "Let's go!",
   'yourName': 'Your name',
   'nameHint': 'Enter your name',
