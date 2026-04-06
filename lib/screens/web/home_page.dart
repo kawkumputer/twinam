@@ -4,35 +4,38 @@ import '../../l10n/web_translations.dart';
 import '../../main_web.dart';
 
 class HomePage extends StatelessWidget {
-  final WebL10n l;
-  final String locale;
-  const HomePage({super.key, required this.l, required this.locale});
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 768;
-    
-    return Scaffold(
-      body: Directionality(
-        textDirection: TextDirection.ltr,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-            _buildHeader(context, isMobile),
-            _buildHeroSection(context, isMobile),
-            _buildTwinAvatarsSection(context, isMobile),
-            _buildFeaturesSection(context, isMobile),
-            _buildCTASection(context, isMobile),
-            _buildDonateSection(context, isMobile),
-            _buildFooter(context, isMobile),
-          ],
+    return ValueListenableBuilder<String>(
+      valueListenable: webLocale,
+      builder: (context, locale, _) {
+        final l = WebL10n(locale);
+        final isMobile = MediaQuery.of(context).size.width < 768;
+        return Scaffold(
+          body: Directionality(
+            textDirection: TextDirection.ltr,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                _buildHeader(context, isMobile, l, locale),
+                _buildHeroSection(context, isMobile, l),
+                _buildTwinAvatarsSection(context, isMobile, l),
+                _buildFeaturesSection(context, isMobile, l),
+                _buildCTASection(context, isMobile, l),
+                _buildDonateSection(context, isMobile, l),
+                _buildFooter(context, isMobile, l),
+              ],
+            ),
+          ),
         ),
-      ),
-    ),
+        );
+      },
     );
   }
 
-  Widget _buildHeader(BuildContext context, bool isMobile) {
+  Widget _buildHeader(BuildContext context, bool isMobile, WebL10n l, String locale) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 60,
@@ -83,7 +86,7 @@ class HomePage extends StatelessWidget {
                 _buildNavLink(context, l.t('navSupport'), '/support'),
                 const SizedBox(width: 24),
               ],
-              _buildLanguageSelector(context),
+              _buildLanguageSelector(context, locale),
             ],
           ),
         ],
@@ -91,7 +94,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildLanguageSelector(BuildContext context) {
+  Widget _buildLanguageSelector(BuildContext context, String locale) {
     final languages = [
       {'code': 'en', 'flag': '🇬🇧'},
       {'code': 'fr', 'flag': '🇫🇷'},
@@ -104,7 +107,7 @@ class HomePage extends StatelessWidget {
       children: languages.map((lang) {
         final isSelected = locale == lang['code'];
         return InkWell(
-          onTap: () => TwinAmWebApp.setLocale(context, lang['code']!),
+          onTap: () => webLocale.value = lang['code']!,
           borderRadius: BorderRadius.circular(6),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
@@ -134,7 +137,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeroSection(BuildContext context, bool isMobile) {
+  Widget _buildHeroSection(BuildContext context, bool isMobile, WebL10n l) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 60,
@@ -203,7 +206,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTwinAvatarsSection(BuildContext context, bool isMobile) {
+  Widget _buildTwinAvatarsSection(BuildContext context, bool isMobile, WebL10n l) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 60,
@@ -319,7 +322,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildFeaturesSection(BuildContext context, bool isMobile) {
+  Widget _buildFeaturesSection(BuildContext context, bool isMobile, WebL10n l) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 60,
@@ -429,7 +432,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildCTASection(BuildContext context, bool isMobile) {
+  Widget _buildCTASection(BuildContext context, bool isMobile, WebL10n l) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 60,
@@ -489,7 +492,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildDonateSection(BuildContext context, bool isMobile) {
+  Widget _buildDonateSection(BuildContext context, bool isMobile, WebL10n l) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 60,
@@ -615,7 +618,7 @@ class HomePage extends StatelessWidget {
     }
   }
 
-  Widget _buildFooter(BuildContext context, bool isMobile) {
+  Widget _buildFooter(BuildContext context, bool isMobile, WebL10n l) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 60,

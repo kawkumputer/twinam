@@ -3,15 +3,16 @@ import '../../l10n/web_translations.dart';
 import '../../main_web.dart';
 
 class TermsPage extends StatelessWidget {
-  final WebL10n l;
-  final String locale;
-  const TermsPage({super.key, required this.l, required this.locale});
+  const TermsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 768;
-    
-    return Scaffold(
+    return ValueListenableBuilder<String>(
+      valueListenable: webLocale,
+      builder: (context, locale, _) {
+        final l = WebL10n(locale);
+        final isMobile = MediaQuery.of(context).size.width < 768;
+        return Scaffold(
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
@@ -27,7 +28,7 @@ class TermsPage extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: _buildLanguageSelector(context),
+            child: _buildLanguageSelector(context, locale),
           ),
         ],
       ),
@@ -84,9 +85,11 @@ class TermsPage extends StatelessWidget {
         ),
       ),
     );
+      },
+    );
   }
 
-  Widget _buildLanguageSelector(BuildContext context) {
+  Widget _buildLanguageSelector(BuildContext context, String locale) {
     final languages = [
       {'code': 'en', 'flag': '🇬🇧'},
       {'code': 'fr', 'flag': '🇫🇷'},
@@ -99,7 +102,7 @@ class TermsPage extends StatelessWidget {
       children: languages.map((lang) {
         final isSelected = locale == lang['code'];
         return InkWell(
-          onTap: () => TwinAmWebApp.setLocale(context, lang['code']!),
+          onTap: () => webLocale.value = lang['code']!,
           borderRadius: BorderRadius.circular(6),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),

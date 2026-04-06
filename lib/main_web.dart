@@ -1,35 +1,20 @@
 import 'package:flutter/material.dart';
-import 'l10n/web_translations.dart';
 import 'screens/web/home_page.dart';
 import 'screens/web/privacy_page.dart';
 import 'screens/web/terms_page.dart';
 import 'screens/web/support_page.dart';
 
+final ValueNotifier<String> webLocale = ValueNotifier<String>('fr');
+
 void main() {
   runApp(const TwinAmWebApp());
 }
 
-class TwinAmWebApp extends StatefulWidget {
+class TwinAmWebApp extends StatelessWidget {
   const TwinAmWebApp({super.key});
-
-  static void setLocale(BuildContext context, String locale) {
-    context.findAncestorStateOfType<_TwinAmWebAppState>()?._setLocale(locale);
-  }
-
-  @override
-  State<TwinAmWebApp> createState() => _TwinAmWebAppState();
-}
-
-class _TwinAmWebAppState extends State<TwinAmWebApp> {
-  String _locale = 'fr';
-
-  void _setLocale(String locale) {
-    setState(() => _locale = locale);
-  }
 
   @override
   Widget build(BuildContext context) {
-    final l = WebL10n(_locale);
     return MaterialApp(
       title: "Twin'Am - Your Digital Companion",
       debugShowCheckedModeBanner: false,
@@ -42,17 +27,11 @@ class _TwinAmWebAppState extends State<TwinAmWebApp> {
         fontFamily: 'SF Pro Display',
       ),
       initialRoute: '/',
-      onGenerateRoute: (settings) {
-        switch (settings.name) {
-          case '/privacy':
-            return MaterialPageRoute(builder: (_) => PrivacyPage(l: l, locale: _locale));
-          case '/terms':
-            return MaterialPageRoute(builder: (_) => TermsPage(l: l, locale: _locale));
-          case '/support':
-            return MaterialPageRoute(builder: (_) => SupportPage(l: l, locale: _locale));
-          default:
-            return MaterialPageRoute(builder: (_) => HomePage(l: l, locale: _locale));
-        }
+      routes: {
+        '/': (context) => const HomePage(),
+        '/privacy': (context) => const PrivacyPage(),
+        '/terms': (context) => const TermsPage(),
+        '/support': (context) => const SupportPage(),
       },
     );
   }
