@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../l10n/web_translations.dart';
+import '../../main_web.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  final WebL10n l;
+  final String locale;
+  const HomePage({super.key, required this.l, required this.locale});
 
   @override
   Widget build(BuildContext context) {
@@ -10,29 +14,16 @@ class HomePage extends StatelessWidget {
     
     return Scaffold(
       body: Directionality(
-        textDirection: TextDirection.ltr, // Web pages typically remain LTR
+        textDirection: TextDirection.ltr,
         child: SingleChildScrollView(
           child: Column(
             children: [
-            // Header/Navigation
             _buildHeader(context, isMobile),
-            
-            // Hero Section
             _buildHeroSection(context, isMobile),
-            
-            // Twin Avatars Section
             _buildTwinAvatarsSection(context, isMobile),
-            
-            // Features Section
             _buildFeaturesSection(context, isMobile),
-            
-            // CTA Section
             _buildCTASection(context, isMobile),
-            
-            // Support/Donate Section
             _buildDonateSection(context, isMobile),
-            
-            // Footer
             _buildFooter(context, isMobile),
           ],
         ),
@@ -81,19 +72,51 @@ class HomePage extends StatelessWidget {
             ],
           ),
           
-          // Navigation
-          if (!isMobile)
-            Row(
-              children: [
-                _buildNavLink(context, 'Privacy', '/privacy'),
+          // Navigation + Language selector
+          Row(
+            children: [
+              if (!isMobile) ...[
+                _buildNavLink(context, l.t('navPrivacy'), '/privacy'),
                 const SizedBox(width: 24),
-                _buildNavLink(context, 'Terms', '/terms'),
+                _buildNavLink(context, l.t('navTerms'), '/terms'),
                 const SizedBox(width: 24),
-                _buildNavLink(context, 'Support', '/support'),
+                _buildNavLink(context, l.t('navSupport'), '/support'),
+                const SizedBox(width: 24),
               ],
-            ),
+              _buildLanguageSelector(context),
+            ],
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildLanguageSelector(BuildContext context) {
+    final languages = [
+      {'code': 'en', 'flag': '🇬🇧'},
+      {'code': 'fr', 'flag': '🇫🇷'},
+      {'code': 'ar', 'flag': '🇸🇦'},
+      {'code': 'es', 'flag': '🇪🇸'},
+      {'code': 'de', 'flag': '🇩🇪'},
+    ];
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: languages.map((lang) {
+        final isSelected = locale == lang['code'];
+        return InkWell(
+          onTap: () => TwinAmWebApp.setLocale(context, lang['code']!),
+          borderRadius: BorderRadius.circular(6),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFF2196F3).withValues(alpha: 0.15) : Colors.transparent,
+              borderRadius: BorderRadius.circular(6),
+              border: isSelected ? Border.all(color: const Color(0xFF2196F3), width: 1.5) : null,
+            ),
+            child: Text(lang['flag']!, style: const TextStyle(fontSize: 20)),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -120,7 +143,7 @@ class HomePage extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Ton compagnon digital pour',
+            l.t('heroTitle1'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: isMobile ? 28 : 48,
@@ -131,7 +154,7 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'construire de meilleures habitudes',
+            l.t('heroTitle2'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: isMobile ? 28 : 48,
@@ -142,7 +165,7 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Avec Twin\'Am, ton Twin personnel t\'accompagne chaque jour pour atteindre tes objectifs et booster ta productivité.',
+            l.t('heroSub'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: isMobile ? 16 : 20,
@@ -189,7 +212,7 @@ class HomePage extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Rencontre ton Twin',
+            l.t('meetTwin'),
             style: TextStyle(
               fontSize: isMobile ? 28 : 36,
               fontWeight: FontWeight.w800,
@@ -198,7 +221,7 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Ton compagnon qui évolue avec toi',
+            l.t('meetTwinSub'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: isMobile ? 16 : 20,
@@ -215,22 +238,22 @@ class HomePage extends StatelessWidget {
             children: [
               _buildTwinAvatarCard(
                 'assets/happy-avatar.jpeg',
-                'Fier de toi ! 🌟',
-                'Quand tu atteins tes objectifs',
+                l.t('twinHappy'),
+                l.t('twinHappyDesc'),
                 const Color(0xFF4CAF50),
                 isMobile,
               ),
               _buildTwinAvatarCard(
                 'assets/neutral-avatar.jpeg',
-                'Continue ! 💪',
-                'Quand tu fais des progrès',
+                l.t('twinNeutral'),
+                l.t('twinNeutralDesc'),
                 const Color(0xFF2196F3),
                 isMobile,
               ),
               _buildTwinAvatarCard(
                 'assets/sad-avatar.jpeg',
-                'Tu peux mieux faire ! 🔥',
-                'Quand tu as besoin de motivation',
+                l.t('twinSad'),
+                l.t('twinSadDesc'),
                 const Color(0xFFFF7043),
                 isMobile,
               ),
@@ -306,7 +329,7 @@ class HomePage extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Fonctionnalités',
+            l.t('features'),
             style: TextStyle(
               fontSize: isMobile ? 28 : 36,
               fontWeight: FontWeight.w800,
@@ -321,39 +344,39 @@ class HomePage extends StatelessWidget {
             alignment: WrapAlignment.center,
             children: [
               _buildFeatureCard(
-                '🤝',
-                'Ton Twin Personnel',
-                'Un compagnon digital qui t\'encourage et te motive chaque jour',
+                '\ud83e\udd1d',
+                l.t('feat1Title'),
+                l.t('feat1Desc'),
                 isMobile,
               ),
               _buildFeatureCard(
-                '📊',
-                'Suivi d\'Habitudes',
-                'Crée des compteurs personnalisés pour suivre tes habitudes quotidiennes',
+                '\ud83d\udcca',
+                l.t('feat2Title'),
+                l.t('feat2Desc'),
                 isMobile,
               ),
               _buildFeatureCard(
-                '✅',
-                'Gestion de Tâches',
-                'Organise tes tâches avec des priorités et des échéances',
+                '\u2705',
+                l.t('feat3Title'),
+                l.t('feat3Desc'),
                 isMobile,
               ),
               _buildFeatureCard(
-                '📈',
-                'Statistiques',
-                'Visualise tes progrès avec des graphiques et des stats détaillées',
+                '\ud83d\udcc8',
+                l.t('feat4Title'),
+                l.t('feat4Desc'),
                 isMobile,
               ),
               _buildFeatureCard(
-                '🎮',
-                'Gamification',
-                'Gagne de l\'XP, monte de niveau et débloque des achievements',
+                '\ud83c\udfae',
+                l.t('feat5Title'),
+                l.t('feat5Desc'),
                 isMobile,
               ),
               _buildFeatureCard(
-                '🔔',
-                'Rappels Intelligents',
-                'Reçois des notifications personnalisées pour rester sur la bonne voie',
+                '\ud83d\udd14',
+                l.t('feat6Title'),
+                l.t('feat6Desc'),
                 isMobile,
               ),
             ],
@@ -422,7 +445,7 @@ class HomePage extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            'Prêt à transformer tes habitudes ?',
+            l.t('ctaTitle'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: isMobile ? 28 : 36,
@@ -432,7 +455,7 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'Télécharge Twin\'Am gratuitement et commence ton voyage vers une meilleure version de toi-même.',
+            l.t('ctaSub'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: isMobile ? 16 : 18,
@@ -450,7 +473,7 @@ class HomePage extends StatelessWidget {
               _buildDownloadButton(
                 'App Store',
                 Icons.apple,
-                'https://apps.apple.com',
+                'https://apps.apple.com/us/app/twinam/id6761271353',
                 isMobile,
               ),
               _buildDownloadButton(
@@ -485,7 +508,7 @@ class HomePage extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            '💝 Support Twin\'Am',
+            l.t('donateTitle'),
             style: TextStyle(
               fontSize: isMobile ? 28 : 36,
               fontWeight: FontWeight.w800,
@@ -495,7 +518,7 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Help us keep Twin\'Am free and ad-free for everyone',
+            l.t('donateSub'),
             style: TextStyle(
               fontSize: isMobile ? 14 : 16,
               color: Colors.grey[700],
@@ -511,7 +534,7 @@ class HomePage extends StatelessWidget {
               _buildDonateButton(
                 context,
                 'Buy Me a Coffee',
-                '☕',
+                '\u2615',
                 const Color(0xFFFFDD57),
                 'https://buymeacoffee.com/hamathkane',
                 isMobile,
@@ -519,7 +542,7 @@ class HomePage extends StatelessWidget {
               _buildDonateButton(
                 context,
                 'PayPal',
-                '💙',
+                '\u2764',
                 const Color(0xFF0070BA),
                 'https://paypal.me/HamathKane',
                 isMobile,
@@ -628,9 +651,9 @@ class HomePage extends StatelessWidget {
             runSpacing: 12,
             alignment: WrapAlignment.center,
             children: [
-              _buildFooterLink(context, 'Privacy Policy', '/privacy'),
-              _buildFooterLink(context, 'Terms of Service', '/terms'),
-              _buildFooterLink(context, 'Support', '/support'),
+              _buildFooterLink(context, l.t('privacyPolicy'), '/privacy'),
+              _buildFooterLink(context, l.t('termsOfService'), '/terms'),
+              _buildFooterLink(context, l.t('navSupport'), '/support'),
             ],
           ),
           
@@ -644,7 +667,7 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            '© 2026 Twin\'Am. All rights reserved.',
+            l.t('copyright'),
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey[600],

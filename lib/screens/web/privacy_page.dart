@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../l10n/web_translations.dart';
+import '../../main_web.dart';
 
 class PrivacyPage extends StatelessWidget {
-  const PrivacyPage({super.key});
+  final WebL10n l;
+  final String locale;
+  const PrivacyPage({super.key, required this.l, required this.locale});
 
   @override
   Widget build(BuildContext context) {
@@ -12,12 +16,7 @@ class PrivacyPage extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
-              'assets/logo.jpeg',
-              height: 32,
-              width: 32,
-              fit: BoxFit.contain,
-            ),
+            Image.asset('assets/logo.jpeg', height: 32, width: 32, fit: BoxFit.contain),
             const SizedBox(width: 12),
             const Text("Twin'Am"),
           ],
@@ -25,6 +24,12 @@ class PrivacyPage extends StatelessWidget {
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF2196F3),
         elevation: 1,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: _buildLanguageSelector(context),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -36,7 +41,7 @@ class PrivacyPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Privacy Policy',
+                l.t('privacyTitle'),
                 style: TextStyle(
                   fontSize: isMobile ? 32 : 48,
                   fontWeight: FontWeight.w800,
@@ -45,120 +50,30 @@ class PrivacyPage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Last updated: April 4, 2026',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
+                l.t('privacyDate'),
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
               const SizedBox(height: 40),
               
-              _buildSection(
-                'Introduction',
-                'Twin\'Am mobile application ("Twin\'Am", "we", "our", or "us") developed and published by Hamath Kane is committed to protecting your privacy. This Privacy Policy explains how Twin\'Am collects, uses, and safeguards your information when you use our mobile application available on Google Play Store.',
-                isMobile,
-              ),
-              
-              _buildSection(
-                '1. Information We Collect',
-                'Twin\'Am is designed with privacy in mind. All your data is stored locally on your device using Hive database. We collect and store:\n\n'
-                '• Counter data (names, values, goals, icons)\n'
-                '• Task information (titles, descriptions, deadlines, priorities)\n'
-                '• User preferences (name, language, theme settings)\n'
-                '• Achievement and XP progress\n'
-                '• Notification preferences\n\n'
-                'This data is stored exclusively on your device and is not transmitted to our servers.',
-                isMobile,
-              ),
-              
-              _buildSection(
-                '2. How We Use Your Information',
-                'Your locally stored data is used to:\n\n'
-                '• Provide core app functionality (counters, tasks, statistics)\n'
-                '• Personalize your experience with your Twin companion\n'
-                '• Send local notifications and reminders\n'
-                '• Track your progress and achievements\n'
-                '• Save your preferences and settings',
-                isMobile,
-              ),
-              
-              _buildSection(
-                '3. Data Storage and Security',
-                'All data is stored locally on your device using Hive, a secure local database. We do not:\n\n'
-                '• Transmit your data to external servers\n'
-                '• Share your data with third parties\n'
-                '• Sell your personal information\n'
-                '• Track your activity outside the app\n\n'
-                'Your data remains on your device and is protected by your device\'s security measures.',
-                isMobile,
-              ),
-              
-              _buildSection(
-                '4. Notifications',
-                'Twin\'Am uses local notifications to:\n\n'
-                '• Remind you about tasks and deadlines\n'
-                '• Send motivational messages from your Twin\n'
-                '• Notify you of achievements\n\n'
-                'These notifications are generated locally on your device. You can disable notifications at any time in your device settings or within the app.',
-                isMobile,
-              ),
-              
-              _buildSection(
-                '5. Third-Party Services',
-                'Twin\'Am uses Google AdMob to display advertisements. AdMob may collect:\n\n'
-                '• Device identifiers (advertising ID)\n'
-                '• IP address\n'
-                '• Device information\n'
-                '• Ad interaction data\n\n'
-                'This data is used for ad personalization and analytics. You can opt out of personalized ads in your device settings.\n\n'
-                'AdMob Privacy Policy: https://policies.google.com/privacy\n\n'
-                'All other app data remains stored locally on your device.',
-                isMobile,
-              ),
-              
-              _buildSection(
-                '6. Children\'s Privacy',
-                'Twin\'Am does not knowingly collect information from children under 13. The app is designed for general audiences and does not require age verification.',
-                isMobile,
-              ),
-              
-              _buildSection(
-                '7. Data Deletion',
-                'You have complete control over your data:\n\n'
-                '• Delete individual counters or tasks within the app\n'
-                '• Clear all app data through your device settings\n'
-                '• Uninstall the app to remove all local data\n\n'
-                'Since all data is stored locally, deleting the app will permanently remove all your information.',
-                isMobile,
-              ),
-              
-              _buildSection(
-                '8. Changes to This Privacy Policy',
-                'We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last updated" date.',
-                isMobile,
-              ),
-              
-              _buildSection(
-                '9. Contact Us',
-                'If you have any questions about this Privacy Policy or Twin\'Am mobile application, please contact us at:\n\n'
-                'Developer: Hamath Kane\n'
-                'Application: Twin\'Am\n'
-                'Email: contact@twinam.app\n'
-                'Google Play Store: Twin\'Am mobile application',
-                isMobile,
-              ),
+              _buildSection(l.t('privacyIntroTitle'), l.t('privacyIntroContent'), isMobile),
+              _buildSection(l.t('privacyCollectTitle'), l.t('privacyCollectContent'), isMobile),
+              _buildSection(l.t('privacyUseTitle'), l.t('privacyUseContent'), isMobile),
+              _buildSection(l.t('privacyStorageTitle'), l.t('privacyStorageContent'), isMobile),
+              _buildSection(l.t('privacyNotifTitle'), l.t('privacyNotifContent'), isMobile),
+              _buildSection(l.t('privacyThirdTitle'), l.t('privacyThirdContent'), isMobile),
+              _buildSection(l.t('privacyChildrenTitle'), l.t('privacyChildrenContent'), isMobile),
+              _buildSection(l.t('privacyDeletionTitle'), l.t('privacyDeletionContent'), isMobile),
+              _buildSection(l.t('privacyChangesTitle'), l.t('privacyChangesContent'), isMobile),
+              _buildSection(l.t('privacyContactTitle'), l.t('privacyContactContent'), isMobile),
               
               const SizedBox(height: 60),
               
               Center(
                 child: TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Back to Home',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: Text(
+                    l.t('backHome'),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -166,6 +81,35 @@ class PrivacyPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLanguageSelector(BuildContext context) {
+    final languages = [
+      {'code': 'en', 'flag': '🇬🇧'},
+      {'code': 'fr', 'flag': '🇫🇷'},
+      {'code': 'ar', 'flag': '🇸🇦'},
+      {'code': 'es', 'flag': '🇪🇸'},
+      {'code': 'de', 'flag': '🇩🇪'},
+    ];
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: languages.map((lang) {
+        final isSelected = locale == lang['code'];
+        return InkWell(
+          onTap: () => TwinAmWebApp.setLocale(context, lang['code']!),
+          borderRadius: BorderRadius.circular(6),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFF2196F3).withValues(alpha: 0.15) : Colors.transparent,
+              borderRadius: BorderRadius.circular(6),
+              border: isSelected ? Border.all(color: const Color(0xFF2196F3), width: 1.5) : null,
+            ),
+            child: Text(lang['flag']!, style: const TextStyle(fontSize: 18)),
+          ),
+        );
+      }).toList(),
     );
   }
 

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../l10n/web_translations.dart';
+import '../../main_web.dart';
 
 class SupportPage extends StatelessWidget {
-  const SupportPage({super.key});
+  final WebL10n l;
+  final String locale;
+  const SupportPage({super.key, required this.l, required this.locale});
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +17,7 @@ class SupportPage extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
-              'assets/logo.jpeg',
-              height: 32,
-              width: 32,
-              fit: BoxFit.contain,
-            ),
+            Image.asset('assets/logo.jpeg', height: 32, width: 32, fit: BoxFit.contain),
             const SizedBox(width: 12),
             const Text("Twin'Am"),
           ],
@@ -26,6 +25,12 @@ class SupportPage extends StatelessWidget {
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF2196F3),
         elevation: 1,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: _buildLanguageSelector(context),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -37,7 +42,7 @@ class SupportPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Support',
+                l.t('supportTitle'),
                 style: TextStyle(
                   fontSize: isMobile ? 32 : 48,
                   fontWeight: FontWeight.w800,
@@ -46,7 +51,7 @@ class SupportPage extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Nous sommes là pour t\'aider',
+                l.t('supportSub'),
                 style: TextStyle(
                   fontSize: isMobile ? 16 : 20,
                   color: Colors.grey[600],
@@ -54,14 +59,12 @@ class SupportPage extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               
-              // Contact Section
               _buildContactSection(isMobile),
               
               const SizedBox(height: 60),
               
-              // FAQ Section
               Text(
-                'Questions Fréquentes',
+                l.t('faqTitle'),
                 style: TextStyle(
                   fontSize: isMobile ? 24 : 32,
                   fontWeight: FontWeight.w700,
@@ -70,71 +73,17 @@ class SupportPage extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               
-              _buildFAQItem(
-                'Comment créer un nouveau compteur ?',
-                'Appuie sur le bouton "+" en bas à droite du Dashboard, puis remplis les informations de ton compteur (nom, objectif, icône, etc.).',
-                isMobile,
-              ),
-              
-              _buildFAQItem(
-                'Comment définir un objectif quotidien ?',
-                'Lors de la création ou modification d\'un compteur, active l\'option "Objectif" et définis le nombre que tu souhaites atteindre chaque jour.',
-                isMobile,
-              ),
-              
-              _buildFAQItem(
-                'Comment ajouter une tâche ?',
-                'Clique sur l\'icône de tâches dans le header du Dashboard, puis sur le bouton "+" pour créer une nouvelle tâche avec un titre, une description, une échéance et une priorité.',
-                isMobile,
-              ),
-              
-              _buildFAQItem(
-                'Mes données sont-elles synchronisées ?',
-                'Actuellement, toutes tes données sont stockées localement sur ton appareil. Elles ne sont pas synchronisées dans le cloud, ce qui garantit ta vie privée.',
-                isMobile,
-              ),
-              
-              _buildFAQItem(
-                'Comment désactiver les notifications ?',
-                'Va dans Paramètres > Notifications et désactive les notifications que tu ne souhaites pas recevoir. Tu peux aussi gérer les notifications dans les paramètres de ton appareil.',
-                isMobile,
-              ),
-              
-              _buildFAQItem(
-                'Comment changer la langue de l\'app ?',
-                'Va dans Paramètres > Langue et sélectionne Français ou English selon ta préférence.',
-                isMobile,
-              ),
-              
-              _buildFAQItem(
-                'Que se passe-t-il si je désinstalle l\'app ?',
-                'Toutes tes données locales seront supprimées. Assure-toi d\'exporter tes données si tu souhaites les conserver avant de désinstaller l\'app.',
-                isMobile,
-              ),
-              
-              _buildFAQItem(
-                'Comment fonctionne le système de Twin ?',
-                'Ton Twin est un compagnon virtuel qui réagit à tes progrès. Il est heureux quand tu atteins tes objectifs, neutre quand tu fais des efforts, et triste quand tu as besoin de motivation. Il t\'envoie des messages personnalisés pour t\'encourager.',
-                isMobile,
-              ),
-              
-              _buildFAQItem(
-                'Comment gagner de l\'XP et monter de niveau ?',
-                'Tu gagnes de l\'XP en atteignant tes objectifs quotidiens, en complétant des tâches et en maintenant des séries (streaks). Plus tu es régulier, plus tu montes de niveaux rapidement !',
-                isMobile,
-              ),
+              for (int i = 1; i <= 9; i++)
+                _buildFAQItem(l.t('faq${i}Q'), l.t('faq${i}A'), isMobile),
               
               const SizedBox(height: 60),
               
               Center(
                 child: TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'Back to Home',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: Text(
+                    l.t('backHome'),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -142,6 +91,35 @@ class SupportPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLanguageSelector(BuildContext context) {
+    final languages = [
+      {'code': 'en', 'flag': '🇬🇧'},
+      {'code': 'fr', 'flag': '🇫🇷'},
+      {'code': 'ar', 'flag': '🇸🇦'},
+      {'code': 'es', 'flag': '🇪🇸'},
+      {'code': 'de', 'flag': '🇩🇪'},
+    ];
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: languages.map((lang) {
+        final isSelected = locale == lang['code'];
+        return InkWell(
+          onTap: () => TwinAmWebApp.setLocale(context, lang['code']!),
+          borderRadius: BorderRadius.circular(6),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            decoration: BoxDecoration(
+              color: isSelected ? const Color(0xFF2196F3).withValues(alpha: 0.15) : Colors.transparent,
+              borderRadius: BorderRadius.circular(6),
+              border: isSelected ? Border.all(color: const Color(0xFF2196F3), width: 1.5) : null,
+            ),
+            child: Text(lang['flag']!, style: const TextStyle(fontSize: 18)),
+          ),
+        );
+      }).toList(),
     );
   }
 
@@ -158,14 +136,10 @@ class SupportPage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(
-            Icons.email_outlined,
-            size: 48,
-            color: Color(0xFF2196F3),
-          ),
+          const Icon(Icons.email_outlined, size: 48, color: Color(0xFF2196F3)),
           const SizedBox(height: 16),
           Text(
-            'Contacte-nous',
+            l.t('contactTitle'),
             style: TextStyle(
               fontSize: isMobile ? 20 : 24,
               fontWeight: FontWeight.w700,
@@ -174,7 +148,7 @@ class SupportPage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Une question ? Un problème ? Une suggestion ?',
+            l.t('contactSub'),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: isMobile ? 14 : 16,

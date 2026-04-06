@@ -73,6 +73,7 @@ class TwinAmApp extends StatelessWidget {
               Locale('fr'),
               Locale('es'),
               Locale('ar'),
+              Locale('de'),
             ],
             home: Directionality(
               textDirection: settings.locale == 'ar' 
