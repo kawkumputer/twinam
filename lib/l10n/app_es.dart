@@ -130,6 +130,7 @@ const Map<String, String> es = {
   'french': 'Francés',
   'spanish': 'Español',
   'arabic': 'Árabe',
+  'german': 'Alemán',
   'darkMode': 'Modo oscuro',
   'soundEffects': 'Efectos de sonido',
   'notifications': 'Notificaciones',

@@ -4,7 +4,6 @@ import '../models/counter.dart';
 import '../services/storage_service.dart';
 import '../services/audio_service.dart';
 import '../services/widget_service.dart';
-import '../services/admob_service.dart';
 
 class CounterProvider extends ChangeNotifier {
   final StorageService _storage;
@@ -62,10 +61,6 @@ class CounterProvider extends ChangeNotifier {
     // Play celebration sound if goal just reached
     if (!wasGoalReached && counter.goalReached) {
       AudioService().playCelebration();
-      // Show interstitial ad when goal is reached (mobile only)
-      if (!kIsWeb) {
-        AdMobService().showInterstitialAdOnGoalReached();
-      }
     }
     
     await _storage.saveCounter(counter);

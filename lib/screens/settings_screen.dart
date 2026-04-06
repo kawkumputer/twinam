@@ -94,6 +94,10 @@ class SettingsScreen extends StatelessWidget {
                     value: 'ar',
                     child: Text(l10n.translate('arabic')),
                   ),
+                  DropdownMenuItem(
+                    value: 'de',
+                    child: Text(l10n.translate('german')),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value != null) settings.setLocale(value);

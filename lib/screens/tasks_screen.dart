@@ -61,7 +61,7 @@ class _TasksScreenState extends State<TasksScreen> with SingleTickerProviderStat
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(l10n.translate('todo')),
+                  Flexible(child: Text(l10n.translate('todo'), overflow: TextOverflow.ellipsis)),
                   if (todoCount > 0) ...[
                     const SizedBox(width: 6),
                     Container(
@@ -87,7 +87,7 @@ class _TasksScreenState extends State<TasksScreen> with SingleTickerProviderStat
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(l10n.translate('inProgress')),
+                  Flexible(child: Text(l10n.translate('inProgress'), overflow: TextOverflow.ellipsis)),
                   if (inProgressCount > 0) ...[
                     const SizedBox(width: 6),
                     Container(
@@ -113,7 +113,7 @@ class _TasksScreenState extends State<TasksScreen> with SingleTickerProviderStat
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(l10n.translate('done')),
+                  Flexible(child: Text(l10n.translate('done'), overflow: TextOverflow.ellipsis)),
                   if (doneCount > 0) ...[
                     const SizedBox(width: 6),
                     Container(

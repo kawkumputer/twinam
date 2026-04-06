@@ -134,6 +134,7 @@ const Map<String, String> ar = {
   'french': 'الفرنسية',
   'spanish': 'الإسبانية',
   'arabic': 'العربية',
+  'german': 'الألمانية',
   'darkMode': 'الوضع الليلي',
   'notifications': 'الإشعارات',
   'enableNotifications': 'تمكين الإشعارات',

@@ -478,6 +478,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       {'code': 'fr', 'label': 'Français', 'flag': '🇫🇷'},
       {'code': 'ar', 'label': 'العربية', 'flag': '🇸🇦'},
       {'code': 'es', 'label': 'Español', 'flag': '🇪🇸'},
+      {'code': 'de', 'label': 'Deutsch', 'flag': '🇩🇪'},
     ];
     showDialog(
       context: context,
