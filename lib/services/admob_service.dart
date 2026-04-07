@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdMobService {
@@ -13,7 +14,7 @@ class AdMobService {
   // Production Ad Unit IDs - Halal-compliant ads
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-4086972652140089/9656987068'; // Test ID (Android)
+      return 'ca-app-pub-4086972652140089/9656987068'; // Production ID (Android)
     } else if (Platform.isIOS) {
       return 'ca-app-pub-4086972652140089/5330932502'; // Production ID (iOS)
     }
@@ -22,7 +23,7 @@ class AdMobService {
 
   static String get interstitialAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-4086972652140089/1447324559'; // Test ID (Android)
+      return 'ca-app-pub-4086972652140089/1447324559'; // Production ID (Android)
     } else if (Platform.isIOS) {
       return 'ca-app-pub-4086972652140089/6031768525'; // Production ID (iOS)
     }
@@ -31,7 +32,7 @@ class AdMobService {
 
   static String get rewardedAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-4086972652140089/6996931064'; // Test ID (Android)
+      return 'ca-app-pub-4086972652140089/6996931064'; // Production ID (Android)
     } else if (Platform.isIOS) {
       return 'ca-app-pub-4086972652140089/2433306423'; // Production ID (iOS)
     }
@@ -60,10 +61,10 @@ class AdMobService {
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (ad) {
-          print('[AdMob] Banner ad loaded');
+          debugPrint('[AdMob] Banner ad loaded');
         },
         onAdFailedToLoad: (ad, error) {
-          print('[AdMob] Banner ad failed to load: $error');
+          debugPrint('[AdMob] Banner ad failed to load: $error');
           ad.dispose();
         },
       ),
@@ -85,10 +86,10 @@ class AdMobService {
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
           _interstitialAd = ad;
-          print('[AdMob] Interstitial ad loaded');
+          debugPrint('[AdMob] Interstitial ad loaded');
         },
         onAdFailedToLoad: (error) {
-          print('[AdMob] Interstitial ad failed to load: $error');
+          debugPrint('[AdMob] Interstitial ad failed to load: $error');
           _interstitialAd = null;
         },
       ),
@@ -113,18 +114,18 @@ class AdMobService {
         onAdDismissedFullScreenContent: (ad) {
           ad.dispose();
           _loadInterstitialAd();
-          print('[AdMob] Interstitial ad dismissed after $trigger');
+          debugPrint('[AdMob] Interstitial ad dismissed after $trigger');
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
-          print('[AdMob] Interstitial ad failed to show: $error');
+          debugPrint('[AdMob] Interstitial ad failed to show: $error');
           ad.dispose();
           _loadInterstitialAd();
         },
       );
       _interstitialAd!.show();
-      print('[AdMob] Interstitial ad shown on $trigger');
+      debugPrint('[AdMob] Interstitial ad shown on $trigger');
     } else {
-      print('[AdMob] Interstitial ad not ready for $trigger');
+      debugPrint('[AdMob] Interstitial ad not ready for $trigger');
       _loadInterstitialAd();
     }
   }
@@ -137,10 +138,10 @@ class AdMobService {
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
           _rewardedAd = ad;
-          print('[AdMob] Rewarded ad loaded');
+          debugPrint('[AdMob] Rewarded ad loaded');
         },
         onAdFailedToLoad: (error) {
-          print('[AdMob] Rewarded ad failed to load: $error');
+          debugPrint('[AdMob] Rewarded ad failed to load: $error');
           _rewardedAd = null;
         },
       ),
@@ -149,7 +150,7 @@ class AdMobService {
 
   Future<bool> showRewardedAd() async {
     if (_rewardedAd == null) {
-      print('[AdMob] Rewarded ad not ready');
+      debugPrint('[AdMob] Rewarded ad not ready');
       _loadRewardedAd();
       return false;
     }
@@ -162,7 +163,7 @@ class AdMobService {
         _loadRewardedAd();
       },
       onAdFailedToShowFullScreenContent: (ad, error) {
-        print('[AdMob] Rewarded ad failed to show: $error');
+        debugPrint('[AdMob] Rewarded ad failed to show: $error');
         ad.dispose();
         _loadRewardedAd();
       },
@@ -170,7 +171,7 @@ class AdMobService {
 
     await _rewardedAd!.show(
       onUserEarnedReward: (ad, reward) {
-        print('[AdMob] User earned reward: ${reward.amount} ${reward.type}');
+        debugPrint('[AdMob] User earned reward: ${reward.amount} ${reward.type}');
         rewarded = true;
       },
     );

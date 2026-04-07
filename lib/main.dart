@@ -6,6 +6,7 @@ import 'services/notification_service.dart';
 import 'services/storage_service.dart';
 import 'services/widget_service.dart';
 import 'services/admob_service.dart';
+import 'services/twin_notification_service.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -13,9 +14,6 @@ void main() async {
 
   final storageService = StorageService();
   await storageService.init();
-  
-  // Force dark mode by default for all users
-  storageService.ensureDarkMode();
 
   // Initialize services with platform checks
   if (!kIsWeb) {
@@ -28,6 +26,8 @@ void main() async {
 
     final adMobService = AdMobService();
     await adMobService.initialize();
+
+    TwinNotificationService().init();
   }
 
   FlutterNativeSplash.remove();

@@ -49,13 +49,14 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
       });
   }
 
-  @override
-  void dispose() {
-    // Show interstitial ad when exiting counter screen (mobile only)
+  void _onExit() {
     if (!kIsWeb) {
       AdMobService().showInterstitialAdOnScreenExit();
     }
-    
+  }
+
+  @override
+  void dispose() {
     _pulseController.dispose();
     _confettiController.dispose();
     super.dispose();
@@ -126,7 +127,12 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
     final counterColor = Color(counter.colorValue);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) _onExit();
+      },
+      child: Scaffold(
       body: Stack(
         children: [
           // Gradient background
@@ -152,7 +158,10 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () {
+                          _onExit();
+                          Navigator.of(context).pop();
+                        },
                         icon: const Icon(Icons.arrow_back_rounded),
                       ),
                       Row(
@@ -411,6 +420,7 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
         ],
       ),
       bottomNavigationBar: const BannerAdWidget(),
+    ),
     );
   }
 

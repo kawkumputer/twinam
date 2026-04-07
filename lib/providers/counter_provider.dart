@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import '../models/counter.dart';
 import '../services/storage_service.dart';
@@ -92,9 +91,6 @@ class CounterProvider extends ChangeNotifier {
   }
 
   void _updateWidgets() {
-    // Calculate score for widget
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
     double score = 0.0;
     int totalWithGoals = 0;
     
@@ -109,12 +105,16 @@ class CounterProvider extends ChangeNotifier {
       score = score / totalWithGoals;
     }
     
-    // Update widget with current data
+    // Read actual level from storage
+    final level = _storage.level;
+    final levelIdx = (level - 1).clamp(0, 14);
+    const titles = ['Newbie','Beginner','Apprentice','Regular','Dedicated','Committed','Expert','Master','Champion','Legend','Mythic','Immortal','Transcendent','Cosmic','Divine'];
+    
     WidgetService().updateCounterWidget(
       counters: _counters,
       score: score,
-      level: 1, // Will be updated with actual level from AchievementProvider
-      levelTitle: 'Newbie',
+      level: level,
+      levelTitle: titles[levelIdx],
     );
   }
 

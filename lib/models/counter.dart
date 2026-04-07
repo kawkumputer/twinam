@@ -88,6 +88,14 @@ class Counter {
       date: DateTime.now(),
       value: value,
     ));
+    _pruneHistory();
+  }
+
+  void _pruneHistory() {
+    if (history.length > 1000) {
+      final cutoff = DateTime.now().subtract(const Duration(days: 90));
+      history.removeWhere((e) => e.date.isBefore(cutoff));
+    }
   }
 
   int get currentStreak {

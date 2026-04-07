@@ -77,11 +77,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
     });
 
-    // Check counter-count and streak achievements
-    achievementProvider.checkCounterCount(counters.length);
-    achievementProvider.checkStreaks(counters);
+    // Schedule Twin notifications and check achievements after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      // Check counter-count and streak achievements
+      achievementProvider.checkCounterCount(counters.length);
+      achievementProvider.checkStreaks(counters);
+    });
 
-    // Schedule Twin notifications based on current state
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final bestStreak = counters.map((c) => c.currentStreak).fold(0, (a, b) => a > b ? a : b);
       TwinNotificationService().scheduleNotificationsIfNeeded(
