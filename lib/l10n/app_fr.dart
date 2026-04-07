@@ -193,6 +193,8 @@ const Map<String, String> fr = {
   'reopen': 'Rouvrir',
   'saveChanges': 'Enregistrer les modifications',
   'urgentTasks': 'Tâches urgentes',
+  'overdue': 'En retard',
+  'noUrgentTasks': 'Aucune tâche urgente 🎉',
   'viewAll': 'Voir tout',
   'completedTasksCleared': 'Tâches terminées effacées',
   'taskCompletedToday': 'tâche terminée ! Bon travail ! 🎉',

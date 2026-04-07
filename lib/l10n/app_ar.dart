@@ -92,6 +92,7 @@ const Map<String, String> ar = {
   'markAsDone': 'تحديد كمكتملة',
   'completed': 'مكتملة',
   'overdue': 'متأخرة',
+  'noUrgentTasks': 'لا توجد مهام عاجلة 🎉',
   'dueToday': 'تنتهي اليوم',
   'dueTomorrow': 'تنتهي غداً',
   'reminderBefore': 'التذكير قبل الموعد النهائي',

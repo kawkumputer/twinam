@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../models/counter.dart';
 import '../services/storage_service.dart';
 import '../services/audio_service.dart';
+import '../services/notification_service.dart';
 import '../services/widget_service.dart';
 
 class CounterProvider extends ChangeNotifier {
@@ -46,6 +47,11 @@ class CounterProvider extends ChangeNotifier {
   }
 
   Future<void> deleteCounter(String id) async {
+    // Cancel any scheduled reminder notification for this counter
+    if (!kIsWeb) {
+      final notifId = NotificationService().notificationIdFromCounterId(id);
+      await NotificationService().cancelReminder(notifId);
+    }
     _counters.removeWhere((c) => c.id == id);
     await _storage.deleteCounter(id);
     _saveOrder();

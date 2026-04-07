@@ -91,6 +91,7 @@ const Map<String, String> es = {
   'markAsDone': 'Marcar como hecha',
   'completed': 'Completada',
   'overdue': 'Vencida',
+  'noUrgentTasks': 'No hay tareas urgentes 🎉',
   'dueToday': 'Vence hoy',
   'dueTomorrow': 'Vence mañana',
   'reminderBefore': 'Recordatorio antes del vencimiento',

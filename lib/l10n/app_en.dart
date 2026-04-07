@@ -195,6 +195,7 @@ const Map<String, String> en = {
   'markAsDone': 'Mark as done',
   'markAsInProgress': 'Mark as in progress',
   'overdue': 'Overdue',
+  'noUrgentTasks': 'No urgent tasks 🎉',
 
   // Daily Verdict
   'dailyVerdict': 'Daily Verdict',

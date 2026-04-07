@@ -257,25 +257,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
-            // Tasks section
-            Consumer<TaskProvider>(
-              builder: (context, taskProvider, _) {
-                // Remove duplicates by using Set to filter unique tasks
-                final allUrgentTasks = <dynamic>{
-                  ...taskProvider.overdueTasks,
-                  ...taskProvider.todayTasks,
-                };
-                final urgentTasks = allUrgentTasks.take(3).toList();
-
-                if (urgentTasks.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
-
-                return SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                  sliver: SliverToBoxAdapter(
-                    child: _TasksQuickView(tasks: urgentTasks, taskProvider: taskProvider),
-                  ),
-                );
-              },
+            // Tasks section - always visible
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+              sliver: Consumer<TaskProvider>(
+                builder: (context, taskProvider, _) {
+                  return SliverToBoxAdapter(
+                    child: _TasksSummaryCard(taskProvider: taskProvider),
+                  );
+                },
+              ),
             ),
 
             // Motivation banner
@@ -358,12 +349,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
       bottomNavigationBar: const BannerAdWidget(),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.of(context).pushNamed('/create');
-        },
-        icon: const Icon(Icons.add_rounded),
-        label: Text(l10n.translate('newCounter')),
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: 'fab_task',
+            onPressed: () => Navigator.of(context).pushNamed('/create-task'),
+            backgroundColor: const Color(0xFFFF9800),
+            mini: true,
+            tooltip: l10n.translate('newTask'),
+            child: const Icon(Icons.task_alt_rounded, color: Colors.white, size: 20),
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton.extended(
+            heroTag: 'fab_counter',
+            onPressed: () => Navigator.of(context).pushNamed('/create'),
+            icon: const Icon(Icons.add_rounded),
+            label: Text(l10n.translate('newCounter')),
+          ),
+        ],
       ),
     );
   }
@@ -928,50 +933,191 @@ class _TwinCard extends StatelessWidget {
   }
 }
 
-class _TasksQuickView extends StatelessWidget {
-  final List tasks;
+class _TasksSummaryCard extends StatelessWidget {
   final TaskProvider taskProvider;
 
-  const _TasksQuickView({required this.tasks, required this.taskProvider});
+  const _TasksSummaryCard({required this.taskProvider});
 
   @override
   Widget build(BuildContext context) {
     final settings = Provider.of<SettingsProvider>(context);
     final l10n = AppLocalizations.of(settings.locale);
-    
+
+    final todoCount = taskProvider.todoTasks.length;
+    final todayCount = taskProvider.todayTasks.length;
+    final overdueCount = taskProvider.overdueCount;
+    final inProgressCount = taskProvider.inProgressTasks.length;
+
+    final allUrgent = <dynamic>{
+      ...taskProvider.overdueTasks,
+      ...taskProvider.todayTasks,
+    }.take(3).toList();
+
+    final hasUrgent = allUrgent.isNotEmpty;
+    final allClear = todoCount == 0 && inProgressCount == 0 && overdueCount == 0;
+
+    final borderColor = overdueCount > 0
+        ? const Color(0xFFFF7043).withValues(alpha: 0.35)
+        : const Color(0xFFFF9800).withValues(alpha: 0.2);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: const Color(0xFFFF9800).withValues(alpha: 0.2),
-          width: 1.5,
-        ),
+        border: Border.all(color: borderColor, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header row
           Row(
             children: [
               const Icon(Icons.task_alt_rounded, color: Color(0xFFFF9800), size: 20),
               const SizedBox(width: 8),
-              Text(
-                l10n.translate('urgentTasks'),
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFFFF9800),
-                    ),
+              Expanded(
+                child: Text(
+                  l10n.translate('tasks'),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFFFF9800),
+                      ),
+                ),
               ),
-              const Spacer(),
-              TextButton(
-                onPressed: () => Navigator.of(context).pushNamed('/tasks'),
-                child: Text(l10n.translate('viewAll'), style: TextStyle(fontSize: 12)),
+              // Quick add task button
+              GestureDetector(
+                onTap: () => Navigator.of(context).pushNamed('/create-task'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF9800).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.add_rounded, size: 14, color: Color(0xFFFF9800)),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.translate('newTask'),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFFF9800),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => Navigator.of(context).pushNamed('/tasks'),
+                child: Text(
+                  l10n.translate('viewAll'),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF2196F3),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
+
           const SizedBox(height: 12),
-          ...tasks.map((task) => _TaskQuickItem(task: task, taskProvider: taskProvider)),
+
+          // Stats chips row
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              if (overdueCount > 0)
+                _StatChip(
+                  count: overdueCount,
+                  label: l10n.translate('overdue'),
+                  color: const Color(0xFFFF7043),
+                  icon: Icons.warning_rounded,
+                ),
+              if (todayCount > 0)
+                _StatChip(
+                  count: todayCount,
+                  label: l10n.translate('today'),
+                  color: const Color(0xFF2196F3),
+                  icon: Icons.today_rounded,
+                ),
+              if (inProgressCount > 0)
+                _StatChip(
+                  count: inProgressCount,
+                  label: l10n.translate('inProgress'),
+                  color: const Color(0xFF9C27B0),
+                  icon: Icons.timelapse_rounded,
+                ),
+              _StatChip(
+                count: todoCount,
+                label: l10n.translate('todo'),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
+                icon: Icons.radio_button_unchecked_rounded,
+              ),
+            ],
+          ),
+
+          // Urgent tasks list or empty message
+          if (hasUrgent) ...[
+            const SizedBox(height: 12),
+            ...allUrgent.map((task) => _TaskQuickItem(task: task, taskProvider: taskProvider)),
+          ] else ...[
+            const SizedBox(height: 10),
+            Text(
+              allClear
+                  ? l10n.translate('noUrgentTasks')
+                  : l10n.translate('noUrgentTasks'),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                    fontStyle: FontStyle.italic,
+                  ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  final int count;
+  final String label;
+  final Color color;
+  final IconData icon;
+
+  const _StatChip({
+    required this.count,
+    required this.label,
+    required this.color,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(
+            '$count $label',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
         ],
       ),
     );
