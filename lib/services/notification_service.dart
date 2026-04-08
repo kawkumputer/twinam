@@ -420,6 +420,70 @@ class NotificationService {
     debugPrint('[Task] Reminder cancelled for task: $taskId');
   }
 
+  int _deadlineAlarmId(String taskId) =>
+      taskId.hashCode.abs() % 100000 + 20000;
+
+  Future<void> scheduleDeadlineAlarm({
+    required String taskId,
+    required String title,
+    required int priority,
+    required DateTime deadline,
+  }) async {
+    if (deadline.isBefore(DateTime.now())) {
+      debugPrint('[Task] Skipping past deadline alarm for: $title');
+      return;
+    }
+
+    final id = _deadlineAlarmId(taskId);
+    final priorityEmoji = _getPriorityEmoji(priority);
+
+    try {
+      await _plugin.zonedSchedule(
+        id,
+        '$priorityEmoji $title',
+        '⏰ Échéance atteinte !',
+        _toTZDateTime(deadline),
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'task_deadline_v1',
+            'Task Deadline Alarm',
+            channelDescription: 'Alarm when task deadline is reached',
+            importance: Importance.max,
+            priority: Priority.max,
+            fullScreenIntent: true,
+            category: AndroidNotificationCategory.alarm,
+            visibility: NotificationVisibility.public,
+            playSound: true,
+            enableVibration: true,
+            vibrationPattern:
+                Int64List.fromList([0, 500, 300, 500, 300, 800]),
+            icon: '@mipmap/ic_launcher',
+            color: _getTaskPriorityColor(priority),
+          ),
+          iOS: const DarwinNotificationDetails(
+            sound: 'default',
+            presentAlert: true,
+            presentSound: true,
+            presentBadge: true,
+            interruptionLevel: InterruptionLevel.timeSensitive,
+          ),
+        ),
+        payload: 'tasks',
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+      debugPrint('[Task] Deadline alarm scheduled for: $title at $deadline');
+    } catch (e) {
+      debugPrint('[Task] Failed to schedule deadline alarm: $e');
+    }
+  }
+
+  Future<void> cancelDeadlineAlarm(String taskId) async {
+    await _plugin.cancel(_deadlineAlarmId(taskId));
+    debugPrint('[Task] Deadline alarm cancelled for: $taskId');
+  }
+
   String _getPriorityEmoji(int priority) {
     switch (priority) {
       case 2: // High

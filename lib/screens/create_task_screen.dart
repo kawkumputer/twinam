@@ -351,9 +351,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       await taskProvider.addTask(newTask);
       if (mounted) {
         HapticFeedback.mediumImpact();
-        // Show interstitial ad after task creation
         AdMobService().showInterstitialAdOnGoalReached();
-        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, '/tasks');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.translate('taskCreated'))),
         );

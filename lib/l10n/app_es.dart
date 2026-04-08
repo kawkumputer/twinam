@@ -259,6 +259,8 @@ const Map<String, String> es = {
   'tomorrowAt': 'Mañana',
   'at': 'a las',
   'overdueBy': 'Vencido por',
+  'minuteAbbr': 'min',
+  'dayAbbr': 'd',
   'monday': 'Lun',
   'tuesday': 'Mar',
   'wednesday': 'Mié',

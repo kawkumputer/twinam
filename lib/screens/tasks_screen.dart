@@ -473,23 +473,31 @@ class _TaskCardState extends State<_TaskCard> with SingleTickerProviderStateMixi
 
   String _formatDeadline(DateTime deadline, bool isOverdue, AppLocalizations l10n) {
     final now = DateTime.now();
-    final diff = deadline.difference(now);
-    
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+    final deadlineDay = DateTime(deadline.year, deadline.month, deadline.day);
+
     if (isOverdue) {
-      if (diff.inDays.abs() == 0) {
-        return '${l10n.translate('overdueBy')} ${diff.inHours.abs()}h';
+      final overdueBy = now.difference(deadline);
+      if (overdueBy.inMinutes < 60) {
+        return '${l10n.translate('overdueBy')} ${overdueBy.inMinutes}${l10n.translate('minuteAbbr')}';
       }
-      return '${l10n.translate('overdueBy')} ${diff.inDays.abs()}j';
+      if (overdueBy.inHours < 24) {
+        return '${l10n.translate('overdueBy')} ${overdueBy.inHours}h';
+      }
+      return '${l10n.translate('overdueBy')} ${overdueBy.inDays}${l10n.translate('dayAbbr')}';
     }
-    
-    if (diff.inDays == 0) {
-      return '${l10n.translate('todayAt')} ${l10n.translate('at')} ${DateFormat.Hm().format(deadline)}';
+
+    final time = DateFormat.Hm().format(deadline);
+    if (deadlineDay.isAtSameMomentAs(today)) {
+      return '${l10n.translate('todayAt')} ${l10n.translate('at')} $time';
     }
-    if (diff.inDays == 1) {
-      return '${l10n.translate('tomorrowAt')} ${l10n.translate('at')} ${DateFormat.Hm().format(deadline)}';
+    if (deadlineDay.isAtSameMomentAs(tomorrow)) {
+      return '${l10n.translate('tomorrowAt')} ${l10n.translate('at')} $time';
     }
+    final diff = deadline.difference(now);
     if (diff.inDays < 7) {
-      return '${DateFormat.E().format(deadline)} ${l10n.translate('at')} ${DateFormat.Hm().format(deadline)}';
+      return '${DateFormat.E().format(deadline)} ${l10n.translate('at')} $time';
     }
     return DateFormat('MMM d, HH:mm').format(deadline);
   }

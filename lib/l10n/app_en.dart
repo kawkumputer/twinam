@@ -245,6 +245,8 @@ const Map<String, String> en = {
   'tomorrowAt': 'Tomorrow',
   'at': 'at',
   'overdueBy': 'Overdue by',
+  'minuteAbbr': 'min',
+  'dayAbbr': 'd',
   'monday': 'Mon',
   'tuesday': 'Tue',
   'wednesday': 'Wed',

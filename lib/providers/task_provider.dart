@@ -96,6 +96,12 @@ class TaskProvider with ChangeNotifier {
     // Schedule notification if task is not done
     if (task.status != TaskStatus.done) {
       await _scheduleTaskNotification(task);
+      await NotificationService().scheduleDeadlineAlarm(
+        taskId: task.id,
+        title: task.title,
+        priority: task.priority.index,
+        deadline: task.deadline,
+      );
     }
     
     notifyListeners();
@@ -109,10 +115,17 @@ class TaskProvider with ChangeNotifier {
       _sortTasks();
       await _saveTasks();
       
-      // Cancel old notification and reschedule if needed
+      // Cancel old notifications and reschedule if needed
       await NotificationService().cancelTaskReminder(updatedTask.id);
+      await NotificationService().cancelDeadlineAlarm(updatedTask.id);
       if (updatedTask.status != TaskStatus.done) {
         await _scheduleTaskNotification(updatedTask);
+        await NotificationService().scheduleDeadlineAlarm(
+          taskId: updatedTask.id,
+          title: updatedTask.title,
+          priority: updatedTask.priority.index,
+          deadline: updatedTask.deadline,
+        );
       }
       
       notifyListeners();
@@ -122,6 +135,7 @@ class TaskProvider with ChangeNotifier {
 
   Future<void> deleteTask(String taskId) async {
     await NotificationService().cancelTaskReminder(taskId);
+    await NotificationService().cancelDeadlineAlarm(taskId);
     _tasks.removeWhere((t) => t.id == taskId);
     await _saveTasks();
     notifyListeners();
@@ -133,6 +147,7 @@ class TaskProvider with ChangeNotifier {
     if (index != -1) {
       _tasks[index] = _tasks[index].markAsDone();
       await NotificationService().cancelTaskReminder(taskId);
+      await NotificationService().cancelDeadlineAlarm(taskId);
       _sortTasks();
       await _saveTasks();
       notifyListeners();

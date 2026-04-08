@@ -259,6 +259,8 @@ const Map<String, String> ar = {
   'tomorrowAt': 'غداً',
   'at': 'في',
   'overdueBy': 'متأخر بـ',
+  'minuteAbbr': 'دق',
+  'dayAbbr': 'ي',
   'monday': 'الإثنين',
   'tuesday': 'الثلاثاء',
   'wednesday': 'الأربعاء',
