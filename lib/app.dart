@@ -17,6 +17,7 @@ import 'screens/daily_verdict_screen.dart';
 import 'screens/stats_screen.dart';
 import 'screens/tasks_screen.dart';
 import 'screens/create_task_screen.dart';
+import 'services/notification_service.dart';
 import 'services/storage_service.dart';
 import 'theme/app_theme.dart';
 
@@ -45,12 +46,14 @@ class TwinAmApp extends StatelessWidget {
       child: Consumer<SettingsProvider>(
         builder: (context, settings, _) {
           final isDark = settings.themeMode == ThemeMode.dark;
-          SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-            statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
-          ));
-          return MaterialApp(
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+              statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+            ),
+            child: MaterialApp(
+            navigatorKey: NotificationService.navigatorKey,
             title: "Twin'Am",
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme(),
@@ -112,6 +115,7 @@ class TwinAmApp extends StatelessWidget {
                   return _buildRoute(const DashboardScreen(), locale: locale);
               }
             },
+          ),
           );
         },
       ),

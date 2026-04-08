@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/counter.dart';
 import '../services/storage_service.dart';
@@ -8,6 +9,7 @@ import '../services/widget_service.dart';
 class CounterProvider extends ChangeNotifier {
   final StorageService _storage;
   List<Counter> _counters = [];
+  Timer? _widgetDebounce;
 
   CounterProvider(this._storage) {
     _loadCounters();
@@ -97,31 +99,33 @@ class CounterProvider extends ChangeNotifier {
   }
 
   void _updateWidgets() {
-    double score = 0.0;
-    int totalWithGoals = 0;
-    
-    for (final counter in _counters) {
-      if (counter.goal != null) {
-        totalWithGoals++;
-        if (counter.goalReached) score += 1.0;
+    _widgetDebounce?.cancel();
+    _widgetDebounce = Timer(const Duration(seconds: 2), () {
+      double score = 0.0;
+      int totalWithGoals = 0;
+
+      for (final counter in _counters) {
+        if (counter.goal != null) {
+          totalWithGoals++;
+          if (counter.goalReached) score += 1.0;
+        }
       }
-    }
-    
-    if (totalWithGoals > 0) {
-      score = score / totalWithGoals;
-    }
-    
-    // Read actual level from storage
-    final level = _storage.level;
-    final levelIdx = (level - 1).clamp(0, 14);
-    const titles = ['Newbie','Beginner','Apprentice','Regular','Dedicated','Committed','Expert','Master','Champion','Legend','Mythic','Immortal','Transcendent','Cosmic','Divine'];
-    
-    WidgetService().updateCounterWidget(
-      counters: _counters,
-      score: score,
-      level: level,
-      levelTitle: titles[levelIdx],
-    );
+
+      if (totalWithGoals > 0) {
+        score = score / totalWithGoals;
+      }
+
+      final level = _storage.level;
+      final levelIdx = (level - 1).clamp(0, 14);
+      const titles = ['Newbie','Beginner','Apprentice','Regular','Dedicated','Committed','Expert','Master','Champion','Legend','Mythic','Immortal','Transcendent','Cosmic','Divine'];
+
+      WidgetService().updateCounterWidget(
+        counters: _counters,
+        score: score,
+        level: level,
+        levelTitle: titles[levelIdx],
+      );
+    });
   }
 
   Future<void> reorderCounters(int oldIndex, int newIndex) async {

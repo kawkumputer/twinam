@@ -6,6 +6,12 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+/// Top-level handler required by flutter_local_notifications for background isolate.
+@pragma('vm:entry-point')
+void _notificationBackgroundHandler(NotificationResponse response) {
+  // Cannot navigate from background isolate — payload handled on next launch.
+}
+
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
@@ -15,6 +21,46 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   bool _initialized = false;
+
+  /// Global navigator key — pass to MaterialApp.navigatorKey.
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
+  /// Payload stored when the navigator is not yet ready or app was cold-started.
+  String? _pendingPayload;
+  String? get pendingPayload => _pendingPayload;
+
+  /// Called by DashboardScreen after first frame to consume a pending payload.
+  void handlePendingPayload() {
+    if (_pendingPayload == null) return;
+    final payload = _pendingPayload!;
+    _pendingPayload = null;
+    final nav = navigatorKey.currentState;
+    if (nav != null) _handlePayload(payload, nav);
+  }
+
+  void _onNotificationTap(NotificationResponse response) {
+    final payload = response.payload;
+    if (payload == null || payload.isEmpty) return;
+    final nav = navigatorKey.currentState;
+    if (nav == null) {
+      _pendingPayload = payload;
+      debugPrint('[Notif] Nav not ready, queuing payload: $payload');
+      return;
+    }
+    _handlePayload(payload, nav);
+  }
+
+  void _handlePayload(String payload, NavigatorState nav) {
+    debugPrint('[Notif] Deep-link: $payload');
+    if (payload.startsWith('counter:')) {
+      final counterId = payload.substring('counter:'.length);
+      nav.pushNamed('/counter', arguments: counterId);
+    } else if (payload == 'tasks') {
+      nav.pushNamed('/tasks');
+    }
+    // 'dashboard' → app is already open, no navigation needed
+  }
 
   Future<void> init() async {
     if (_initialized) return;
@@ -41,9 +87,20 @@ class NotificationService {
       linux: linuxSettings,
     );
 
-    await _plugin.initialize(initSettings);
+    await _plugin.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: _onNotificationTap,
+      onDidReceiveBackgroundNotificationResponse: _notificationBackgroundHandler,
+    );
     _initialized = true;
     debugPrint('[Notif] Plugin initialized');
+
+    // Handle cold-start: app opened by tapping a notification
+    final launchDetails = await _plugin.getNotificationAppLaunchDetails();
+    if (launchDetails?.didNotificationLaunchApp == true) {
+      _pendingPayload = launchDetails?.notificationResponse?.payload;
+      debugPrint('[Notif] Cold-start payload: $_pendingPayload');
+    }
   }
 
   Future<bool> requestPermission() async {
@@ -67,6 +124,7 @@ class NotificationService {
     required String body,
     required int hour,
     required int minute,
+    String? payload,
   }) async {
     try {
       await _plugin.zonedSchedule(
@@ -85,7 +143,8 @@ class NotificationService {
           ),
           iOS: const DarwinNotificationDetails(),
         ),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        payload: payload,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time,
@@ -346,6 +405,7 @@ class NotificationService {
         ),
         iOS: const DarwinNotificationDetails(),
       ),
+      payload: 'tasks',
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,

@@ -11,6 +11,7 @@ import '../models/counter.dart';
 import '../widgets/banner_ad_widget.dart';
 import '../widgets/animated_counter.dart';
 import '../services/admob_service.dart';
+import '../services/audio_service.dart';
 import 'package:share_plus/share_plus.dart';
 
 class CounterScreen extends StatefulWidget {
@@ -87,6 +88,10 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
         counter.goalDirection == GoalDirection.reach) {
       _triggerConfetti();
       achievementProvider.recordGoalCompleted();
+      HapticFeedback.heavyImpact();
+      if (achievementProvider.soundEnabled) {
+        AudioService().playCelebration();
+      }
     }
   }
 

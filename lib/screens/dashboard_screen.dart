@@ -9,8 +9,8 @@ import '../providers/task_provider.dart';
 import '../widgets/counter_card.dart';
 import '../widgets/twin_avatar_widget.dart';
 import '../widgets/banner_ad_widget.dart';
-import '../services/twin_notification_service.dart';
 import '../services/notification_service.dart';
+import '../services/twin_notification_service.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -22,6 +22,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _welcomeChecked = false;
   bool _notificationPermissionChecked = false;
+  bool _postFrameScheduled = false;
 
   double _getDailyScore(List counters) {
     if (counters.isEmpty) return 0;
@@ -48,8 +49,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final counters = counterProvider.counters;
     final achievementProvider = context.watch<AchievementProvider>();
 
-    // Check for welcome dialog on first launch
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Register at most one post-frame callback per frame to prevent accumulation
+    if (!_postFrameScheduled) {
+      _postFrameScheduled = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _postFrameScheduled = false;
       if (!_welcomeChecked) {
         _welcomeChecked = true;
         if (!settings.hasUserName && mounted) {
@@ -75,24 +79,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
         achievementProvider.clearLastUnlocked();
         _showAchievementUnlock(context, last, l10n);
       }
+      // Check achievements
+      if (mounted) {
+        achievementProvider.checkCounterCount(counters.length);
+        achievementProvider.checkStreaks(counters);
+      }
+      // Schedule Twin notifications (guarded internally by date)
+      if (mounted) {
+        final bestStreak = counters.map((c) => c.currentStreak).fold(0, (a, b) => a > b ? a : b);
+        TwinNotificationService().scheduleNotificationsIfNeeded(
+          counters: counters,
+          bestStreak: bestStreak,
+          translate: l10n.translate,
+        );
+      }
+      // Handle deep-link from cold-start notification tap
+      NotificationService().handlePendingPayload();
     });
-
-    // Schedule Twin notifications and check achievements after build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      // Check counter-count and streak achievements
-      achievementProvider.checkCounterCount(counters.length);
-      achievementProvider.checkStreaks(counters);
-    });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final bestStreak = counters.map((c) => c.currentStreak).fold(0, (a, b) => a > b ? a : b);
-      TwinNotificationService().scheduleNotificationsIfNeeded(
-        counters: counters,
-        bestStreak: bestStreak,
-        translate: l10n.translate,
-      );
-    });
+    }
 
     return Scaffold(
       body: SafeArea(
@@ -904,7 +908,7 @@ class _TwinCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '$scorePercent% today',
+                        '$scorePercent% ${l10n.translate('today')}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w700,
                               color: color,

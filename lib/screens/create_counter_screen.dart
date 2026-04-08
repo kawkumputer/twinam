@@ -30,15 +30,10 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
   bool _reminderEnabled = false;
   TimeOfDay _reminderTime = const TimeOfDay(hour: 9, minute: 0);
 
-  String _previewName = '';
-
   @override
   void initState() {
     super.initState();
     _stepController.text = '1';
-    _nameController.addListener(() {
-      setState(() => _previewName = _nameController.text);
-    });
     _goalController.addListener(() {
       setState(() {});
     });
@@ -98,10 +93,6 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Live preview card
-            _buildPreviewCard(context),
-            const SizedBox(height: 28),
-
             // Emoji selector
             _buildSectionTitle(context, l10n.translate('icon')),
             const SizedBox(height: 12),
@@ -383,101 +374,6 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
     );
   }
 
-  Widget _buildPreviewCard(BuildContext context) {
-    final color = AppTheme.counterColors[_selectedColorIndex];
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final name = _previewName.isEmpty ? '...' : _previewName;
-    final goalText = _goalController.text.trim();
-    final goal = goalText.isEmpty ? null : int.tryParse(goalText);
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOutCubic,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: color.withValues(alpha: isDark ? 0.25 : 0.15),
-          width: 1.5,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Emoji circle
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Center(
-              child: Text(_selectedEmoji, style: const TextStyle(fontSize: 28)),
-            ),
-          ),
-          const SizedBox(width: 16),
-          // Name + value
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Text(
-                      '0',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: color,
-                          ),
-                    ),
-                    if (goal != null) ...[
-                      Text(
-                        ' / $goal',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                              fontWeight: FontWeight.w500,
-                            ),
-                      ),
-                    ],
-                  ],
-                ),
-              ],
-            ),
-          ),
-          // Color indicator
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(Icons.add_rounded, color: color, size: 22),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
@@ -578,6 +474,7 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
         body: notifBody,
         hour: _reminderTime.hour,
         minute: _reminderTime.minute,
+        payload: 'counter:$counterId',
       );
     } else {
       await notifService.cancelReminder(notifId);

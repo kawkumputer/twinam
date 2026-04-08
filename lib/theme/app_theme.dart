@@ -29,9 +29,20 @@ class AppTheme {
   ];
 
   static const List<String> counterEmojis = [
-    '💧', '☕', '🚬', '💪', '🏃', '📖', '💊', '🍎',
-    '🧘', '✏️', '🎯', '⭐', '🔢', '❤️', '🙏', '📱',
-    '🍕', '🍺', '💤', '🎵', '🌟', '✅', '🔥', '💰',
+    // Top habits (most popular)
+    '💧', '🏃', '💪', '📖', '🧘', '☕', '😴', '🍎',
+    // Health & wellness (all ≤ Unicode 9.0)
+    '💊', '🥗', '📿', '💆', '🌿', '🥛', '🍵', '🍇',
+    // Exercise & sport
+    '🏋️', '🚴', '🏊', '🚶', '🥊', '⚽', '🏀', '🎾',
+    // Work & learning
+    '✏️', '📝', '📚', '🎓', '💻', '🎯', '📊', '⏰',
+    // Lifestyle & creativity
+    '🎵', '🎨', '📷', '🎮', '🏠', '🌱', '🌙', '🛁',
+    // Motivation & tracking
+    '🔥', '⭐', '🌟', '✅', '❤️', '🙏', '💰', '🏆',
+    // Other
+    '🍕', '🍺', '🚬', '📱', '🔢', '☀️', '🎁', '🌈',
   ];
 
   static ThemeData lightTheme() {
