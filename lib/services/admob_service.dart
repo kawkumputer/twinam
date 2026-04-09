@@ -7,6 +7,10 @@ class AdMobService {
   factory AdMobService() => _instance;
   AdMobService._internal();
 
+  /// Master switch to enable/disable all ads.
+  /// Set to true when ready to monetize (500-1000 active users).
+  static const bool adsEnabled = false;
+
   BannerAd? _bannerAd;
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
@@ -40,6 +44,10 @@ class AdMobService {
   }
 
   Future<void> initialize() async {
+    if (!adsEnabled) {
+      debugPrint('[AdMob] Ads disabled — skipping initialization');
+      return;
+    }
     await MobileAds.instance.initialize();
     
     // Configure for halal-compliant ads (family-friendly, no sensitive content)
@@ -55,6 +63,7 @@ class AdMobService {
 
   // Banner Ad
   BannerAd? createBannerAd() {
+    if (!adsEnabled) return null;
     _bannerAd = BannerAd(
       adUnitId: bannerAdUnitId,
       size: AdSize.banner,
@@ -109,6 +118,7 @@ class AdMobService {
   }
 
   void _showInterstitialAd(String trigger) {
+    if (!adsEnabled) return;
     if (_interstitialAd != null) {
       _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
         onAdDismissedFullScreenContent: (ad) {
@@ -149,6 +159,7 @@ class AdMobService {
   }
 
   Future<bool> showRewardedAd() async {
+    if (!adsEnabled) return false;
     if (_rewardedAd == null) {
       debugPrint('[AdMob] Rewarded ad not ready');
       _loadRewardedAd();
@@ -179,7 +190,7 @@ class AdMobService {
     return rewarded;
   }
 
-  bool get isRewardedAdReady => _rewardedAd != null;
+  bool get isRewardedAdReady => adsEnabled && _rewardedAd != null;
 
   void dispose() {
     _bannerAd?.dispose();
