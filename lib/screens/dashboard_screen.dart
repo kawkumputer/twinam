@@ -11,6 +11,7 @@ import '../widgets/twin_avatar_widget.dart';
 import '../widgets/banner_ad_widget.dart';
 import '../services/notification_service.dart';
 import '../services/twin_notification_service.dart';
+import '../theme/app_theme.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -207,6 +208,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 child: const Icon(
                                   Icons.task_alt_rounded,
                                   color: Color(0xFFFF9800),
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.of(context).pushNamed('/friends');
+                              },
+                              icon: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryColor.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: const Icon(
+                                  Icons.people_rounded,
+                                  color: AppTheme.primaryColor,
                                   size: 20,
                                 ),
                               ),
