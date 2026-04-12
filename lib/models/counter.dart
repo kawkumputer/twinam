@@ -18,6 +18,7 @@ class Counter {
   bool reminderEnabled;
   int reminderHour;
   int reminderMinute;
+  List<int> reminderDays; // 1=Mon…7=Sun, empty = every day
 
   Counter({
     required this.id,
@@ -32,12 +33,14 @@ class Counter {
     this.reminderEnabled = false,
     this.reminderHour = 9,
     this.reminderMinute = 0,
+    List<int>? reminderDays,
     DateTime? createdAt,
     DateTime? lastResetAt,
     List<CounterEntry>? history,
   })  : createdAt = createdAt ?? DateTime.now(),
         lastResetAt = lastResetAt ?? DateTime.now(),
-        history = history ?? [];
+        history = history ?? [],
+        reminderDays = reminderDays ?? [];
 
   double get progress {
     if (goal == null || goal == 0) return 0;
@@ -167,6 +170,7 @@ class Counter {
       'reminderEnabled': reminderEnabled,
       'reminderHour': reminderHour,
       'reminderMinute': reminderMinute,
+      'reminderDays': reminderDays,
     };
   }
 
@@ -184,6 +188,7 @@ class Counter {
       reminderEnabled: json['reminderEnabled'] as bool? ?? false,
       reminderHour: json['reminderHour'] as int? ?? 9,
       reminderMinute: json['reminderMinute'] as int? ?? 0,
+      reminderDays: (json['reminderDays'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [],
       createdAt: DateTime.parse(json['createdAt'] as String),
       lastResetAt: DateTime.parse(json['lastResetAt'] as String),
       history: (json['history'] as List<dynamic>?)

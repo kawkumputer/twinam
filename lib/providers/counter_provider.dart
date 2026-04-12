@@ -19,15 +19,32 @@ class CounterProvider extends ChangeNotifier {
 
   void _loadCounters() {
     _counters = _storage.getAllCounters();
-    _checkAutoResets();
+    _initAsync();
+  }
+
+  Future<void> _initAsync() async {
+    await _checkAutoResets();
     notifyListeners();
   }
 
-  void _checkAutoResets() {
+  Future<void> _checkAutoResets() async {
     for (final counter in _counters) {
       if (counter.shouldReset()) {
         counter.resetValue();
-        _storage.saveCounter(counter);
+        await _storage.saveCounter(counter);
+        // Reschedule reminder now that the counter has reset for the new day
+        if (!kIsWeb && counter.reminderEnabled) {
+          final notifId = NotificationService().notificationIdFromCounterId(counter.id);
+          await NotificationService().scheduleWeeklyReminders(
+            baseId: notifId,
+            title: '${counter.emoji} ${counter.name}',
+            body: '',
+            hour: counter.reminderHour,
+            minute: counter.reminderMinute,
+            days: counter.reminderDays,
+            payload: 'counter:${counter.id}',
+          );
+        }
       }
     }
   }
@@ -52,7 +69,7 @@ class CounterProvider extends ChangeNotifier {
     // Cancel any scheduled reminder notification for this counter
     if (!kIsWeb) {
       final notifId = NotificationService().notificationIdFromCounterId(id);
-      await NotificationService().cancelReminder(notifId);
+      await NotificationService().cancelWeeklyReminders(notifId);
     }
     _counters.removeWhere((c) => c.id == id);
     await _storage.deleteCounter(id);
@@ -68,6 +85,17 @@ class CounterProvider extends ChangeNotifier {
     // Play celebration sound if goal just reached
     if (!wasGoalReached && counter.goalReached) {
       AudioService().playCelebration();
+    }
+
+    // Cancel today's reminder on every tap before the reminder time fires.
+    // The notification will be rescheduled automatically when the counter resets next day.
+    if (!kIsWeb && counter.reminderEnabled) {
+      final now = DateTime.now();
+      final reminderToday = DateTime(now.year, now.month, now.day, counter.reminderHour, counter.reminderMinute);
+      if (now.isBefore(reminderToday)) {
+        final notifId = NotificationService().notificationIdFromCounterId(id);
+        await NotificationService().cancelWeeklyReminders(notifId);
+      }
     }
     
     await _storage.saveCounter(counter);

@@ -34,9 +34,13 @@ class NotificationService {
   void handlePendingPayload() {
     if (_pendingPayload == null) return;
     final payload = _pendingPayload!;
-    _pendingPayload = null;
     final nav = navigatorKey.currentState;
-    if (nav != null) _handlePayload(payload, nav);
+    if (nav == null) {
+      debugPrint('[Notif] Navigator not ready, will retry payload: $payload');
+      return; // keep _pendingPayload so next call retries
+    }
+    _pendingPayload = null;
+    _handlePayload(payload, nav);
   }
 
   void _onNotificationTap(NotificationResponse response) {
@@ -75,6 +79,16 @@ class NotificationService {
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
+      notificationCategories: [
+        DarwinNotificationCategory(
+          'counter_reminder',
+          options: {DarwinNotificationCategoryOption.hiddenPreviewShowTitle},
+        ),
+        DarwinNotificationCategory(
+          'task_reminder',
+          options: {DarwinNotificationCategoryOption.hiddenPreviewShowTitle},
+        ),
+      ],
     );
     const linuxSettings = LinuxInitializationSettings(
       defaultActionName: "Open Twin'Am",
@@ -141,7 +155,12 @@ class NotificationService {
             priority: Priority.high,
             icon: '@mipmap/ic_launcher',
           ),
-          iOS: const DarwinNotificationDetails(),
+          iOS: const DarwinNotificationDetails(
+            categoryIdentifier: 'counter_reminder',
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
         ),
         payload: payload,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -160,6 +179,53 @@ class NotificationService {
       await _plugin.cancel(id);
     } catch (e) {
       debugPrint('[Notif] Failed to cancel reminder $id: $e');
+    }
+  }
+
+  /// Cancels today's instance and reschedules from tomorrow at the same time.
+  Future<void> skipTodayAndReschedule({
+    required int id,
+    required String title,
+    required String body,
+    required int hour,
+    required int minute,
+    String? payload,
+  }) async {
+    await cancelReminder(id);
+    try {
+      final now = tz.TZDateTime.now(tz.local);
+      var tomorrow = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute)
+          .add(const Duration(days: 1));
+      await _plugin.zonedSchedule(
+        id,
+        title,
+        body,
+        tomorrow,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'daily_reminders',
+            'Daily Reminders',
+            channelDescription: 'Daily counter reminders',
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+          ),
+          iOS: const DarwinNotificationDetails(
+            categoryIdentifier: 'counter_reminder',
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+        ),
+        payload: payload,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      debugPrint('[Notif] Skipped today, rescheduled id=$id from tomorrow at $hour:$minute');
+    } catch (e) {
+      debugPrint('[Notif] Failed to reschedule $id: $e');
     }
   }
 
@@ -185,6 +251,80 @@ class NotificationService {
 
   int notificationIdFromCounterId(String counterId) {
     return counterId.hashCode.abs() % 100000;
+  }
+
+  /// Returns the per-weekday notification ID for a counter.
+  /// weekday: 1=Mon … 7=Sun
+  int _weekdayNotifId(int baseId, int weekday) => baseId + weekday * 100000;
+
+  /// Schedules one weekly notification per selected day.
+  /// [days] = subset of 1-7 (Mon-Sun). Empty list falls back to daily.
+  Future<void> scheduleWeeklyReminders({
+    required int baseId,
+    required String title,
+    required String body,
+    required int hour,
+    required int minute,
+    required List<int> days,
+    String? payload,
+  }) async {
+    await cancelWeeklyReminders(baseId);
+    if (days.isEmpty) {
+      await scheduleDailyReminder(
+          id: baseId, title: title, body: body, hour: hour, minute: minute, payload: payload);
+      return;
+    }
+    for (final weekday in days) {
+      final id = _weekdayNotifId(baseId, weekday);
+      try {
+        await _plugin.zonedSchedule(
+          id,
+          title,
+          body,
+          _nextInstanceOfWeekdayTime(weekday, hour, minute),
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              'daily_reminders',
+              'Daily Reminders',
+              channelDescription: 'Daily counter reminders',
+              importance: Importance.high,
+              priority: Priority.high,
+              icon: '@mipmap/ic_launcher',
+            ),
+            iOS: const DarwinNotificationDetails(
+              categoryIdentifier: 'counter_reminder',
+              presentAlert: true,
+              presentBadge: true,
+              presentSound: true,
+            ),
+          ),
+          payload: payload,
+          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+        );
+        debugPrint('[Notif] Weekly reminder id=$id weekday=$weekday at $hour:$minute');
+      } catch (e) {
+        debugPrint('[Notif] Failed to schedule weekly reminder id=$id: $e');
+      }
+    }
+  }
+
+  Future<void> cancelWeeklyReminders(int baseId) async {
+    await cancelReminder(baseId); // cancel daily if any
+    for (int weekday = 1; weekday <= 7; weekday++) {
+      await cancelReminder(_weekdayNotifId(baseId, weekday));
+    }
+  }
+
+  tz.TZDateTime _nextInstanceOfWeekdayTime(int weekday, int hour, int minute) {
+    final now = tz.TZDateTime.now(tz.local);
+    var candidate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    while (candidate.weekday != weekday || candidate.isBefore(now)) {
+      candidate = candidate.add(const Duration(days: 1));
+    }
+    return candidate;
   }
 
   // ── Twin Notifications ─────────────────────────────────────────────────────

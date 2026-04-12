@@ -955,7 +955,7 @@ class _TasksSummaryCard extends StatelessWidget {
     final allUrgent = <dynamic>{
       ...taskProvider.overdueTasks,
       ...taskProvider.todayTasks,
-    }.take(3).toList();
+    }.take(2).toList();
 
     final hasUrgent = allUrgent.isNotEmpty;
     final allClear = todoCount == 0 && inProgressCount == 0 && overdueCount == 0;

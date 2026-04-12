@@ -29,6 +29,8 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
   Counter? _existingCounter;
   bool _reminderEnabled = false;
   TimeOfDay _reminderTime = const TimeOfDay(hour: 9, minute: 0);
+  List<int> _reminderDays = []; // 1=Mon…7=Sun, empty=every day
+  bool _nameError = false;
 
   @override
   void initState() {
@@ -58,6 +60,7 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
         _stepController.text = _existingCounter!.step.toString();
         _reminderEnabled = _existingCounter!.reminderEnabled;
         _reminderTime = TimeOfDay(hour: _existingCounter!.reminderHour, minute: _existingCounter!.reminderMinute);
+        _reminderDays = List<int>.from(_existingCounter!.reminderDays);
         if (_existingCounter!.goal != null) {
           _goalController.text = _existingCounter!.goal.toString();
         }
@@ -139,8 +142,10 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
             const SizedBox(height: 12),
             TextField(
               controller: _nameController,
+              onChanged: (_) { if (_nameError) setState(() => _nameError = false); },
               decoration: InputDecoration(
                 hintText: l10n.translate('counterNameHint'),
+                errorText: _nameError ? l10n.translate('fieldRequired') : null,
               ),
               textCapitalization: TextCapitalization.sentences,
             ),
@@ -315,6 +320,8 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
                   ),
                   if (_reminderEnabled) ...[
                     const SizedBox(height: 12),
+                    _buildDaySelector(context, l10n),
+                    const SizedBox(height: 8),
                     GestureDetector(
                       onTap: () async {
                         final picked = await showTimePicker(
@@ -385,6 +392,63 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
     );
   }
 
+  Widget _buildDaySelector(BuildContext context, AppLocalizations l10n) {
+    const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    final color = AppTheme.counterColors[_selectedColorIndex];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _reminderDays.isEmpty ? l10n.translate('everyDay') : l10n.translate('specificDays'),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(7, (i) {
+            final weekday = i + 1;
+            final isSelected = _reminderDays.contains(weekday);
+            final label = l10n.translate(dayKeys[i]).substring(0, 1);
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (isSelected) {
+                    _reminderDays.remove(weekday);
+                  } else {
+                    _reminderDays.add(weekday);
+                    _reminderDays.sort();
+                  }
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: isSelected ? color : Theme.of(context).colorScheme.surfaceContainerHighest,
+                  shape: BoxShape.circle,
+                  border: isSelected ? null : Border.all(color: color.withValues(alpha: 0.3)),
+                ),
+                child: Center(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: isSelected ? Colors.white : color,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
   Widget _buildChip(
     BuildContext context,
     String label,
@@ -416,7 +480,10 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
 
   Future<void> _onSave() async {
     final name = _nameController.text.trim();
-    if (name.isEmpty) return;
+    if (name.isEmpty) {
+      setState(() => _nameError = true);
+      return;
+    }
 
     final provider = context.read<CounterProvider>();
     final settings = context.read<SettingsProvider>();
@@ -440,6 +507,7 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
       _existingCounter!.reminderEnabled = _reminderEnabled;
       _existingCounter!.reminderHour = _reminderTime.hour;
       _existingCounter!.reminderMinute = _reminderTime.minute;
+      _existingCounter!.reminderDays = List<int>.from(_reminderDays);
       provider.updateCounter(_existingCounter!);
       counterId = _existingCounter!.id;
     } else {
@@ -456,6 +524,7 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
         reminderEnabled: _reminderEnabled,
         reminderHour: _reminderTime.hour,
         reminderMinute: _reminderTime.minute,
+        reminderDays: List<int>.from(_reminderDays),
       );
       provider.addCounter(counter);
     }
@@ -468,16 +537,17 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
       final notifBody = userName.isNotEmpty
           ? '$userName${l10n.translate('reminderBodyPersonal')}'
           : l10n.translate('reminderBody');
-      await notifService.scheduleDailyReminder(
-        id: notifId,
+      await notifService.scheduleWeeklyReminders(
+        baseId: notifId,
         title: '$_selectedEmoji $name',
         body: notifBody,
         hour: _reminderTime.hour,
         minute: _reminderTime.minute,
+        days: _reminderDays,
         payload: 'counter:$counterId',
       );
     } else {
-      await notifService.cancelReminder(notifId);
+      await notifService.cancelWeeklyReminders(notifId);
     }
 
     if (mounted) Navigator.of(context).pop();

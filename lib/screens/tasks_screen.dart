@@ -497,7 +497,9 @@ class _TaskCardState extends State<_TaskCard> with SingleTickerProviderStateMixi
     }
     final diff = deadline.difference(now);
     if (diff.inDays < 7) {
-      return '${DateFormat.E().format(deadline)} ${l10n.translate('at')} $time';
+      const weekdayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+      final dayLabel = l10n.translate(weekdayKeys[deadline.weekday - 1]);
+      return '$dayLabel ${l10n.translate('at')} $time';
     }
     return DateFormat('MMM d, HH:mm').format(deadline);
   }

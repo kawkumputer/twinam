@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:upgrader/upgrader.dart';
 import 'providers/achievement_provider.dart';
 import 'providers/counter_provider.dart';
 import 'providers/settings_provider.dart';
@@ -19,6 +20,7 @@ import 'screens/tasks_screen.dart';
 import 'screens/create_task_screen.dart';
 import 'services/notification_service.dart';
 import 'services/storage_service.dart';
+import 'services/upgrader_messages.dart';
 import 'theme/app_theme.dart';
 
 class TwinAmApp extends StatelessWidget {
@@ -73,11 +75,17 @@ class TwinAmApp extends StatelessWidget {
               Locale('ar'),
               Locale('de'),
             ],
-            home: Directionality(
-              textDirection: settings.locale == 'ar' 
-                  ? TextDirection.rtl 
-                  : TextDirection.ltr,
-              child: const DashboardScreen(),
+            home: UpgradeAlert(
+              upgrader: Upgrader(
+                durationUntilAlertAgain: const Duration(days: 1),
+                messages: _getUpgraderMessages(settings.locale),
+              ),
+              child: Directionality(
+                textDirection: settings.locale == 'ar' 
+                    ? TextDirection.rtl 
+                    : TextDirection.ltr,
+                child: const DashboardScreen(),
+              ),
             ),
             onGenerateRoute: (routeSettings) {
               final locale = settings.locale;
@@ -120,6 +128,21 @@ class TwinAmApp extends StatelessWidget {
         },
       ),
     );
+  }
+
+  static UpgraderMessages _getUpgraderMessages(String locale) {
+    switch (locale) {
+      case 'fr':
+        return UpgraderMessagesFr();
+      case 'ar':
+        return UpgraderMessagesAr();
+      case 'es':
+        return UpgraderMessagesEs();
+      case 'de':
+        return UpgraderMessagesDe();
+      default:
+        return UpgraderMessages(code: 'en');
+    }
   }
 
   static PageRouteBuilder _buildRoute(Widget page, {String? locale}) {

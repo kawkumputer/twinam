@@ -31,7 +31,7 @@ class _StatsScreenState extends State<StatsScreen> {
     }
 
     final counterColor = Color(counter.colorValue);
-    final chartData = _getChartData(counter);
+    final chartData = _getChartData(counter, l10n);
 
     return Scaffold(
         appBar: AppBar(
@@ -264,7 +264,11 @@ class _StatsScreenState extends State<StatsScreen> {
     );
   }
 
-  List<_ChartEntry> _getChartData(Counter counter) {
+  static const _weekdayKeys = [
+    'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'
+  ];
+
+  List<_ChartEntry> _getChartData(Counter counter, AppLocalizations l10n) {
     final now = DateTime.now();
 
     if (_selectedPeriod == 0) {
@@ -277,8 +281,9 @@ class _StatsScreenState extends State<StatsScreen> {
             e.date.month == date.month &&
             e.date.day == date.day);
         final maxVal = dayEntries.isEmpty ? 0 : dayEntries.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+        final key = _weekdayKeys[date.weekday - 1];
         return _ChartEntry(
-          label: DateFormat('E').format(date).substring(0, 2),
+          label: l10n.translate(key),
           value: maxVal,
         );
       });
