@@ -16,7 +16,6 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.9'
           channel: 'stable'
 
       - name: Install dependencies
@@ -77,10 +76,13 @@ jobs:
         env:
           DEVELOPMENT_TEAM: ${{ secrets.DEVELOPMENT_TEAM }}
         run: |
-          # Step 1: Build flutter app without codesign
+          # Step 1: Inject DEVELOPMENT_TEAM so flutter build doesn't reject the project
+          sed -i '' "s/DEVELOPMENT_TEAM = \"\"/DEVELOPMENT_TEAM = \"$DEVELOPMENT_TEAM\"/g" ios/Runner.xcodeproj/project.pbxproj
+
+          # Step 2: Build flutter app without codesign
           flutter build ios --release --no-codesign
 
-          # Step 2: Get provisioning profile UUID
+          # Step 3: Get provisioning profile UUID
           PP_PATH=$RUNNER_TEMP/twinam_distribution.mobileprovision
           PP_UUID=$(/usr/libexec/PlistBuddy -c "Print UUID" /dev/stdin <<< $(/usr/bin/security cms -D -i $PP_PATH))
           echo "Using provisioning profile UUID: $PP_UUID"
