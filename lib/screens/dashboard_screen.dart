@@ -231,6 +231,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                             IconButton(
                               onPressed: () {
+                                Navigator.of(context).pushNamed('/challenges');
+                              },
+                              icon: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.warningColor.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: const Icon(
+                                  Icons.bolt_rounded,
+                                  color: AppTheme.warningColor,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
                                 Navigator.of(context).pushNamed('/achievements');
                               },
                               icon: Container(

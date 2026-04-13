@@ -69,6 +69,9 @@ create policy "Users can create challenges" on public.challenges
 create policy "Creator can update challenge" on public.challenges
   for update using (auth.uid() = creator_id);
 
+create policy "Creator can delete challenge" on public.challenges
+  for delete using (auth.uid() = creator_id);
+
 -- 4. CHALLENGE PARTICIPANTS
 create table if not exists public.challenge_participants (
   id uuid default gen_random_uuid() primary key,
@@ -82,16 +85,25 @@ create table if not exists public.challenge_participants (
 
 alter table public.challenge_participants enable row level security;
 
+-- SECURITY DEFINER function: checks participation WITHOUT applying RLS (breaks the recursion cycle)
+create or replace function public.is_challenge_participant(p_challenge_id uuid, p_user_id uuid)
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.challenge_participants
+    where challenge_id = p_challenge_id and user_id = p_user_id
+  );
+$$;
+
+-- challenge_participants SELECT: any participant can see ALL rows for their shared challenges
+-- Uses SECURITY DEFINER function to avoid RLS recursion
 create policy "Participants viewable by challenge members" on public.challenge_participants
   for select using (
-    exists (
-      select 1 from public.challenges c
-      where c.id = challenge_id and (
-        c.creator_id = auth.uid() or
-        exists (select 1 from public.challenge_participants cp
-                where cp.challenge_id = c.id and cp.user_id = auth.uid())
-      )
-    )
+    public.is_challenge_participant(challenge_id, auth.uid())
   );
 
 create policy "Creator can add participants" on public.challenge_participants
@@ -102,15 +114,29 @@ create policy "Creator can add participants" on public.challenge_participants
 create policy "Users can update their own participation" on public.challenge_participants
   for update using (auth.uid() = user_id);
 
--- SELECT policy for challenges (added here because it references challenge_participants)
+-- challenges SELECT: uses SECURITY DEFINER function to check participation (no RLS recursion)
 create policy "Challenges viewable by participants" on public.challenges
   for select using (
-    auth.uid() = creator_id or
-    exists (
-      select 1 from public.challenge_participants
-      where challenge_id = challenges.id and user_id = auth.uid()
-    )
+    creator_id = auth.uid()
+    or public.is_challenge_participant(id, auth.uid())
   );
+
+-- 5b. Trigger: auto-activate challenge when invited participant accepts
+create or replace function public.handle_participant_accepted()
+returns trigger as $$
+begin
+  if NEW.status = 'accepted' and OLD.status = 'invited' then
+    update public.challenges
+    set status = 'active'
+    where id = NEW.challenge_id;
+  end if;
+  return NEW;
+end;
+$$ language plpgsql security definer;
+
+create or replace trigger on_participant_accepted
+  after update of status on public.challenge_participants
+  for each row execute procedure public.handle_participant_accepted();
 
 -- 5. Function: auto-create profile on signup
 create or replace function public.handle_new_user()

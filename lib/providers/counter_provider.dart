@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/counter.dart';
+import '../services/challenge_service.dart';
 import '../services/storage_service.dart';
 import '../services/audio_service.dart';
 import '../services/notification_service.dart';
@@ -49,7 +50,15 @@ class CounterProvider extends ChangeNotifier {
     }
   }
 
+  bool hasCounterForChallenge(String challengeId) =>
+      _counters.any((c) => c.challengeId == challengeId);
+
   Future<void> addCounter(Counter counter) async {
+    // Prevent duplicate challenge-linked counters
+    if (counter.challengeId != null &&
+        hasCounterForChallenge(counter.challengeId!)) {
+      return;
+    }
     _counters.add(counter);
     await _storage.saveCounter(counter);
     _saveOrder();
@@ -102,7 +111,10 @@ class CounterProvider extends ChangeNotifier {
     if (!kIsWeb) {
       _updateWidgets();
     }
-    
+    // Sync to Supabase challenge if linked
+    if (counter.challengeId != null) {
+      unawaited(ChallengeService.updateProgress(counter.challengeId!, counter.value));
+    }
     notifyListeners();
   }
 
@@ -112,6 +124,10 @@ class CounterProvider extends ChangeNotifier {
     await _storage.saveCounter(counter);
     if (!kIsWeb) {
       _updateWidgets();
+    }
+    // Sync to Supabase challenge if linked
+    if (counter.challengeId != null) {
+      unawaited(ChallengeService.updateProgress(counter.challengeId!, counter.value));
     }
     notifyListeners();
   }

@@ -19,6 +19,7 @@ class Counter {
   int reminderHour;
   int reminderMinute;
   List<int> reminderDays; // 1=Mon…7=Sun, empty = every day
+  String? challengeId; // If set, increments sync to Supabase challenge progress
 
   Counter({
     required this.id,
@@ -33,6 +34,7 @@ class Counter {
     this.reminderEnabled = false,
     this.reminderHour = 9,
     this.reminderMinute = 0,
+    this.challengeId,
     List<int>? reminderDays,
     DateTime? createdAt,
     DateTime? lastResetAt,
@@ -171,6 +173,7 @@ class Counter {
       'reminderHour': reminderHour,
       'reminderMinute': reminderMinute,
       'reminderDays': reminderDays,
+      'challengeId': challengeId,
     };
   }
 
@@ -188,6 +191,7 @@ class Counter {
       reminderEnabled: json['reminderEnabled'] as bool? ?? false,
       reminderHour: json['reminderHour'] as int? ?? 9,
       reminderMinute: json['reminderMinute'] as int? ?? 0,
+      challengeId: json['challengeId'] as String?,
       reminderDays: (json['reminderDays'] as List<dynamic>?)?.map((e) => e as int).toList() ?? [],
       createdAt: DateTime.parse(json['createdAt'] as String),
       lastResetAt: DateTime.parse(json['lastResetAt'] as String),

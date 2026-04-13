@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:upgrader/upgrader.dart';
 import 'providers/achievement_provider.dart';
 import 'providers/auth_provider.dart';
+import 'providers/challenge_provider.dart';
 import 'providers/counter_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/task_provider.dart';
@@ -19,6 +20,7 @@ import 'screens/daily_verdict_screen.dart';
 import 'screens/stats_screen.dart';
 import 'screens/tasks_screen.dart';
 import 'screens/create_task_screen.dart';
+import 'screens/challenges/challenges_screen.dart';
 import 'screens/friends/friends_screen.dart';
 import 'services/notification_service.dart';
 import 'services/storage_service.dart';
@@ -48,6 +50,9 @@ class TwinAmApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => AuthProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ChallengeProvider(),
         ),
       ],
       child: Consumer<SettingsProvider>(
@@ -121,6 +126,8 @@ class TwinAmApp extends StatelessWidget {
                   return _buildRoute(const TasksScreen(), locale: locale);
                 case '/friends':
                   return _buildRoute(const FriendsScreen(), locale: locale);
+                case '/challenges':
+                  return _buildRoute(const ChallengesScreen(), locale: locale);
                 case '/create-task':
                   return _buildRoute(const CreateTaskScreen(), locale: locale);
                 case '/edit-task':

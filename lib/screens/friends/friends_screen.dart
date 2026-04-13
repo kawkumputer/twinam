@@ -6,6 +6,7 @@ import '../../services/supabase_service.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../auth/login_screen.dart';
+import '../challenges/create_challenge_screen.dart';
 
 class FriendsScreen extends StatefulWidget {
   const FriendsScreen({super.key});
@@ -354,7 +355,7 @@ class _FriendsScreenState extends State<FriendsScreen>
               ),
             )
           else
-            ..._friends.map((f) => _FriendCard(profile: f)),
+            ..._friends.map((f) => _FriendCard(profile: f, l10n: l10n)),
         ],
       ),
     );
@@ -424,30 +425,44 @@ class _FriendsScreenState extends State<FriendsScreen>
 
 class _FriendCard extends StatelessWidget {
   final Map<String, dynamic> profile;
+  final AppLocalizations l10n;
 
-  const _FriendCard({required this.profile});
+  const _FriendCard({required this.profile, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final username = profile['username'] as String? ?? '?';
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.15),
           child: Text(
-            (profile['username'] as String)[0].toUpperCase(),
+            username[0].toUpperCase(),
             style: const TextStyle(
               color: AppTheme.primaryColor,
               fontWeight: FontWeight.w700,
             ),
           ),
         ),
-        title: Text('@${profile['username']}'),
+        title: Text('@$username'),
         subtitle: profile['display_name'] != null
             ? Text(profile['display_name'] as String,
                 style: theme.textTheme.bodySmall)
             : null,
+        trailing: IconButton(
+          icon: const Icon(Icons.bolt_rounded, color: AppTheme.warningColor),
+          tooltip: l10n.translate('challengeMe'),
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => CreateChallengeScreen(
+                opponentId: profile['id'] as String,
+                opponentUsername: username,
+              ),
+            ));
+          },
+        ),
       ),
     );
   }
