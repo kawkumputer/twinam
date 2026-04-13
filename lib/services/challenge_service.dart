@@ -100,9 +100,15 @@ class ChallengeService {
     // Challenge status is activated automatically by DB trigger on_participant_accepted
   }
 
-  /// Update current user's progress in a challenge
+  /// Update current user's progress in a challenge (only when active)
   static Future<void> updateProgress(String challengeId, int value) async {
     final uid = SupabaseService.currentUser!.id;
+    final challenge = await _client
+        .from('challenges')
+        .select('status')
+        .eq('id', challengeId)
+        .single();
+    if (challenge['status'] != 'active') return;
     await _client
         .from('challenge_participants')
         .update({'current_value': value})
