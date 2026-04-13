@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/web_translations.dart';
 import '../../main_web.dart';
+import '../../widgets/twin_avatar_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -240,21 +241,21 @@ class HomePage extends StatelessWidget {
             alignment: WrapAlignment.center,
             children: [
               _buildTwinAvatarCard(
-                'assets/happy-avatar.jpeg',
+                TwinState.happy,
                 l.t('twinHappy'),
                 l.t('twinHappyDesc'),
                 const Color(0xFF4CAF50),
                 isMobile,
               ),
               _buildTwinAvatarCard(
-                'assets/neutral-avatar.jpeg',
+                TwinState.neutral,
                 l.t('twinNeutral'),
                 l.t('twinNeutralDesc'),
                 const Color(0xFF2196F3),
                 isMobile,
               ),
               _buildTwinAvatarCard(
-                'assets/sad-avatar.jpeg',
+                TwinState.sad,
                 l.t('twinSad'),
                 l.t('twinSadDesc'),
                 const Color(0xFFFF7043),
@@ -267,7 +268,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTwinAvatarCard(String imagePath, String message, String description, Color color, bool isMobile) {
+  Widget _buildTwinAvatarCard(TwinState state, String message, String description, Color color, bool isMobile) {
     return Container(
       width: isMobile ? double.infinity : 280,
       padding: const EdgeInsets.all(24),
@@ -288,14 +289,10 @@ class HomePage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(100),
-            child: Image.asset(
-              imagePath,
-              width: 120,
-              height: 120,
-              fit: BoxFit.cover,
-            ),
+          TwinAvatarWidget(
+            state: state,
+            size: 104,
+            enableMicroBehaviors: false,
           ),
           const SizedBox(height: 20),
           Text(

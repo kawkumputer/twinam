@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 import '../l10n/app_localizations.dart';
 
 enum TwinState { happy, neutral, sad }
@@ -50,6 +51,17 @@ class TwinAvatarWidget extends StatefulWidget {
     }
   }
 
+  static String videoForState(TwinState state) {
+    switch (state) {
+      case TwinState.happy:
+        return 'assets/idle-happy.mp4';
+      case TwinState.neutral:
+        return 'assets/idle-neutre.mp4';
+      case TwinState.sad:
+        return 'assets/idle-sad.mp4';
+    }
+  }
+
   static Color colorForState(TwinState state) {
     switch (state) {
       case TwinState.happy:
@@ -67,6 +79,10 @@ class TwinAvatarWidget extends StatefulWidget {
 
 class _TwinAvatarWidgetState extends State<TwinAvatarWidget>
     with TickerProviderStateMixin {
+  // Video controller
+  VideoPlayerController? _videoController;
+  bool _videoInitialized = false;
+
   // Animation controllers
   late AnimationController _breathingController;
   late AnimationController _idleController;
@@ -77,7 +93,6 @@ class _TwinAvatarWidgetState extends State<TwinAvatarWidget>
   late Animation<double> _breathingAnimation;
   late Animation<double> _glowAnimation;
   late Animation<double> _idleSwayAnimation;
-  late Animation<double> _blinkAnimation;
   late Animation<double> _welcomeScaleAnimation;
   late Animation<double> _welcomeRotationAnimation;
   
@@ -86,7 +101,6 @@ class _TwinAvatarWidgetState extends State<TwinAvatarWidget>
   Timer? _idleTimer;
   
   // State
-  bool _isBlinking = false;
   bool _showWelcome = true;
   final Random _random = Random();
 
@@ -124,10 +138,6 @@ class _TwinAvatarWidgetState extends State<TwinAvatarWidget>
       vsync: this,
     );
     
-    _blinkAnimation = Tween<double>(begin: 1.0, end: 0.1).animate(
-      CurvedAnimation(parent: _blinkController, curve: Curves.easeInOut),
-    );
-    
     // Welcome animation (on app open)
     _welcomeController = AnimationController(
       duration: const Duration(milliseconds: 1200),
@@ -148,9 +158,28 @@ class _TwinAvatarWidgetState extends State<TwinAvatarWidget>
       ),
     );
     
+    _initVideo();
     if (widget.enableMicroBehaviors) {
       _startMicroBehaviors();
       _playWelcomeAnimation();
+    }
+  }
+
+  Future<void> _initVideo() async {
+    final path = TwinAvatarWidget.videoForState(widget.state);
+    final controller = VideoPlayerController.asset(path);
+    await controller.initialize();
+    controller.setLooping(true);
+    controller.setVolume(0);
+    controller.play();
+    if (mounted) {
+      setState(() {
+        _videoController?.dispose();
+        _videoController = controller;
+        _videoInitialized = true;
+      });
+    } else {
+      controller.dispose();
     }
   }
   
@@ -173,11 +202,9 @@ class _TwinAvatarWidgetState extends State<TwinAvatarWidget>
   
   void _performBlink() async {
     if (!mounted) return;
-    setState(() => _isBlinking = true);
     await _blinkController.forward();
     await _blinkController.reverse();
     if (mounted) {
-      setState(() => _isBlinking = false);
       _scheduleNextBlink();
     }
   }
@@ -194,13 +221,15 @@ class _TwinAvatarWidgetState extends State<TwinAvatarWidget>
   void didUpdateWidget(TwinAvatarWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.state != widget.state) {
-      // React to state change with a little bounce
+      _videoInitialized = false;
+      _initVideo();
       _breathingController.forward(from: 0);
     }
   }
 
   @override
   void dispose() {
+    _videoController?.dispose();
     _breathingController.dispose();
     _idleController.dispose();
     _blinkController.dispose();
@@ -213,7 +242,6 @@ class _TwinAvatarWidgetState extends State<TwinAvatarWidget>
   @override
   Widget build(BuildContext context) {
     final color = TwinAvatarWidget.colorForState(widget.state);
-    final asset = TwinAvatarWidget.assetForState(widget.state);
 
     return GestureDetector(
       onTap: widget.onTap,
@@ -274,30 +302,21 @@ class _TwinAvatarWidgetState extends State<TwinAvatarWidget>
                               child: Stack(
                                 fit: StackFit.expand,
                                 children: [
-                                  Image.asset(
-                                    asset,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  // Blink overlay (simulates eye closing)
-                                  if (_isBlinking && widget.enableMicroBehaviors)
-                                    Positioned(
-                                      top: 0,
-                                      left: 0,
-                                      right: 0,
-                                      height: (widget.size + 16) * (1 - _blinkAnimation.value),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Colors.black.withValues(alpha: 0.7),
-                                              Colors.black.withValues(alpha: 0.3),
-                                              Colors.transparent,
-                                            ],
-                                          ),
+                                  if (_videoInitialized && _videoController != null)
+                                    SizedBox.expand(
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: SizedBox(
+                                          width: _videoController!.value.size.width,
+                                          height: _videoController!.value.size.height,
+                                          child: VideoPlayer(_videoController!),
                                         ),
                                       ),
+                                    )
+                                  else
+                                    Image.asset(
+                                      TwinAvatarWidget.assetForState(widget.state),
+                                      fit: BoxFit.cover,
                                     ),
                                 ],
                               ),

@@ -540,13 +540,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 8),
-                  ClipOval(
-                    child: Image.asset(
-                      'assets/happy-avatar.jpeg',
-                      width: 90,
-                      height: 90,
-                      fit: BoxFit.cover,
-                    ),
+                  TwinAvatarWidget(
+                    state: TwinState.happy,
+                    size: 74,
+                    enableMicroBehaviors: false,
                   ),
                   const SizedBox(height: 16),
                   Text(
