@@ -10,6 +10,7 @@ import '../../providers/settings_provider.dart';
 import '../../services/supabase_service.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../../widgets/twin_avatar_widget.dart';
 
 class ChallengesScreen extends StatefulWidget {
   const ChallengesScreen({super.key});
@@ -454,13 +455,24 @@ class _ChallengeCard extends StatelessWidget {
         .firstWhere((p) => p.userId != uid,
             orElse: () => challenge.participants.first);
 
+    final duoVideo = challenge.isCompleted
+        ? (me.currentValue >= challenge.targetValue
+            ? TwinDuoWidget.videoCompleted
+            : TwinDuoWidget.videoNeutral)
+        : TwinDuoWidget.videoActive;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TwinDuoWidget(videoAsset: duoVideo, height: 120),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             Text(challenge.title,
                 style: const TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w700)),
@@ -486,8 +498,10 @@ class _ChallengeCard extends StatelessWidget {
               target: challenge.targetValue,
               color: AppTheme.accentColor,
             ),
-          ],
-        ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

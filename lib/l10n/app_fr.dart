@@ -228,9 +228,11 @@ const Map<String, String> fr = {
   'supportTwinAm': '💝 Soutenez Twin\'Am',
 
   // Twin Avatar Messages
+  'twinExcitedMessage': 'INCROYABLE ! Tu es inarrêtable ! 🔥🏆',
   'twinHappyMessage': 'Je suis fier de toi ! 🌟',
   'twinNeutralMessage': 'Continue, tu peux le faire 💪',
   'twinSadMessage': 'Tu peux faire mieux. Allez ! 🔥',
+  'twinCryMessage': 'Tu me manques… reviens 🥺',
   'myTwin': 'Mon Twin',
   'twinAndYou': 'Toi & ton Twin',
   'yourTwin': 'Ton Twin',

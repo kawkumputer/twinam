@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import '../l10n/app_localizations.dart';
 
-enum TwinState { happy, neutral, sad }
+enum TwinState { excited, happy, neutral, sad, cry }
 
 class TwinAvatarWidget extends StatefulWidget {
   final TwinState state;
@@ -23,53 +23,94 @@ class TwinAvatarWidget extends StatefulWidget {
   });
 
   static TwinState fromScore(double score) {
-    if (score >= 0.8) return TwinState.happy;
+    if (score >= 0.9) return TwinState.excited;
+    if (score >= 0.7) return TwinState.happy;
     if (score >= 0.4) return TwinState.neutral;
-    return TwinState.sad;
+    if (score >= 0.15) return TwinState.sad;
+    return TwinState.cry;
   }
 
   static String messageForState(TwinState state, [String locale = 'en']) {
     final l10n = AppLocalizations(locale);
     switch (state) {
+      case TwinState.excited:
+        return l10n.translate('twinExcitedMessage');
       case TwinState.happy:
         return l10n.translate('twinHappyMessage');
       case TwinState.neutral:
         return l10n.translate('twinNeutralMessage');
       case TwinState.sad:
         return l10n.translate('twinSadMessage');
+      case TwinState.cry:
+        return l10n.translate('twinCryMessage');
     }
   }
 
   static String assetForState(TwinState state) {
     switch (state) {
+      case TwinState.excited:
       case TwinState.happy:
         return 'assets/happy-avatar.jpeg';
       case TwinState.neutral:
         return 'assets/neutral-avatar.jpeg';
       case TwinState.sad:
+      case TwinState.cry:
         return 'assets/sad-avatar.jpeg';
     }
   }
 
   static String videoForState(TwinState state) {
+    final rng = Random();
     switch (state) {
+      case TwinState.excited:
+        const excitedList = [
+          'assets/excited-1.mp4',
+          'assets/excited-2.mp4',
+          'assets/excited-3.mp4',
+          'assets/excited-4.mp4',
+        ];
+        return excitedList[rng.nextInt(excitedList.length)];
       case TwinState.happy:
-        return 'assets/idle-happy.mp4';
+        const happyList = [
+          'assets/excited-1.mp4',
+          'assets/excited-2.mp4',
+          'assets/excited-3.mp4',
+          'assets/excited-4.mp4',
+        ];
+        return happyList[rng.nextInt(happyList.length)];
       case TwinState.neutral:
-        return 'assets/idle-neutre.mp4';
+        const neutralList = [
+          'assets/neutral-1.mp4',
+          'assets/neutral-2.mp4',
+        ];
+        return neutralList[rng.nextInt(neutralList.length)];
       case TwinState.sad:
-        return 'assets/idle-sad.mp4';
+        const sadList = [
+          'assets/cry-1.mp4',
+          'assets/cry-2.mp4',
+        ];
+        return sadList[rng.nextInt(sadList.length)];
+      case TwinState.cry:
+        const cryList = [
+          'assets/cry-1.mp4',
+          'assets/cry-2.mp4',
+        ];
+        return cryList[rng.nextInt(cryList.length)];
     }
   }
 
   static Color colorForState(TwinState state) {
     switch (state) {
+      case TwinState.excited:
+        return const Color(0xFFFF6D00);
       case TwinState.happy:
         return const Color(0xFF4CAF50);
       case TwinState.neutral:
         return const Color(0xFF2196F3);
       case TwinState.sad:
         return const Color(0xFFFF7043);
+      case TwinState.cry:
+        return const Color(0xFF607D8B);
     }
   }
 
@@ -370,6 +411,91 @@ class _TwinAvatarWidgetState extends State<TwinAvatarWidget>
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+// ─── TwinDuoWidget ──────────────────────────────────────────────────────────
+// Two-twin animation banner used in challenge cards
+
+class TwinDuoWidget extends StatefulWidget {
+  final String videoAsset;
+  final double height;
+
+  const TwinDuoWidget({
+    super.key,
+    required this.videoAsset,
+    this.height = 130,
+  });
+
+  static const videoActive = 'assets/excited-two-twin.mp4';
+  static const videoCompleted = 'assets/Two-twin-with-hug.mp4';
+  static const videoNeutral = 'assets/neutral-two-twin.mp4';
+
+  @override
+  State<TwinDuoWidget> createState() => _TwinDuoWidgetState();
+}
+
+class _TwinDuoWidgetState extends State<TwinDuoWidget> {
+  VideoPlayerController? _controller;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  @override
+  void didUpdateWidget(TwinDuoWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.videoAsset != widget.videoAsset) {
+      _initialized = false;
+      _init();
+    }
+  }
+
+  Future<void> _init() async {
+    final c = VideoPlayerController.asset(widget.videoAsset);
+    await c.initialize();
+    c.setLooping(true);
+    c.setVolume(0);
+    c.play();
+    if (mounted) {
+      setState(() {
+        _controller?.dispose();
+        _controller = c;
+        _initialized = true;
+      });
+    } else {
+      c.dispose();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: SizedBox(
+        height: widget.height,
+        width: double.infinity,
+        child: _initialized && _controller != null
+            ? FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: _controller!.value.size.width,
+                  height: _controller!.value.size.height,
+                  child: VideoPlayer(_controller!),
+                ),
+              )
+            : Container(color: Colors.black12),
       ),
     );
   }
