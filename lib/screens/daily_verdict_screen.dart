@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/counter.dart';
 import '../providers/counter_provider.dart';
 import '../providers/achievement_provider.dart';
@@ -655,8 +656,9 @@ class _ShareSheetState extends State<_ShareSheet> {
     setState(() => _capturing = true);
     try {
       await Future.delayed(const Duration(milliseconds: 100));
+      final atName = widget.userName.isNotEmpty ? '@${widget.userName}' : 'Twin';
       final shareText =
-          '${widget.userName.isNotEmpty ? '@${widget.userName}' : 'Twin'} ${widget.l10n.translate('shareVerdictAchieved')} ${(widget.score * 100).round()}%\n${widget.l10n.translate('shareVerdictDownload')}';
+          '${_VerdictShareCard._attributionForState(widget.state, widget.l10n, atName)} – ${(widget.score * 100).round()}%\n${widget.l10n.translate('shareVerdictDownload')}\nhttps://apps.apple.com/us/app/twinam/id6761271353';
 
       if (kIsWeb) {
         await SharePlus.instance.share(
@@ -705,59 +707,78 @@ class _ShareSheetState extends State<_ShareSheet> {
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: BorderRadius.circular(24),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(2),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          // Preview card
-          RepaintBoundary(
-            key: _captureKey,
-            child: _VerdictShareCard(
-              userName: widget.userName,
-              score: widget.score,
-              state: widget.state,
-              message: widget.message,
-              l10n: widget.l10n,
+            const SizedBox(height: 16),
+            // Preview card
+            RepaintBoundary(
+              key: _captureKey,
+              child: _VerdictShareCard(
+                userName: widget.userName,
+                score: widget.score,
+                state: widget.state,
+                message: widget.message,
+                l10n: widget.l10n,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _capturing ? null : _capture,
-                icon: _capturing
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                      )
-                    : const Icon(Icons.ios_share_rounded, size: 20),
-                label: Text(
-                  widget.l10n.translate('shareVerdict'),
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: color,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _capturing ? null : _capture,
+                  icon: _capturing
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Icon(Icons.ios_share_rounded, size: 20),
+                  label: Text(
+                    widget.l10n.translate('shareVerdict'),
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: color,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 24),
-        ],
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                _StoreButton(
+                  label: 'App Store',
+                  icon: Icons.apple_rounded,
+                  url: 'https://apps.apple.com/us/app/twinam/id6761271353',
+                ),
+                SizedBox(width: 12),
+                _StoreButton(
+                  label: 'Play Store',
+                  icon: Icons.android_rounded,
+                  url: 'https://play.google.com/store/apps/details?id=com.twinam.twinam',
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -790,6 +811,17 @@ class _VerdictShareCard extends StatelessWidget {
     }
   }
 
+  static String _attributionForState(TwinState state, AppLocalizations l10n, String name) {
+    final key = switch (state) {
+      TwinState.excited => 'shareVerdictExcited',
+      TwinState.happy   => 'shareVerdictHappy',
+      TwinState.neutral => 'shareVerdictNeutral',
+      TwinState.sad     => 'shareVerdictSad',
+      TwinState.cry     => 'shareVerdictCry',
+    };
+    return '$name ${l10n.translate(key)}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final color = TwinAvatarWidget.colorForState(state);
@@ -799,7 +831,7 @@ class _VerdictShareCard extends StatelessWidget {
 
     return SizedBox(
       width: 360,
-      height: 640,
+      height: 500,
       child: DecoratedBox(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -837,7 +869,7 @@ class _VerdictShareCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 28),
               // Twin emoji
               Container(
                 width: 120,
@@ -851,7 +883,7 @@ class _VerdictShareCard extends StatelessWidget {
                   child: Text(emoji, style: const TextStyle(fontSize: 64)),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 18),
               // Score
               Text(
                 '$scorePercent%',
@@ -874,7 +906,7 @@ class _VerdictShareCard extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 24),
               // Divider
               Container(
                 height: 1,
@@ -883,7 +915,7 @@ class _VerdictShareCard extends StatelessWidget {
               const SizedBox(height: 20),
               // Attribution
               Text(
-                '@$name ${l10n.translate('shareVerdictAchieved')}',
+                _attributionForState(state, l10n, '@$name'),
                 style: const TextStyle(
                   color: Colors.white60,
                   fontSize: 14,
@@ -903,6 +935,44 @@ class _VerdictShareCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StoreButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final String url;
+
+  const _StoreButton({required this.label, required this.icon, required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () async {
+        final uri = Uri.parse(url);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      },
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18),
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16),
+            const SizedBox(width: 6),
+            Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+          ],
         ),
       ),
     );

@@ -96,9 +96,10 @@ class _CounterCardState extends State<CounterCard> with SingleTickerProviderStat
           ),
           child: Stack(
             children: [
-              Positioned(
+              Positioned.directional(
+                textDirection: Directionality.of(context),
                 top: -20,
-                right: -20,
+                end: -20,
                 child: Container(
                   width: 80,
                   height: 80,
@@ -164,9 +165,10 @@ class _CounterCardState extends State<CounterCard> with SingleTickerProviderStat
                 ),
               ),
               if (counter.goal != null)
-                Positioned(
+                Positioned.directional(
+                  textDirection: Directionality.of(context),
                   top: 12,
-                  right: 12,
+                  end: 12,
                   child: counter.goalReached
                       ? Container(
                           padding: const EdgeInsets.all(4),

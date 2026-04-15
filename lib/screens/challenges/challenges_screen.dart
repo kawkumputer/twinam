@@ -49,7 +49,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     if (!auth.isLoggedIn) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.translate('challenges'))),
-        body: const Center(child: Text('Connecte-toi pour voir tes défis.')),
+        body: Center(child: Text(l10n.translate('connectToSeeChallenges'))),
       );
     }
 

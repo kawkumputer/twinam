@@ -320,7 +320,7 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
                   ),
                   if (_reminderEnabled) ...[
                     const SizedBox(height: 12),
-                    _buildDaySelector(context, l10n),
+                    _buildDaySelector(context, l10n, settings.locale),
                     const SizedBox(height: 8),
                     GestureDetector(
                       onTap: () async {
@@ -392,8 +392,9 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
     );
   }
 
-  Widget _buildDaySelector(BuildContext context, AppLocalizations l10n) {
+  Widget _buildDaySelector(BuildContext context, AppLocalizations l10n, String locale) {
     const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const arAbbr  = ['\u0646', '\u062b', '\u0631', '\u062e', '\u062c', '\u0633', '\u062d'];
     final color = AppTheme.counterColors[_selectedColorIndex];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -410,7 +411,9 @@ class _CreateCounterScreenState extends State<CreateCounterScreen> {
           children: List.generate(7, (i) {
             final weekday = i + 1;
             final isSelected = _reminderDays.contains(weekday);
-            final label = l10n.translate(dayKeys[i]).substring(0, 1);
+            final label = locale == 'ar'
+                ? arAbbr[i]
+                : l10n.translate(dayKeys[i]).substring(0, 1).toUpperCase();
             return GestureDetector(
               onTap: () {
                 setState(() {

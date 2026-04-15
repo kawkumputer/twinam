@@ -327,8 +327,8 @@ class _FriendsScreenState extends State<FriendsScreen>
                       ),
                     ),
                     title: Text('@${req['username'] ?? ''}'),
-                    trailing: const Chip(
-                      label: Text('En attente'),
+                    trailing: Chip(
+                      label: Text(l10n.translate('pending')),
                       visualDensity: VisualDensity.compact,
                     ),
                   ),

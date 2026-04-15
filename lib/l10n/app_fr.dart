@@ -167,7 +167,11 @@ const Map<String, String> fr = {
 
   // Share Verdict
   'shareVerdict': 'Partager mon Verdict',
-  'shareVerdictAchieved': 'a explosé sa journée sur Twin\'Am ! 🔥',
+  'shareVerdictExcited': 'a explosé sa journée sur Twin\'Am ! 🔥',
+  'shareVerdictHappy': 'a eu une super journée sur Twin\'Am ! 🌟',
+  'shareVerdictNeutral': 'progresse sur Twin\'Am 💪',
+  'shareVerdictSad': 'continue ses efforts sur Twin\'Am 🔥',
+  'shareVerdictCry': 'fait son grand retour sur Twin\'Am ! 💪',
   'shareVerdictDownload': 'Télécharge Twin\'Am et relève le défi →',
   'yourName': 'Ton nom',
   'nameHint': 'Entre ton prénom',

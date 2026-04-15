@@ -190,7 +190,7 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.info_outline_rounded,
             iconColor: const Color(0xFFFFB74D),
             title: l10n.translate('about'),
-            subtitle: '${l10n.translate('version')} 1.0.0',
+            subtitle: '${l10n.translate('version')} 1.0.10',
           ),
           
           // Add bottom padding to ensure About button is fully visible
