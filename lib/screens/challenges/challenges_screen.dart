@@ -11,6 +11,7 @@ import '../../services/supabase_service.dart';
 import '../../theme/app_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/twin_avatar_widget.dart';
+import 'create_challenge_screen.dart';
 
 class ChallengesScreen extends StatefulWidget {
   const ChallengesScreen({super.key});
@@ -22,6 +23,7 @@ class ChallengesScreen extends StatefulWidget {
 class _ChallengesScreenState extends State<ChallengesScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  List<Map<String, dynamic>> _friends = [];
 
   @override
   void initState() {
@@ -29,7 +31,33 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ChallengeProvider>().load();
+      _loadFriends();
     });
+  }
+
+  Future<void> _loadFriends() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return;
+    try {
+      final client = SupabaseService.client;
+      final rows = List<Map<String, dynamic>>.from(
+        await client
+            .from('friendships')
+            .select('requester_id, addressee_id')
+            .or('requester_id.eq.$uid,addressee_id.eq.$uid')
+            .eq('status', 'accepted') as List,
+      );
+      final ids = rows
+          .map((f) => f['requester_id'] == uid
+              ? f['addressee_id'] as String
+              : f['requester_id'] as String)
+          .toList();
+      if (ids.isEmpty) return;
+      final profiles = List<Map<String, dynamic>>.from(
+        await client.from('profiles').select().inFilter('id', ids) as List,
+      );
+      if (mounted) setState(() => _friends = profiles);
+    } catch (_) {}
   }
 
   @override
@@ -111,13 +139,13 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     ThemeData theme,
     ChallengeProvider challenges,
   ) {
-    if (invitations.isEmpty && outgoing.isEmpty) {
+    if (invitations.isEmpty && outgoing.isEmpty && _friends.isEmpty) {
       return _emptyState(Icons.inbox_outlined, l10n.translate('noInvitations'));
     }
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
       children: [
-        // Incoming invitations
+        // ── Incoming invitations ────────────────────────────────
         ...invitations.map((c) => _InvitationCard(
           challenge: c,
           onAccept: () async {
@@ -138,24 +166,112 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           onReject: () => challenges.respond(c.id, false),
           l10n: l10n,
         )),
-        // Outgoing (sent) pending challenges
-        if (outgoing.isNotEmpty) ...
-          [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                l10n.translate('sentRequests'),
-                style: theme.textTheme.titleSmall
-                    ?.copyWith(color: Colors.grey, fontWeight: FontWeight.w600),
-              ),
+        // ── Outgoing sent challenges ─────────────────────────────
+        if (outgoing.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              l10n.translate('sentRequests'),
+              style: theme.textTheme.titleSmall
+                  ?.copyWith(color: Colors.grey, fontWeight: FontWeight.w600),
             ),
-            ...outgoing.map((c) => _OutgoingChallengeCard(
-              challenge: c,
-              onDelete: () => _confirmDelete(c, challenges, l10n),
-              onEdit: () => _showEditDialog(c, challenges, l10n),
-              l10n: l10n,
-            )),
-          ],
+          ),
+          ...outgoing.map((c) => _OutgoingChallengeCard(
+            challenge: c,
+            onDelete: () => _confirmDelete(c, challenges, l10n),
+            onEdit: () => _showEditDialog(c, challenges, l10n),
+            l10n: l10n,
+          )),
+        ],
+        // ── Challenge a friend ─────────────────────────────────
+        if (_friends.isNotEmpty) ...[
+          if (invitations.isNotEmpty || outgoing.isNotEmpty)
+            const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                const Icon(Icons.bolt_rounded, size: 15, color: AppTheme.warningColor),
+                const SizedBox(width: 6),
+                Text(
+                  l10n.translate('friends'),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                      color: AppTheme.warningColor, fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+          ),
+          ..._friends.map((f) {
+            final uname = f['username'] as String? ?? '?';
+            final dname = f['display_name'] as String?;
+            final ci = uname.codeUnitAt(0) % AppTheme.counterColors.length;
+            final col = AppTheme.counterColors[ci];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.cardTheme.color ?? theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: col.withValues(alpha: 0.2)),
+                boxShadow: [
+                  BoxShadow(color: col.withValues(alpha: 0.06), blurRadius: 10, offset: const Offset(0, 3)),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 46, height: 46,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [col, col.withValues(alpha: 0.65)],
+                        begin: Alignment.topLeft, end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(uname[0].toUpperCase(),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 19)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('@$uname', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                        if (dname != null && dname.isNotEmpty)
+                          Text(dname,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () => Navigator.of(context)
+                        .push(MaterialPageRoute(
+                          builder: (_) => CreateChallengeScreen(
+                            opponentId: f['id'] as String,
+                            opponentUsername: uname,
+                          ),
+                        ))
+                        .then((_) => challenges.load()),
+                    icon: const Icon(Icons.bolt_rounded, size: 14),
+                    label: Text(l10n.translate('launchChallenge'),
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.warningColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
       ],
     );
   }
@@ -489,14 +605,20 @@ class _ChallengeCard extends StatelessWidget {
               label: l10n.translate('you'),
               value: me.currentValue,
               target: challenge.targetValue,
-              color: AppTheme.primaryColor,
+              twinState: TwinAvatarWidget.fromScore(
+                  challenge.targetValue > 0
+                      ? (me.currentValue / challenge.targetValue).clamp(0.0, 1.0)
+                      : 0.0),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             _ProgressRow(
               label: '@${opponent.username ?? '?'}',
               value: opponent.currentValue,
               target: challenge.targetValue,
-              color: AppTheme.accentColor,
+              twinState: TwinAvatarWidget.fromScore(
+                  challenge.targetValue > 0
+                      ? (opponent.currentValue / challenge.targetValue).clamp(0.0, 1.0)
+                      : 0.0),
             ),
               ],
             ),
@@ -511,40 +633,79 @@ class _ProgressRow extends StatelessWidget {
   final String label;
   final int value;
   final int target;
-  final Color color;
+  final TwinState twinState;
 
   const _ProgressRow({
     required this.label,
     required this.value,
     required this.target,
-    required this.color,
+    required this.twinState,
   });
+
+  static String _emojiForState(TwinState s) {
+    switch (s) {
+      case TwinState.excited: return '🔥';
+      case TwinState.happy:   return '😊';
+      case TwinState.neutral: return '😐';
+      case TwinState.sad:     return '😢';
+      case TwinState.cry:     return '😭';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final ratio = target > 0 ? (value / target).clamp(0.0, 1.0) : 0.0;
+    final stateColor = TwinAvatarWidget.colorForState(twinState);
+    final emoji = _emojiForState(twinState);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: TextStyle(color: color, fontSize: 12)),
-            Text('$value / $target',
-                style: TextStyle(
-                    color: color,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600)),
+            ClipOval(
+              child: Image.asset(
+                TwinAvatarWidget.assetForState(twinState),
+                width: 30, height: 30, fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(label,
+                      style: TextStyle(
+                          color: stateColor,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600)),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(emoji, style: const TextStyle(fontSize: 13)),
+                      const SizedBox(width: 4),
+                      Text('$value / $target',
+                          style: TextStyle(
+                              color: stateColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
-        const SizedBox(height: 4),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(4),
-          child: LinearProgressIndicator(
-            value: ratio,
-            backgroundColor: color.withValues(alpha: 0.15),
-            valueColor: AlwaysStoppedAnimation(color),
-            minHeight: 8,
+        const SizedBox(height: 5),
+        Padding(
+          padding: const EdgeInsets.only(left: 38),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: ratio,
+              backgroundColor: stateColor.withValues(alpha: 0.15),
+              valueColor: AlwaysStoppedAnimation(stateColor),
+              minHeight: 8,
+            ),
           ),
         ),
       ],

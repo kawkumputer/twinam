@@ -367,6 +367,7 @@ const Map<String, String> fr = {
   'updateProgress': 'Mettre à jour ma progression',
   'currentValue': 'Ma valeur actuelle',
   'challengeMe': 'Défier',
+  'launchChallenge': 'Lance un défi',
   'you': 'Moi',
   'required': 'Requis',
   'waitingFor': 'En attente de',
@@ -411,4 +412,6 @@ const Map<String, String> fr = {
   'noFriendsMessage': 'Ajoute des amis pour les défier !',
   'friendAdded': 'Ami ajouté !',
   'userNotFound': 'Utilisateur introuvable',
+  'pending': 'En attente',
+  'connectToSeeChallenges': 'Connecte-toi pour voir tes défis.',
 };

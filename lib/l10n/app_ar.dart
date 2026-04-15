@@ -435,6 +435,7 @@ const Map<String, String> ar = {
   'updateProgress': 'تحديث التقدم',
   'currentValue': 'قيمتي الحالية',
   'challengeMe': 'تحدَّ',
+  'launchChallenge': 'تحدَّ صديقك',
   'you': 'أنا',
   'required': 'مطلوب',
   'waitingFor': 'في انتظار',

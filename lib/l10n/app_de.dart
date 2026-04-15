@@ -398,6 +398,7 @@ const Map<String, String> de = {
   'updateProgress': 'Fortschritt aktualisieren',
   'currentValue': 'Mein aktueller Wert',
   'challengeMe': 'Herausfordern',
+  'launchChallenge': 'Herausfordern!',
   'you': 'Ich',
   'required': 'Erforderlich',
   'waitingFor': 'Warte auf',

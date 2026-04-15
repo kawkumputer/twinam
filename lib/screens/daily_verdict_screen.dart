@@ -658,7 +658,7 @@ class _ShareSheetState extends State<_ShareSheet> {
       await Future.delayed(const Duration(milliseconds: 100));
       final atName = widget.userName.isNotEmpty ? '@${widget.userName}' : 'Twin';
       final shareText =
-          '${_VerdictShareCard._attributionForState(widget.state, widget.l10n, atName)} – ${(widget.score * 100).round()}%\n${widget.l10n.translate('shareVerdictDownload')}\nhttps://apps.apple.com/us/app/twinam/id6761271353';
+          '${_VerdictShareCard._attributionForState(widget.state, widget.l10n, atName)} – ${(widget.score * 100).round()}%\n${widget.l10n.translate('shareVerdictDownload')}\n\n📱 iOS: https://apps.apple.com/us/app/twinam/id6761271353\n🤖 Android: https://play.google.com/store/apps/details?id=com.twinam.twinam';
 
       if (kIsWeb) {
         await SharePlus.instance.share(

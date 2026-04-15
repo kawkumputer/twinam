@@ -435,6 +435,7 @@ const Map<String, String> es = {
   'updateProgress': 'Actualizar progreso',
   'currentValue': 'Mi valor actual',
   'challengeMe': 'Desafiar',
+  'launchChallenge': '¡Lanzar reto!',
   'you': 'Yo',
   'required': 'Requerido',
   'waitingFor': 'Esperando a',

@@ -361,6 +361,7 @@ const Map<String, String> en = {
   'updateProgress': 'Update progress',
   'currentValue': 'My current value',
   'challengeMe': 'Challenge',
+  'launchChallenge': 'Challenge!',
   'you': 'Me',
   'required': 'Required',
   'waitingFor': 'Waiting for',
@@ -405,4 +406,6 @@ const Map<String, String> en = {
   'noFriendsMessage': 'Add friends to challenge them!',
   'friendAdded': 'Friend added!',
   'userNotFound': 'User not found',
+  'pending': 'Pending',
+  'connectToSeeChallenges': 'Sign in to see your challenges.',
 };

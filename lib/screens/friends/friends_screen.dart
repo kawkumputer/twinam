@@ -282,80 +282,91 @@ class _FriendsScreenState extends State<FriendsScreen>
     return RefreshIndicator(
       onRefresh: _loadFriends,
       child: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
         children: [
-          // Received pending requests
+          // ── Header stats ──────────────────────────────────
+          if (_friends.isNotEmpty) _FriendsHeader(count: _friends.length, l10n: l10n),
+
+          // ── Pending received ──────────────────────────────
           if (_pendingReceived.isNotEmpty) ...[
-            Text(
-              l10n.translate('pendingRequests'),
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: AppTheme.warningColor,
-                fontWeight: FontWeight.w700,
-              ),
+            const SizedBox(height: 20),
+            _SectionLabel(
+              icon: Icons.notification_important_rounded,
+              label: l10n.translate('pendingRequests'),
+              color: AppTheme.warningColor,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             ..._pendingReceived.map((req) => _PendingCard(
                   profile: req,
                   onAccept: () => _respondToRequest(req['friendship_id'], true),
                   onReject: () => _respondToRequest(req['friendship_id'], false),
                   l10n: l10n,
                 )),
-            const Divider(height: 28),
           ],
-          // Sent pending requests
+
+          // ── Sent pending ──────────────────────────────────
           if (_pendingSent.isNotEmpty) ...[
-            Text(
-              l10n.translate('sentRequests'),
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                fontWeight: FontWeight.w700,
-              ),
+            const SizedBox(height: 20),
+            _SectionLabel(
+              icon: Icons.schedule_send_rounded,
+              label: l10n.translate('sentRequests'),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: 8),
-            ..._pendingSent.map((req) => Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor:
-                          AppTheme.primaryColor.withValues(alpha: 0.1),
-                      child: Text(
-                        (req['username'] as String? ?? '?')[0].toUpperCase(),
-                        style: const TextStyle(
-                          color: AppTheme.primaryColor,
-                          fontWeight: FontWeight.w700,
-                        ),
+            const SizedBox(height: 10),
+            ..._pendingSent.map((req) {
+              final uname = req['username'] as String? ?? '?';
+              final ci = uname.codeUnitAt(0) % AppTheme.counterColors.length;
+              final col = AppTheme.counterColors[ci];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: theme.cardTheme.color ?? theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: col.withValues(alpha: 0.18)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44, height: 44,
+                      decoration: BoxDecoration(
+                        color: col.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(uname[0].toUpperCase(),
+                            style: TextStyle(color: col, fontWeight: FontWeight.w800, fontSize: 18)),
                       ),
                     ),
-                    title: Text('@${req['username'] ?? ''}'),
-                    trailing: Chip(
-                      label: Text(l10n.translate('pending')),
-                      visualDensity: VisualDensity.compact,
+                    const SizedBox(width: 12),
+                    Expanded(child: Text('@$uname', style: const TextStyle(fontWeight: FontWeight.w600))),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppTheme.warningColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(l10n.translate('pending'),
+                          style: const TextStyle(color: AppTheme.warningColor, fontSize: 12, fontWeight: FontWeight.w600)),
                     ),
-                  ),
-                )),
-            const Divider(height: 28),
-          ],
-          // Friends list
-          if (_friends.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 60),
-                child: Column(
-                  children: [
-                    const Icon(Icons.people_outline, size: 56,
-                        color: Colors.grey),
-                    const SizedBox(height: 12),
-                    Text(l10n.translate('noFriends'),
-                        style: theme.textTheme.titleMedium),
-                    const SizedBox(height: 4),
-                    Text(l10n.translate('noFriendsMessage'),
-                        style: theme.textTheme.bodySmall),
                   ],
                 ),
-              ),
-            )
-          else
+              );
+            }),
+          ],
+
+          // ── Friends list ──────────────────────────────────
+          if (_friends.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            _SectionLabel(
+              icon: Icons.people_rounded,
+              label: l10n.translate('friends'),
+              color: AppTheme.primaryColor,
+            ),
+            const SizedBox(height: 10),
             ..._friends.map((f) => _FriendCard(profile: f, l10n: l10n)),
+          ] else if (_pendingReceived.isEmpty && _pendingSent.isEmpty)
+            _EmptyFriends(l10n: l10n, theme: theme),
         ],
       ),
     );
@@ -363,7 +374,7 @@ class _FriendsScreenState extends State<FriendsScreen>
 
   Widget _buildSearchTab(AppLocalizations l10n, ThemeData theme) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
       child: Column(
         children: [
           TextField(
@@ -375,8 +386,7 @@ class _FriendsScreenState extends State<FriendsScreen>
                   ? const Padding(
                       padding: EdgeInsets.all(12),
                       child: SizedBox(
-                        width: 18,
-                        height: 18,
+                        width: 18, height: 18,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       ),
                     )
@@ -390,27 +400,65 @@ class _FriendsScreenState extends State<FriendsScreen>
               itemCount: _searchResults.length,
               itemBuilder: (_, i) {
                 final user = _searchResults[i];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.15),
-                      child: Text(
-                        (user['username'] as String)[0].toUpperCase(),
-                        style: const TextStyle(
-                          color: AppTheme.primaryColor,
-                          fontWeight: FontWeight.w700,
+                final uname = user['username'] as String? ?? '?';
+                final dname = user['display_name'] as String?;
+                final ci = uname.codeUnitAt(0) % AppTheme.counterColors.length;
+                final col = AppTheme.counterColors[ci];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  decoration: BoxDecoration(
+                    color: theme.cardTheme.color ?? theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: col.withValues(alpha: 0.2)),
+                    boxShadow: [
+                      BoxShadow(color: col.withValues(alpha: 0.06), blurRadius: 10, offset: const Offset(0, 3)),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 50, height: 50,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [col, col.withValues(alpha: 0.65)],
+                              begin: Alignment.topLeft, end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(uname[0].toUpperCase(),
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20)),
+                          ),
                         ),
-                      ),
-                    ),
-                    title: Text('@${user['username']}'),
-                    subtitle: user['display_name'] != null
-                        ? Text(user['display_name'] as String)
-                        : null,
-                    trailing: IconButton(
-                      icon: const Icon(Icons.person_add_rounded,
-                          color: AppTheme.primaryColor),
-                      onPressed: () => _sendRequest(user['id'] as String),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('@$uname', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                              if (dname != null && dname.isNotEmpty)
+                                Text(dname, style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                            ],
+                          ),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () => _sendRequest(user['id'] as String),
+                          icon: const Icon(Icons.person_add_rounded, size: 15),
+                          label: Text(l10n.translate('addFriend'),
+                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.primaryColor,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -433,35 +481,99 @@ class _FriendCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final username = profile['username'] as String? ?? '?';
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: AppTheme.primaryColor.withValues(alpha: 0.15),
-          child: Text(
-            username[0].toUpperCase(),
-            style: const TextStyle(
-              color: AppTheme.primaryColor,
-              fontWeight: FontWeight.w700,
-            ),
+    final displayName = profile['display_name'] as String?;
+    final initial = username[0].toUpperCase();
+    final colorIndex = username.codeUnitAt(0) % AppTheme.counterColors.length;
+    final avatarColor = AppTheme.counterColors[colorIndex];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: theme.cardTheme.color ?? theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: avatarColor.withValues(alpha: 0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: avatarColor.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
-        ),
-        title: Text('@$username'),
-        subtitle: profile['display_name'] != null
-            ? Text(profile['display_name'] as String,
-                style: theme.textTheme.bodySmall)
-            : null,
-        trailing: IconButton(
-          icon: const Icon(Icons.bolt_rounded, color: AppTheme.warningColor),
-          tooltip: l10n.translate('challengeMe'),
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => CreateChallengeScreen(
-                opponentId: profile['id'] as String,
-                opponentUsername: username,
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Row(
+          children: [
+            Container(
+              width: 54,
+              height: 54,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [avatarColor, avatarColor.withValues(alpha: 0.65)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: avatarColor.withValues(alpha: 0.4),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-            ));
-          },
+              child: Center(
+                child: Text(
+                  initial,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 22,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '@$username',
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                  ),
+                  if (displayName != null && displayName.isNotEmpty)
+                    Text(
+                      displayName,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => CreateChallengeScreen(
+                  opponentId: profile['id'] as String,
+                  opponentUsername: username,
+                ),
+              )),
+              icon: const Icon(Icons.bolt_rounded, size: 15),
+              label: Text(
+                l10n.translate('launchChallenge'),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.warningColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -483,37 +595,219 @@ class _PendingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: AppTheme.warningColor.withValues(alpha: 0.15),
-          child: Text(
-            (profile['username'] as String)[0].toUpperCase(),
-            style: const TextStyle(
-              color: AppTheme.warningColor,
-              fontWeight: FontWeight.w700,
-            ),
+    final theme = Theme.of(context);
+    final username = profile['username'] as String? ?? '?';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: theme.cardTheme.color ?? theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppTheme.warningColor.withValues(alpha: 0.45)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.warningColor.withValues(alpha: 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
           ),
-        ),
-        title: Text('@${profile['username']}'),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
           children: [
-            IconButton(
-              icon: const Icon(Icons.check_circle_outline,
-                  color: AppTheme.successColor),
-              onPressed: onAccept,
-              tooltip: l10n.translate('accept'),
+            Container(
+              width: 48,
+              height: 48,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppTheme.warningColor, Color(0xFFFFA726)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  username[0].toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
             ),
-            IconButton(
-              icon: const Icon(Icons.cancel_outlined,
-                  color: AppTheme.dangerColor),
-              onPressed: onReject,
-              tooltip: l10n.translate('reject'),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                '@$username',
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+              ),
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OutlinedButton(
+                  onPressed: onReject,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.dangerColor,
+                    side: const BorderSide(color: AppTheme.dangerColor),
+                    padding: const EdgeInsets.all(8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Icon(Icons.close_rounded, size: 18),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: onAccept,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.successColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.all(8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Icon(Icons.check_rounded, size: 18),
+                ),
+              ],
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _SectionLabel({required this.icon, required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 13, letterSpacing: 0.3),
+        ),
+      ],
+    );
+  }
+}
+
+class _FriendsHeader extends StatelessWidget {
+  final int count;
+  final AppLocalizations l10n;
+
+  const _FriendsHeader({required this.count, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.primaryColor.withValues(alpha: 0.18),
+            AppTheme.primaryColor.withValues(alpha: 0.06),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Text('🤝', style: TextStyle(fontSize: 26)),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$count',
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                  color: AppTheme.primaryColor,
+                  height: 1.1,
+                ),
+              ),
+              Text(
+                count == 1 ? l10n.translate('friends') : l10n.translate('friends'),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          const Icon(Icons.people_rounded, size: 40, color: AppTheme.primaryColor),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyFriends extends StatelessWidget {
+  final AppLocalizations l10n;
+  final ThemeData theme;
+
+  const _EmptyFriends({required this.l10n, required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 60),
+      child: Column(
+        children: [
+          Container(
+            width: 90,
+            height: 90,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryColor.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: Text('👥', style: TextStyle(fontSize: 44)),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            l10n.translate('noFriends'),
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.translate('noFriendsMessage'),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
