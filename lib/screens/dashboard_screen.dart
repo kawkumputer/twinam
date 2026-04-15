@@ -12,6 +12,7 @@ import '../widgets/banner_ad_widget.dart';
 import '../services/notification_service.dart';
 import '../services/twin_notification_service.dart';
 import '../theme/app_theme.dart';
+import '../models/task.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -25,21 +26,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _notificationPermissionChecked = false;
   bool _postFrameScheduled = false;
 
-  double _getDailyScore(List counters) {
-    if (counters.isEmpty) return 0;
+  double _getDailyScore(List counters, TaskProvider taskProvider) {
+    // Count goals from counters
+    int totalGoals = 0;
+    int reachedGoals = 0;
+    
     final withGoal = counters.where((c) => c.goal != null).toList();
-    if (withGoal.isEmpty) {
+    totalGoals += withGoal.length;
+    reachedGoals += withGoal.where((c) => c.goalReached).length;
+    
+    // Count tasks due today or overdue
+    final urgentTasks = taskProvider.tasks.where((t) => 
+      (t.isDueToday || t.isOverdue) && t.status != TaskStatus.done
+    ).toList();
+    final completedUrgentTasks = taskProvider.tasks.where((t) => 
+      (t.isDueToday || t.isOverdue) && t.status == TaskStatus.done
+    ).toList();
+    
+    totalGoals += urgentTasks.length + completedUrgentTasks.length;
+    reachedGoals += completedUrgentTasks.length;
+    
+    // If no goals at all, check if there's any activity
+    if (totalGoals == 0) {
       final total = counters.fold<int>(0, (sum, c) => sum + (c.value as int));
       return total > 0 ? 1.0 : 0.0;
     }
-    final reached = withGoal.where((c) => c.goalReached).length;
-    return reached / withGoal.length;
-  }
-
-  String _getDailyMotivation(AppLocalizations l10n) {
-    final dayOfYear = DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
-    final index = (dayOfYear % 7) + 1;
-    return l10n.translate('motivate$index');
+    
+    return reachedGoals / totalGoals;
   }
 
   @override
@@ -109,8 +122,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // User name with Twin reference
+                    // User name with Twin reference + Settings
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
                           child: RichText(
@@ -153,129 +167,126 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ),
                         ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/settings');
+                          },
+                          icon: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Icon(
+                              Icons.settings_rounded,
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Action buttons row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/achievements');
+                          },
+                          icon: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFB74D).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Text('🏆', style: TextStyle(fontSize: 20)),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/tasks');
+                          },
+                          icon: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF9800).withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(
+                              Icons.task_alt_rounded,
+                              color: Color(0xFFFF9800),
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/challenges');
+                          },
+                          icon: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.warningColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(
+                              Icons.bolt_rounded,
+                              color: AppTheme.warningColor,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed('/friends');
+                          },
+                          icon: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(
+                              Icons.people_rounded,
+                              color: AppTheme.primaryColor,
+                              size: 20,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 12),
                     // Level and XP bar
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        Text(
+                          '${achievementProvider.levelEmoji} ${l10n.translate('level')} ${achievementProvider.level}',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF2196F3),
+                              ),
+                        ),
+                        const SizedBox(width: 8),
                         Expanded(
-                          child: Row(
-                            children: [
-                              Text(
-                                '${achievementProvider.levelEmoji} ${l10n.translate('level')} ${achievementProvider.level}',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      color: const Color(0xFF2196F3),
-                                    ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(4),
-                                  child: LinearProgressIndicator(
-                                    value: achievementProvider.levelProgress,
-                                    minHeight: 5,
-                                    backgroundColor: const Color(0xFF2196F3).withValues(alpha: 0.1),
-                                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2196F3)),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                '${achievementProvider.xp} XP',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                                      fontSize: 10,
-                                    ),
-                              ),
-                            ],
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: achievementProvider.levelProgress,
+                              minHeight: 5,
+                              backgroundColor: const Color(0xFF2196F3).withValues(alpha: 0.1),
+                              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2196F3)),
+                            ),
                           ),
                         ),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).pushNamed('/tasks');
-                              },
-                              icon: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFF9800).withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: const Icon(
-                                  Icons.task_alt_rounded,
-                                  color: Color(0xFFFF9800),
-                                  size: 20,
-                                ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${achievementProvider.xp} XP',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                                fontSize: 10,
                               ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).pushNamed('/friends');
-                              },
-                              icon: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.primaryColor.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: const Icon(
-                                  Icons.people_rounded,
-                                  color: AppTheme.primaryColor,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).pushNamed('/challenges');
-                              },
-                              icon: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.warningColor.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: const Icon(
-                                  Icons.bolt_rounded,
-                                  color: AppTheme.warningColor,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).pushNamed('/achievements');
-                              },
-                              icon: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFB74D).withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: const Text('🏆', style: TextStyle(fontSize: 20)),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                Navigator.of(context).pushNamed('/settings');
-                              },
-                              icon: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: Icon(
-                                  Icons.settings_rounded,
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                                ),
-                              ),
-                            ),
-                          ],
                         ),
                       ],
                     ),
@@ -286,13 +297,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // Twin Avatar card
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-              sliver: SliverToBoxAdapter(
-                child: _TwinCard(
-                  score: _getDailyScore(counters),
-                  counters: counters,
-                  locale: settings.locale,
-                  onTap: () => Navigator.of(context).pushNamed('/verdict'),
-                ),
+              sliver: Consumer<TaskProvider>(
+                builder: (context, taskProvider, _) {
+                  return SliverToBoxAdapter(
+                    child: _TwinCard(
+                      score: _getDailyScore(counters, taskProvider),
+                      counters: counters,
+                      locale: settings.locale,
+                      onTap: () => Navigator.of(context).pushNamed('/verdict'),
+                    ),
+                  );
+                },
               ),
             ),
 
@@ -307,36 +322,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 },
               ),
             ),
-
-            // Motivation banner
-            if (counters.isNotEmpty)
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-                sliver: SliverToBoxAdapter(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2196F3).withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Row(
-                      children: [
-                        const Text('💡', style: TextStyle(fontSize: 18)),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            _getDailyMotivation(l10n),
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontStyle: FontStyle.italic,
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                                ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
 
             if (counters.isEmpty)
               SliverFillRemaining(
@@ -875,6 +860,12 @@ class _TwinCard extends StatelessWidget {
 
   const _TwinCard({required this.score, required this.counters, required this.locale, this.onTap});
 
+  static Color _barColor(double score) {
+    if (score >= 1.0) return const Color(0xFF4CAF50);
+    if (score >= 0.5) return const Color(0xFFFF9800);
+    return const Color(0xFFE53935);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations(locale);
@@ -897,7 +888,11 @@ class _TwinCard extends StatelessWidget {
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
-              color: color.withValues(alpha: 0.2),
+              color: score >= 1.0 
+                ? const Color(0xFF4CAF50).withValues(alpha: 0.3)
+                : score == 0.0
+                  ? const Color(0xFFE53935).withValues(alpha: 0.3)
+                  : color.withValues(alpha: 0.2),
               width: 1.5,
             ),
           ),
@@ -934,8 +929,8 @@ class _TwinCard extends StatelessWidget {
                         child: LinearProgressIndicator(
                           value: score,
                           minHeight: 7,
-                          backgroundColor: color.withValues(alpha: 0.12),
-                          valueColor: AlwaysStoppedAnimation<Color>(color),
+                          backgroundColor: _barColor(score).withValues(alpha: 0.12),
+                          valueColor: AlwaysStoppedAnimation<Color>(_barColor(score)),
                         ),
                       ),
                       const SizedBox(height: 4),
