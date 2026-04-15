@@ -164,6 +164,11 @@ const Map<String, String> fr = {
   'onboardingCelebrateTitle': 'Ton Twin est fier ! 🎉',
   'onboardingCelebrateDesc': 'Reviens demain pour le garder heureux.\nL\'abandonner le fera pleurer… 🥺',
   'onboardingStart': 'Commencer mon aventure',
+
+  // Share Verdict
+  'shareVerdict': 'Partager mon Verdict',
+  'shareVerdictAchieved': 'a explosé sa journée sur Twin\'Am ! 🔥',
+  'shareVerdictDownload': 'Télécharge Twin\'Am et relève le défi →',
   'yourName': 'Ton nom',
   'nameHint': 'Entre ton prénom',
   'reminderBodyPersonal': ', n\'oublie pas de mettre à jour ton compteur !',

@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/counter.dart';
 import '../providers/counter_provider.dart';
 import '../providers/achievement_provider.dart';
@@ -24,6 +30,7 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
   late Animation<double> _fadeIn;
   late Animation<double> _slideUp;
   late Animation<double> _scoreAnim;
+  bool _isSharing = false;
 
   @override
   void initState() {
@@ -62,6 +69,34 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
     _entryController.dispose();
     _scoreController.dispose();
     super.dispose();
+  }
+
+  Future<void> _shareVerdict({
+    required String userName,
+    required double score,
+    required TwinState state,
+    required String message,
+    required AppLocalizations l10n,
+  }) async {
+    if (_isSharing) return;
+    setState(() => _isSharing = true);
+    HapticFeedback.mediumImpact();
+    try {
+      await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (ctx) => _ShareSheet(
+          userName: userName,
+          score: score,
+          state: state,
+          message: message,
+          l10n: l10n,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isSharing = false);
+    }
   }
 
   double _computeScore(List<Counter> counters) {
@@ -384,7 +419,45 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
                   ),
                 ),
               ),
-              
+
+              const SizedBox(height: 12),
+
+              // Share button
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _isSharing
+                      ? null
+                      : () => _shareVerdict(
+                            userName: settings.userName,
+                            score: score,
+                            state: twinState,
+                            message: twinMessage,
+                            l10n: l10n,
+                          ),
+                  icon: _isSharing
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.ios_share_rounded, size: 20),
+                  label: Text(
+                    l10n.translate('shareVerdict'),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 15),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: twinColor,
+                    side: BorderSide(color: twinColor.withValues(alpha: 0.6)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ),
+
               const SizedBox(height: 35),
             ],
           ),
@@ -552,6 +625,289 @@ class _HabitRow {
 }
 
 // ── Habit breakdown row widget ───────────────────────────────────────────────
+
+// ── Share sheet ──────────────────────────────────────────────────────────────
+
+class _ShareSheet extends StatefulWidget {
+  final String userName;
+  final double score;
+  final TwinState state;
+  final String message;
+  final AppLocalizations l10n;
+
+  const _ShareSheet({
+    required this.userName,
+    required this.score,
+    required this.state,
+    required this.message,
+    required this.l10n,
+  });
+
+  @override
+  State<_ShareSheet> createState() => _ShareSheetState();
+}
+
+class _ShareSheetState extends State<_ShareSheet> {
+  final _captureKey = GlobalKey();
+  bool _capturing = false;
+
+  Future<void> _capture() async {
+    setState(() => _capturing = true);
+    try {
+      await Future.delayed(const Duration(milliseconds: 100));
+      final shareText =
+          '${widget.userName.isNotEmpty ? '@${widget.userName}' : 'Twin'} ${widget.l10n.translate('shareVerdictAchieved')} ${(widget.score * 100).round()}%\n${widget.l10n.translate('shareVerdictDownload')}';
+
+      if (kIsWeb) {
+        await SharePlus.instance.share(
+          ShareParams(text: shareText, subject: "Twin'Am Daily Verdict"),
+        );
+        if (mounted) Navigator.pop(context);
+        return;
+      }
+
+      final boundary = _captureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) {
+        await SharePlus.instance.share(ShareParams(text: shareText));
+        if (mounted) Navigator.pop(context);
+        return;
+      }
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) {
+        await SharePlus.instance.share(ShareParams(text: shareText));
+        if (mounted) Navigator.pop(context);
+        return;
+      }
+      final bytes = byteData.buffer.asUint8List();
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/twin_verdict.png');
+      await file.writeAsBytes(bytes);
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path, mimeType: 'image/png')],
+          text: shareText,
+        ),
+      );
+      if (mounted) Navigator.pop(context);
+    } catch (_) {
+    } finally {
+      if (mounted) setState(() => _capturing = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = TwinAvatarWidget.colorForState(widget.state);
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Preview card
+          RepaintBoundary(
+            key: _captureKey,
+            child: _VerdictShareCard(
+              userName: widget.userName,
+              score: widget.score,
+              state: widget.state,
+              message: widget.message,
+              l10n: widget.l10n,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _capturing ? null : _capture,
+                icon: _capturing
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Icon(Icons.ios_share_rounded, size: 20),
+                label: Text(
+                  widget.l10n.translate('shareVerdict'),
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: color,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Verdict share card (static, story-format) ─────────────────────────────────
+
+class _VerdictShareCard extends StatelessWidget {
+  final String userName;
+  final double score;
+  final TwinState state;
+  final String message;
+  final AppLocalizations l10n;
+
+  const _VerdictShareCard({
+    required this.userName,
+    required this.score,
+    required this.state,
+    required this.message,
+    required this.l10n,
+  });
+
+  static String _emojiForState(TwinState s) {
+    switch (s) {
+      case TwinState.excited: return '🔥';
+      case TwinState.happy:   return '😊';
+      case TwinState.neutral: return '😐';
+      case TwinState.sad:     return '😢';
+      case TwinState.cry:     return '😭';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = TwinAvatarWidget.colorForState(state);
+    final scorePercent = (score * 100).round();
+    final name = userName.isNotEmpty ? userName : 'Twin';
+    final emoji = _emojiForState(state);
+
+    return SizedBox(
+      width: 360,
+      height: 640,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0D0D1A), Color(0xFF1A1B2E), Color(0xFF0D0D1A)],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Branding
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    "Twin'Am",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 48),
+              // Twin emoji
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: color.withValues(alpha: 0.15),
+                  border: Border.all(color: color.withValues(alpha: 0.4), width: 2),
+                ),
+                child: Center(
+                  child: Text(emoji, style: const TextStyle(fontSize: 64)),
+                ),
+              ),
+              const SizedBox(height: 32),
+              // Score
+              Text(
+                '$scorePercent%',
+                style: TextStyle(
+                  color: color,
+                  fontSize: 88,
+                  fontWeight: FontWeight.w900,
+                  height: 1.0,
+                  letterSpacing: -4,
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Message
+              Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 40),
+              // Divider
+              Container(
+                height: 1,
+                color: Colors.white12,
+              ),
+              const SizedBox(height: 20),
+              // Attribution
+              Text(
+                '@$name ${l10n.translate('shareVerdictAchieved')}',
+                style: const TextStyle(
+                  color: Colors.white60,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.translate('shareVerdictDownload'),
+                style: TextStyle(
+                  color: color.withValues(alpha: 0.8),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _HabitBreakdownRow extends StatelessWidget {
   final _HabitRow row;
