@@ -13,6 +13,7 @@ import 'providers/task_provider.dart';
 import 'screens/counter_screen.dart';
 import 'screens/create_counter_screen.dart';
 import 'screens/dashboard_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/widget_settings_screen.dart';
 import 'screens/achievements_screen.dart';
@@ -94,7 +95,14 @@ class TwinAmApp extends StatelessWidget {
                 textDirection: settings.locale == 'ar' 
                     ? TextDirection.rtl 
                     : TextDirection.ltr,
-                child: const DashboardScreen(),
+                child: Consumer<SettingsProvider>(
+                  builder: (context, s, _) {
+                    if (!s.onboardingCompleted) {
+                      return const OnboardingScreen();
+                    }
+                    return const DashboardScreen();
+                  },
+                ),
               ),
             ),
             onGenerateRoute: (routeSettings) {

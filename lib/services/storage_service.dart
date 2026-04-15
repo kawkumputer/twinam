@@ -58,6 +58,10 @@ class StorageService {
   String get userName => _settings.get('userName', defaultValue: '') as String;
   set userName(String value) => _settings.put('userName', value);
 
+  // Onboarding
+  bool get onboardingCompleted => _settings.get('onboardingCompleted', defaultValue: false) as bool;
+  set onboardingCompleted(bool value) => _settings.put('onboardingCompleted', value);
+
   // User stats
   int get totalTaps => _settings.get('totalTaps', defaultValue: 0) as int;
   set totalTaps(int value) => _settings.put('totalTaps', value);

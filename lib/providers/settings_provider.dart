@@ -10,6 +10,7 @@ class SettingsProvider extends ChangeNotifier {
   String get locale => _storage.locale;
   String get userName => _storage.userName;
   bool get hasUserName => _storage.userName.isNotEmpty;
+  bool get onboardingCompleted => _storage.onboardingCompleted;
 
   ThemeMode get themeMode => isDarkMode ? ThemeMode.dark : ThemeMode.light;
 
@@ -25,6 +26,11 @@ class SettingsProvider extends ChangeNotifier {
 
   void setUserName(String name) {
     _storage.userName = name.trim();
+    notifyListeners();
+  }
+
+  void completeOnboarding() {
+    _storage.onboardingCompleted = true;
     notifyListeners();
   }
 }
