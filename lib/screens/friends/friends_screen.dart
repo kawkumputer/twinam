@@ -137,8 +137,16 @@ class _FriendsScreenState extends State<FriendsScreen>
           .neq('id', uid ?? '')
           .limit(10);
 
+      final excludeIds = {
+        uid ?? '',
+        ..._friends.map((f) => f['id'] as String? ?? ''),
+        ..._pendingSent.map((f) => f['id'] as String? ?? ''),
+        ..._pendingReceived.map((f) => f['id'] as String? ?? ''),
+      };
       setState(() {
-        _searchResults = List<Map<String, dynamic>>.from(results as List);
+        _searchResults = List<Map<String, dynamic>>.from(results as List)
+            .where((p) => !excludeIds.contains(p['id'] as String?))
+            .toList();
         _searching = false;
       });
     } catch (_) {

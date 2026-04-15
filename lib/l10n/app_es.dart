@@ -411,6 +411,15 @@ const Map<String, String> es = {
   'pending': 'Pendiente',
   'connectToSeeChallenges': 'Inicia sesión para ver tus desafíos.',
 
+  // Account management
+  'myAccount': 'Mi cuenta',
+  'deleteAccount': 'Eliminar mi cuenta',
+  'deleteAccountDesc': 'Elimina permanentemente tu perfil y todos tus datos',
+  'deleteAccountTitle': '¿Eliminar cuenta?',
+  'deleteAccountWarning': 'Esta acción es irreversible.\n\nSe eliminará permanentemente:\n• Tu perfil y amigos\n• Tus desafíos y progreso',
+  'deleteAccountConfirm': 'Sí, eliminar',
+  'deleteAccountSuccess': 'Cuenta eliminada.',
+
   // Challenges
   'challenges': 'Desafíos',
   'newChallenge': 'Nuevo desafío',

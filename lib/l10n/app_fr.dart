@@ -414,4 +414,13 @@ const Map<String, String> fr = {
   'userNotFound': 'Utilisateur introuvable',
   'pending': 'En attente',
   'connectToSeeChallenges': 'Connecte-toi pour voir tes défis.',
+
+  // Account management
+  'myAccount': 'Mon compte',
+  'deleteAccount': 'Supprimer mon compte',
+  'deleteAccountDesc': 'Supprime définitivement ton profil et toutes tes données',
+  'deleteAccountTitle': 'Supprimer le compte ?',
+  'deleteAccountWarning': 'Cette action est irréversible.\n\nTout sera supprimé définitivement :\n• Ton profil et tes amis\n• Tes défis et ta progression',
+  'deleteAccountConfirm': 'Oui, supprimer',
+  'deleteAccountSuccess': 'Compte supprimé.',
 };

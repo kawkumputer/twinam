@@ -1,4 +1,5 @@
 import '../models/challenge_model.dart';
+import 'crypto_service.dart';
 import 'supabase_service.dart';
 
 class ChallengeService {
@@ -19,8 +20,8 @@ class ChallengeService {
 
     final row = await _client.from('challenges').insert({
       'creator_id': uid,
-      'title': title,
-      'description': description,
+      'title': CryptoService.encrypt(title),
+      'description': CryptoService.encryptNullable(description),
       'challenge_type': challengeType,
       'target_value': targetValue,
       'start_date': _dateStr(start),
@@ -79,12 +80,15 @@ class ChallengeService {
     );
 
     return challengeRows.map((c) {
+      final decrypted = Map<String, dynamic>.from(c)
+        ..['title'] = CryptoService.decrypt(c['title'] as String? ?? '')
+        ..['description'] = CryptoService.decryptNullable(c['description'] as String?);
       final cId = c['id'] as String;
       final parts = allParts
           .where((p) => p['challenge_id'] == cId)
           .map((p) => ChallengeParticipant.fromMap(p))
           .toList();
-      return Challenge.fromMap(c, participants: parts);
+      return Challenge.fromMap(decrypted, participants: parts);
     }).toList();
   }
 
@@ -125,8 +129,8 @@ class ChallengeService {
   static Future<void> updateChallengeInfo(
       String challengeId, String title, String? description) async {
     await _client.from('challenges').update({
-      'title': title,
-      'description': description,
+      'title': CryptoService.encrypt(title),
+      'description': CryptoService.encryptNullable(description),
     }).eq('id', challengeId);
   }
 

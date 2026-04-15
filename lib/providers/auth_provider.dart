@@ -2,12 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/twin_user.dart';
 import '../services/auth_service.dart';
+import '../services/storage_service.dart';
 import '../services/supabase_service.dart';
 
 enum AuthStatus { unknown, authenticated, unauthenticated }
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
+  final StorageService _storage = StorageService();
 
   AuthStatus _status = AuthStatus.unknown;
   TwinUser? _currentUser;
@@ -143,6 +145,26 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> signOut() async {
     await _authService.signOut();
+  }
+
+  Future<bool> deleteAccount() async {
+    _loading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      await _authService.deleteAccount();
+      await _storage.clearAllData();
+      _currentUser = null;
+      _status = AuthStatus.unauthenticated;
+      _loading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = _parseError(e);
+      _loading = false;
+      notifyListeners();
+      return false;
+    }
   }
 
   void clearError() {

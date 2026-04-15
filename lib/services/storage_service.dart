@@ -48,6 +48,20 @@ class StorageService {
     await _counters.delete(id);
   }
 
+  Future<void> clearAllCounters() async {
+    await _counters.clear();
+  }
+
+  Future<void> clearAllData() async {
+    await _counters.clear();
+    await _tasks.clear();
+    await _settings.clear();
+  }
+
+  Future<void> saveCounterOrder(List<String> order) async {
+    await _settings.put('counterOrder', jsonEncode(order));
+  }
+
   // Settings
   bool get isDarkMode => _settings.get('isDarkMode', defaultValue: true) as bool;
   set isDarkMode(bool value) => _settings.put('isDarkMode', value);

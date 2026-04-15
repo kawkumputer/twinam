@@ -55,6 +55,30 @@ class AuthService {
     await _client.auth.signOut();
   }
 
+  Future<void> deleteAccount() async {
+    final uid = _client.auth.currentUser?.id;
+    if (uid == null) return;
+
+    try {
+      await _client
+          .from('challenge_participants')
+          .delete()
+          .eq('user_id', uid);
+      await _client
+          .from('friendships')
+          .delete()
+          .or('requester_id.eq.$uid,addressee_id.eq.$uid');
+      await _client.from('challenges').delete().eq('creator_id', uid);
+      await _client.from('profiles').delete().eq('id', uid);
+      // Delete the auth user via a SECURITY DEFINER DB function (if set up)
+      try {
+        await _client.rpc('delete_user_account');
+      } catch (_) {}
+    } catch (_) {}
+
+    await _client.auth.signOut();
+  }
+
   Future<TwinUser> getProfile(String userId) async {
     final data = await _client
         .from('profiles')

@@ -408,4 +408,13 @@ const Map<String, String> en = {
   'userNotFound': 'User not found',
   'pending': 'Pending',
   'connectToSeeChallenges': 'Sign in to see your challenges.',
+
+  // Account management
+  'myAccount': 'My Account',
+  'deleteAccount': 'Delete my account',
+  'deleteAccountDesc': 'Permanently delete your profile and all your data',
+  'deleteAccountTitle': 'Delete account?',
+  'deleteAccountWarning': 'This action is irreversible.\n\nAll of the following will be permanently deleted:\n• Your profile and friends\n• Your challenges and progress',
+  'deleteAccountConfirm': 'Yes, delete',
+  'deleteAccountSuccess': 'Account deleted.',
 };

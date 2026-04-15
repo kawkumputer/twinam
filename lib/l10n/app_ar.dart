@@ -411,6 +411,15 @@ const Map<String, String> ar = {
   'pending': 'في الانتظار',
   'connectToSeeChallenges': 'سجّل دخولك لترى تحدياتك.',
 
+  // Account management
+  'myAccount': 'حسابي',
+  'deleteAccount': 'حذف حسابي',
+  'deleteAccountDesc': 'حذف ملفك الشخصي وجميع بياناتك نهائياً',
+  'deleteAccountTitle': 'حذف الحساب؟',
+  'deleteAccountWarning': 'هذا الإجراء لا يمكن التراجع عنه.\n\nسيتم حذف ما يلي نهائياً:\n• ملفك الشخصي وأصدقاؤك\n• تحدياتك وتقدمك',
+  'deleteAccountConfirm': 'نعم، احذف',
+  'deleteAccountSuccess': 'تم حذف الحساب.',
+
   // Challenges
   'challenges': 'التحديات',
   'newChallenge': 'تحدٍّ جديد',

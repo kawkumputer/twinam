@@ -4,16 +4,26 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/achievement_provider.dart';
+import '../providers/auth_provider.dart';
 import '../providers/settings_provider.dart';
+import '../theme/app_theme.dart';
 import '../widgets/banner_ad_widget.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _deletingAccount = false;
 
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
     final l10n = AppLocalizations.of(settings.locale);
+    final auth = context.watch<AuthProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -190,10 +200,56 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.info_outline_rounded,
             iconColor: const Color(0xFFFFB74D),
             title: l10n.translate('about'),
-            subtitle: '${l10n.translate('version')} 1.0.10',
+            subtitle: '${l10n.translate('version')} 1.1.0',
           ),
-          
-          // Add bottom padding to ensure About button is fully visible
+
+          // ── Account section (only when logged in) ──────────────
+          if (auth.isLoggedIn) ...
+            [
+              const SizedBox(height: 32),
+              Padding(
+                padding: const EdgeInsets.only(left: 4, bottom: 12),
+                child: Text(
+                  l10n.translate('myAccount'),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
+              // Sign out
+              GestureDetector(
+                onTap: () async => context.read<AuthProvider>().signOut(),
+                child: _buildSettingsTile(
+                  context,
+                  icon: Icons.logout_rounded,
+                  iconColor: const Color(0xFF2196F3),
+                  title: l10n.translate('signOut'),
+                  trailing: const Icon(Icons.chevron_right_rounded, size: 24),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Delete account
+              GestureDetector(
+                onTap: _deletingAccount ? null : () => _confirmDeleteAccount(context, l10n),
+                child: _buildSettingsTile(
+                  context,
+                  icon: Icons.delete_forever_rounded,
+                  iconColor: AppTheme.dangerColor,
+                  title: l10n.translate('deleteAccount'),
+                  subtitle: l10n.translate('deleteAccountDesc'),
+                  trailing: _deletingAccount
+                      ? const SizedBox(
+                          width: 20, height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.chevron_right_rounded, size: 24,
+                          color: AppTheme.dangerColor),
+                ),
+              ),
+            ],
+
           const SizedBox(height: 35),
         ],
       ),
@@ -236,6 +292,55 @@ class SettingsScreen extends StatelessWidget {
               Navigator.pop(ctx);
             },
             child: Text(l10n.translate('save')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmDeleteAccount(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(l10n.translate('deleteAccountTitle')),
+        content: Text(l10n.translate('deleteAccountWarning')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.translate('cancel')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.dangerColor,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final messenger = ScaffoldMessenger.of(context);
+              final auth = context.read<AuthProvider>();
+              setState(() => _deletingAccount = true);
+              final success = await auth.deleteAccount();
+              if (!mounted) return;
+              setState(() => _deletingAccount = false);
+              if (success) {
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.translate('deleteAccountSuccess')),
+                    backgroundColor: AppTheme.dangerColor,
+                  ),
+                );
+              } else if (auth.error != null) {
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(auth.error!),
+                    backgroundColor: AppTheme.dangerColor,
+                  ),
+                );
+                auth.clearError();
+              }
+            },
+            child: Text(l10n.translate('deleteAccountConfirm')),
           ),
         ],
       ),
