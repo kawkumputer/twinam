@@ -1,0 +1,23 @@
+Twin'Am - App Encryption Documentation
+
+1. ENCRYPTION USAGE:
+   - AES-256 encryption for challenge data stored locally and in Supabase cloud
+   - HTTPS/TLS for all network communications with Supabase backend
+   - No proprietary or non-standard encryption algorithms
+
+2. PURPOSE:
+   - Protect user challenge titles and descriptions
+   - Secure data transmission between app and cloud backend
+
+3. EXEMPTION STATUS:
+   - App qualifies for encryption export exemption under Category 5 Part 2
+   - Uses only standard encryption available in iOS SDK and open-source libraries
+   - No custom cryptographic implementations
+
+4. LIBRARIES USED:
+   - encrypt: ^5.0.3 (Dart package for AES encryption)
+   - Supabase SDK (uses standard HTTPS/TLS)
+
+5. COMPLIANCE:
+   - ITSAppUsesNonExemptEncryption = NO (declared in Info.plist)
+   - No encryption for authentication or digital signatures beyond standard SSL/TLS

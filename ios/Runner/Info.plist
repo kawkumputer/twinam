@@ -87,5 +87,7 @@
 			<dict><key>SKAdNetworkIdentifier</key><string>9rd848q2bk.skadnetwork</string></dict>
 			<dict><key>SKAdNetworkIdentifier</key><string>x8jxxk4c84.skadnetwork</string></dict>
 		</array>
+		<key>ITSAppUsesNonExemptEncryption</key>
+		<false/>
 	</dict>
 </plist>
