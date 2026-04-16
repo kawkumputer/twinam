@@ -53,6 +53,31 @@ class CounterProvider extends ChangeNotifier {
   bool hasCounterForChallenge(String challengeId) =>
       _counters.any((c) => c.challengeId == challengeId);
 
+  /// Deletes local counters whose linked challenge no longer exists.
+  Future<void> cleanupOrphanedChallengeCounters(
+      List<String> activeChallengeIds) async {
+    final orphaned = _counters
+        .where((c) =>
+            c.challengeId != null &&
+            !activeChallengeIds.contains(c.challengeId))
+        .map((c) => c.id)
+        .toList();
+    for (final id in orphaned) {
+      await deleteCounter(id);
+    }
+  }
+
+  /// Deletes all challenge-linked counters (used on account deletion).
+  Future<void> deleteAllChallengeCounters() async {
+    final ids = _counters
+        .where((c) => c.challengeId != null)
+        .map((c) => c.id)
+        .toList();
+    for (final id in ids) {
+      await deleteCounter(id);
+    }
+  }
+
   Future<void> addCounter(Counter counter) async {
     // Prevent duplicate challenge-linked counters
     if (counter.challengeId != null &&

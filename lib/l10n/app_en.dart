@@ -409,6 +409,10 @@ const Map<String, String> en = {
   'pending': 'Pending',
   'connectToSeeChallenges': 'Sign in to see your challenges.',
 
+  // Challenges - opponent left / pending lock
+  'opponentLeft': 'Opponent has left the challenge',
+  'challengePendingLocked': 'Waiting for acceptance — counter is locked',
+
   // Account management
   'myAccount': 'My Account',
   'deleteAccount': 'Delete my account',

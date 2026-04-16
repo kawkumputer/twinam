@@ -18,6 +18,11 @@ class ChallengeProvider extends ChangeNotifier {
   List<Challenge> get completed =>
       _challenges.where((c) => c.isCompleted).toList();
 
+  bool isChallengePending(String challengeId) =>
+      _challenges.any((c) => c.id == challengeId && c.isPending);
+
+  List<String> get challengeIds => _challenges.map((c) => c.id).toList();
+
   Future<void> load() async {
     _loading = true;
     _error = null;

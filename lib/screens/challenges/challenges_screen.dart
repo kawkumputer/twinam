@@ -30,9 +30,16 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ChallengeProvider>().load();
+      _loadAndCleanup();
       _loadFriends();
     });
+  }
+
+  Future<void> _loadAndCleanup() async {
+    await context.read<ChallengeProvider>().load();
+    if (!mounted) return;
+    final ids = context.read<ChallengeProvider>().challengeIds;
+    await context.read<CounterProvider>().cleanupOrphanedChallengeCounters(ids);
   }
 
   Future<void> _loadFriends() async {
@@ -106,7 +113,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
             ),
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
-            onPressed: () => challenges.load(),
+            onPressed: _loadAndCleanup,
           ),
         ],
         bottom: TabBar(
@@ -567,9 +574,10 @@ class _ChallengeCard extends StatelessWidget {
     final me = challenge.participants
         .firstWhere((p) => p.userId == uid,
             orElse: () => challenge.participants.first);
-    final opponent = challenge.participants
-        .firstWhere((p) => p.userId != uid,
-            orElse: () => challenge.participants.first);
+    final opponentList =
+        challenge.participants.where((p) => p.userId != uid).toList();
+    final opponentLeft = opponentList.isEmpty;
+    final opponent = opponentLeft ? null : opponentList.first;
 
     final duoVideo = challenge.isCompleted
         ? (me.currentValue >= challenge.targetValue
@@ -600,7 +608,6 @@ class _ChallengeCard extends StatelessWidget {
             const SizedBox(height: 6),
             _ChipRow(challenge: challenge, l10n: l10n),
             const SizedBox(height: 12),
-            // Progress comparison
             _ProgressRow(
               label: l10n.translate('you'),
               value: me.currentValue,
@@ -611,15 +618,18 @@ class _ChallengeCard extends StatelessWidget {
                       : 0.0),
             ),
             const SizedBox(height: 8),
-            _ProgressRow(
-              label: '@${opponent.username ?? '?'}',
-              value: opponent.currentValue,
-              target: challenge.targetValue,
-              twinState: TwinAvatarWidget.fromScore(
-                  challenge.targetValue > 0
-                      ? (opponent.currentValue / challenge.targetValue).clamp(0.0, 1.0)
-                      : 0.0),
-            ),
+            if (opponentLeft)
+              _OpponentLeftRow(l10n: l10n)
+            else
+              _ProgressRow(
+                label: '@${opponent!.username ?? '?'}',
+                value: opponent.currentValue,
+                target: challenge.targetValue,
+                twinState: TwinAvatarWidget.fromScore(
+                    challenge.targetValue > 0
+                        ? (opponent.currentValue / challenge.targetValue).clamp(0.0, 1.0)
+                        : 0.0),
+              ),
               ],
             ),
           ),
@@ -709,6 +719,37 @@ class _ProgressRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _OpponentLeftRow extends StatelessWidget {
+  final AppLocalizations l10n;
+  const _OpponentLeftRow({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.person_off_rounded, size: 18, color: Colors.grey),
+          const SizedBox(width: 8),
+          Text(
+            l10n.translate('opponentLeft'),
+            style: const TextStyle(
+              color: Colors.grey,
+              fontStyle: FontStyle.italic,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -411,6 +411,10 @@ const Map<String, String> ar = {
   'pending': 'في الانتظار',
   'connectToSeeChallenges': 'سجّل دخولك لترى تحدياتك.',
 
+  // Challenges - opponent left / pending lock
+  'opponentLeft': 'غادر الخصم التحدي',
+  'challengePendingLocked': 'بانتظار القبول — العداد مقفل',
+
   // Account management
   'myAccount': 'حسابي',
   'deleteAccount': 'حذف حسابي',

@@ -1,15 +1,14 @@
 import 'package:flutter/foundation.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/twin_user.dart';
 import '../services/auth_service.dart';
-import '../services/storage_service.dart';
 import '../services/supabase_service.dart';
 
 enum AuthStatus { unknown, authenticated, unauthenticated }
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
-  final StorageService _storage = StorageService();
 
   AuthStatus _status = AuthStatus.unknown;
   TwinUser? _currentUser;
@@ -153,7 +152,11 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
     try {
       await _authService.deleteAccount();
-      await _storage.clearAllData();
+      try {
+        if (Hive.isBoxOpen('counters')) await Hive.box<String>('counters').clear();
+        if (Hive.isBoxOpen('settings')) await Hive.box<dynamic>('settings').clear();
+        if (Hive.isBoxOpen('tasks')) await Hive.box<String>('tasks').clear();
+      } catch (_) {}
       _currentUser = null;
       _status = AuthStatus.unauthenticated;
       _loading = false;

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/achievement_provider.dart';
+import '../providers/challenge_provider.dart';
 import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/task_provider.dart';
@@ -346,6 +347,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           );
                         },
                         onQuickTap: () {
+                          if (counter.challengeId != null &&
+                              context
+                                  .read<ChallengeProvider>()
+                                  .isChallengePending(counter.challengeId!)) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(l10n.translate(
+                                    'challengePendingLocked')),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                            return;
+                          }
                           achievementProvider.recordTap();
                           if (achievementProvider.soundEnabled) {
                             SystemSound.play(SystemSoundType.click);

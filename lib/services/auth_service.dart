@@ -59,22 +59,36 @@ class AuthService {
     final uid = _client.auth.currentUser?.id;
     if (uid == null) return;
 
+    bool rpcSuccess = false;
     try {
-      await _client
-          .from('challenge_participants')
-          .delete()
-          .eq('user_id', uid);
-      await _client
-          .from('friendships')
-          .delete()
-          .or('requester_id.eq.$uid,addressee_id.eq.$uid');
-      await _client.from('challenges').delete().eq('creator_id', uid);
-      await _client.from('profiles').delete().eq('id', uid);
-      // Delete the auth user via a SECURITY DEFINER DB function (if set up)
-      try {
-        await _client.rpc('delete_user_account');
-      } catch (_) {}
+      // Preferred: single SECURITY DEFINER function bypasses all RLS policies
+      // and also deletes the auth.users row.
+      // Run supabase/migrations/20260415_delete_user_account.sql first.
+      await _client.rpc('delete_user_account');
+      rpcSuccess = true;
     } catch (_) {}
+
+    if (!rpcSuccess) {
+      // Fallback: manual deletion (requires matching RLS DELETE policies)
+      try {
+        await _client
+            .from('challenge_participants')
+            .delete()
+            .eq('user_id', uid);
+      } catch (_) {}
+      try {
+        await _client
+            .from('friendships')
+            .delete()
+            .or('requester_id.eq.$uid,addressee_id.eq.$uid');
+      } catch (_) {}
+      try {
+        await _client.from('challenges').delete().eq('creator_id', uid);
+      } catch (_) {}
+      try {
+        await _client.from('profiles').delete().eq('id', uid);
+      } catch (_) {}
+    }
 
     await _client.auth.signOut();
   }

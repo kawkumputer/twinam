@@ -374,6 +374,10 @@ const Map<String, String> de = {
   'pending': 'Ausstehend',
   'connectToSeeChallenges': 'Melde dich an, um deine Herausforderungen zu sehen.',
 
+  // Challenges - opponent left / pending lock
+  'opponentLeft': 'Der Gegner hat die Herausforderung verlassen',
+  'challengePendingLocked': 'Warte auf Akzeptanz — Zähler gesperrt',
+
   // Account management
   'myAccount': 'Mein Konto',
   'deleteAccount': 'Konto löschen',

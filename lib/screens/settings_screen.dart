@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/achievement_provider.dart';
 import '../providers/auth_provider.dart';
+import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/banner_ad_widget.dart';
@@ -319,9 +320,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Navigator.pop(ctx);
               final messenger = ScaffoldMessenger.of(context);
               final auth = context.read<AuthProvider>();
+              final counters = context.read<CounterProvider>();
               setState(() => _deletingAccount = true);
               final success = await auth.deleteAccount();
               if (!mounted) return;
+              if (success) {
+                await counters.deleteAllChallengeCounters();
+              }
               setState(() => _deletingAccount = false);
               if (success) {
                 messenger.showSnackBar(
