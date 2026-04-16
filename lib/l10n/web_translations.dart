@@ -88,8 +88,8 @@ class WebL10n {
         "• Save your preferences and settings",
     'privacyStorageTitle': '3. Data Storage and Security',
     'privacyStorageContent': "Twin'Am uses two storage systems:\n\n"
-        "Local storage (Hive): Counters, tasks and preferences stay on your device and are never transmitted.\n\n"
-        "Cloud storage (Supabase): When you create an account, your profile, friends and challenges are securely stored on Supabase servers (GDPR-compliant infrastructure). We do not:\n"
+        "Local storage (Hive): counters, tasks and preferences stay on your device and are never transmitted.\n\n"
+        "Cloud storage (Supabase): when you create an account, your profile, friends and challenges are stored on Supabase servers (GDPR-compliant infrastructure). Challenge titles and descriptions are additionally encrypted with AES-256 before being stored in the cloud. We do not:\n"
         "• Share your data with third parties\n"
         "• Sell your personal information\n"
         "• Track your activity outside the app",
@@ -212,6 +212,10 @@ class WebL10n {
 
     'feat7Title': 'Social Challenges',
     'feat7Desc': 'Challenge your friends to habit duels and track each other\'s progress in real time',
+    'feat8Title': 'Guided Onboarding',
+    'feat8Desc': 'A smooth first-launch experience to set up your Twin and personalize your habits in minutes',
+    'feat9Title': 'Expressive Twin Avatars',
+    'feat9Desc': '5 unique avatar states — excited, happy, neutral, sad, crying — that react live to your daily progress',
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -286,15 +290,15 @@ class WebL10n {
         "• Fournir les fonctionnalités principales (compteurs, tâches, statistiques)\n"
         "• Personnaliser votre expérience avec votre compagnon Twin\n"
         "• Envoyer des notifications et rappels locaux\n"
-        "• Suivre vos progrès et achievements\n"
+        "• Suivre votre progression et vos achievements\n"
         "• Sauvegarder vos préférences et paramètres",
     'privacyStorageTitle': '3. Stockage et sécurité des données',
     'privacyStorageContent': "Twin'Am utilise deux systèmes de stockage :\n\n"
-        "Stockage local (Hive) : compteurs, tâches et préférences restent sur votre appareil et ne sont jamais transmis.\n\n"
-        "Stockage cloud (Supabase) : si vous créez un compte, votre profil, vos amis et vos défis sont stockés sur les serveurs Supabase (infrastructure conforme RGPD). Nous ne :\n"
-        "• Partageons pas vos données avec des tiers\n"
-        "• Vendons pas vos informations personnelles\n"
-        "• Suivons pas votre activité en dehors de l'application",
+        "Stockage local (Hive) : les compteurs, tâches et préférences restent sur votre appareil et ne sont jamais transmis.\n\n"
+        "Stockage cloud (Supabase) : lorsque vous créez un compte, votre profil, vos amis et vos défis sont stockés sur les serveurs Supabase (infrastructure conforme RGPD). Les titres et descriptions des défis sont de plus chiffrés en AES-256 avant d'être envoyés dans le cloud. Nous ne :\n"
+        "• Partageons jamais vos données avec des tiers\n"
+        "• Vendons jamais vos informations personnelles\n"
+        "• Traquons jamais votre activité hors de l'app",
     'privacyNotifTitle': '4. Notifications',
     'privacyNotifContent': "Twin'Am utilise des notifications locales pour :\n\n"
         "• Vous rappeler vos tâches et échéances\n"
@@ -414,6 +418,10 @@ class WebL10n {
 
     'feat7Title': 'Défis Sociaux',
     'feat7Desc': "Défie tes amis sur une habitude et suivez mutuellement votre progression en temps réel",
+    'feat8Title': 'Onboarding Guidé',
+    'feat8Desc': "Une expérience de première ouverture fluide pour configurer ton Twin et personnaliser tes habitudes en quelques minutes",
+    'feat9Title': 'Avatars Twin Expressifs',
+    'feat9Desc': "5 états d'avatar uniques — enthousiaste, heureux, neutre, triste, larmes — qui réagissent en direct à ta progression quotidienne",
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -493,7 +501,7 @@ class WebL10n {
     'privacyStorageTitle': '3. تخزين البيانات وأمانها',
     'privacyStorageContent': "يستخدم Twin'Am نظامَي تخزين:\n\n"
         "التخزين المحلي (Hive): تبقى العدادات والمهام والتفضيلات على جهازك ولا تُنقل أبداً.\n\n"
-        "التخزين السحابي (Supabase): عند إنشاء حساب، يُخزَّن ملفك الشخصي وأصدقاؤك وتحدياتك على خوادم Supabase (بنية تحتية متوافقة مع GDPR). نحن لا:\n"
+        "التخزين السحابي (Supabase): عند إنشاء حساب، يُخزَّن ملفك الشخصي وأصدقاؤك وتحدياتك على خوادم Supabase (بنية تحتية متوافقة مع GDPR). تُشفَّر عناوين التحديات وأوصافها إضافةً إلى ذلك بخوارزمية AES-256 قبل إرسالها إلى السحابة. نحن لا:\n"
         "• نشارك بياناتك مع أطراف ثالثة\n"
         "• نبيع معلوماتك الشخصية\n"
         "• نتتبع نشاطك خارج التطبيق",
@@ -614,7 +622,11 @@ class WebL10n {
     'faq11A': 'اذهب إلى الإعدادات > حسابي > حذف حسابي وأكّد. ستُحذف جميع بياناتك (الملف الشخصي، الأصدقاء، التحديات) نهائياً من خوادمنا. تبقى العدادات والمهام المحلية حتى تحذف التطبيق.',
 
     'feat7Title': 'التحديات الاجتماعية',
-    'feat7Desc': 'تحدّى أصدقاءك على عادة وتابعوا تقدم بعضكم في الوقت الفعلي',
+    'feat7Desc': 'تحدّى أصدقائك على عادة وتابعوا تقدم بعضكم في الوقت الفعلي',
+    'feat8Title': 'إعداد توجيهي',
+    'feat8Desc': 'تجربة أول تشغيل سلسة لإعداد توأمك وتخصيص عاداتك في دقائق معدودة',
+    'feat9Title': 'أفاتارات توأم معبّرة',
+    'feat9Desc': '5 حالات أفاتار فريدة — متحمس، سعيد، محايد، حزين، باكٍ — تتفاعل مباشرةً مع تقدمك اليومي',
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -694,7 +706,7 @@ class WebL10n {
     'privacyStorageTitle': '3. Almacenamiento y seguridad',
     'privacyStorageContent': "Twin'Am utiliza dos sistemas de almacenamiento:\n\n"
         "Almacenamiento local (Hive): contadores, tareas y preferencias permanecen en su dispositivo y nunca se transmiten.\n\n"
-        "Almacenamiento en la nube (Supabase): al crear una cuenta, su perfil, amigos y desafíos se almacenan en servidores Supabase (infraestructura compatible con GDPR). No:\n"
+        "Almacenamiento en la nube (Supabase): al crear una cuenta, su perfil, amigos y desafíos se almacenan en servidores Supabase (infraestructura compatible con GDPR). Los títulos y descripciones de los desafíos se cifran adicionalmente con AES-256 antes de enviarse a la nube. No:\n"
         "• Compartimos sus datos con terceros\n"
         "• Vendemos su información personal\n"
         "• Rastreamos su actividad fuera de la app",
@@ -816,6 +828,10 @@ class WebL10n {
 
     'feat7Title': 'Desafíos Sociales',
     'feat7Desc': 'Desafía a tus amigos en un hábito y seguiros el progreso mutuamente en tiempo real',
+    'feat8Title': 'Incorporación Guiada',
+    'feat8Desc': 'Una experiencia de primera apertura fluida para configurar tu Twin y personalizar tus hábitos en minutos',
+    'feat9Title': 'Avatares Twin Expresivos',
+    'feat9Desc': '5 estados de avatar únicos — entusiasmado, feliz, neutral, triste, llorando — que reaccionan en vivo a tu progreso diario',
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -895,7 +911,7 @@ class WebL10n {
     'privacyStorageTitle': '3. Datenspeicherung und Sicherheit',
     'privacyStorageContent': "Twin'Am verwendet zwei Speichersysteme:\n\n"
         "Lokaler Speicher (Hive): Zähler, Aufgaben und Einstellungen bleiben auf Ihrem Gerät und werden niemals übertragen.\n\n"
-        "Cloud-Speicher (Supabase): Bei Konto-Erstellung werden Ihr Profil, Freunde und Herausforderungen auf Supabase-Servern gespeichert (DSGVO-konforme Infrastruktur). Wir:\n"
+        "Cloud-Speicher (Supabase): Bei Konto-Erstellung werden Ihr Profil, Freunde und Herausforderungen auf Supabase-Servern gespeichert (DSGVO-konforme Infrastruktur). Herausforderungstitel und -beschreibungen werden zusätzlich mit AES-256 verschlüsselt, bevor sie in die Cloud gesendet werden. Wir:\n"
         "• Teilen Ihre Daten nicht mit Dritten\n"
         "• Verkaufen Ihre persönlichen Informationen nicht\n"
         "• Verfolgen Ihre Aktivitäten nicht außerhalb der App",
@@ -1017,5 +1033,9 @@ class WebL10n {
 
     'feat7Title': 'Soziale Herausforderungen',
     'feat7Desc': 'Fordere deine Freunde zu Gewohnheits-Duellen heraus und verfolgt gegenseitig euren Fortschritt in Echtzeit',
+    'feat8Title': 'Geführtes Onboarding',
+    'feat8Desc': 'Ein reibungsloser Erstkontakt zum Einrichten deines Twins und Personalisieren deiner Gewohnheiten in wenigen Minuten',
+    'feat9Title': 'Ausdrucksstarke Twin-Avatare',
+    'feat9Desc': '5 einzigartige Avatar-Zustände — begeistert, glücklich, neutral, traurig, weinend — die live auf deinen täglichen Fortschritt reagieren',
   };
 }

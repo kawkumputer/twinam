@@ -380,9 +380,21 @@ class HomePage extends StatelessWidget {
                 isMobile,
               ),
               _buildFeatureCard(
-                '\u{1F91D}',
+                '🤝',
                 l.t('feat7Title'),
                 l.t('feat7Desc'),
+                isMobile,
+              ),
+              _buildFeatureCard(
+                '🚀',
+                l.t('feat8Title'),
+                l.t('feat8Desc'),
+                isMobile,
+              ),
+              _buildFeatureCard(
+                '🎭',
+                l.t('feat9Title'),
+                l.t('feat9Desc'),
                 isMobile,
               ),
             ],
