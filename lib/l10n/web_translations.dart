@@ -65,17 +65,20 @@ class WebL10n {
 
     // ── Privacy Page ──
     'privacyTitle': 'Privacy Policy',
-    'privacyDate': 'Last updated: April 6, 2026',
+    'privacyDate': 'Last updated: April 16, 2026',
     'privacyIntroTitle': 'Introduction',
     'privacyIntroContent': "Twin'Am mobile application (\"Twin'Am\", \"we\", \"our\", or \"us\") developed and published by Hamath Kane is committed to protecting your privacy. This Privacy Policy explains how Twin'Am collects, uses, and safeguards your information when you use our mobile application available on Google Play Store and Apple App Store.",
     'privacyCollectTitle': '1. Information We Collect',
-    'privacyCollectContent': "Twin'Am is designed with privacy in mind. All your data is stored locally on your device using Hive database. We collect and store:\n\n"
+    'privacyCollectContent': "Twin'Am uses both local and cloud storage depending on the feature.\n\n"
+        "Stored locally on your device (Hive):\n"
         "• Counter data (names, values, goals, icons)\n"
         "• Task information (titles, descriptions, deadlines, priorities)\n"
-        "• User preferences (name, language, theme settings)\n"
-        "• Achievement and XP progress\n"
-        "• Notification preferences\n\n"
-        "This data is stored exclusively on your device and is not transmitted to our servers.",
+        "• Preferences (theme, notifications, XP progress)\n\n"
+        "Stored in the cloud (Supabase) when you create an account:\n"
+        "• Your profile (username)\n"
+        "• Friend list\n"
+        "• Challenge data (title, type, progress, participants)\n\n"
+        "Using the app without an account keeps all data local only.",
     'privacyUseTitle': '2. How We Use Your Information',
     'privacyUseContent': "Your locally stored data is used to:\n\n"
         "• Provide core app functionality (counters, tasks, statistics)\n"
@@ -84,12 +87,12 @@ class WebL10n {
         "• Track your progress and achievements\n"
         "• Save your preferences and settings",
     'privacyStorageTitle': '3. Data Storage and Security',
-    'privacyStorageContent': "All data is stored locally on your device using Hive, a secure local database. We do not:\n\n"
-        "• Transmit your data to external servers\n"
+    'privacyStorageContent': "Twin'Am uses two storage systems:\n\n"
+        "Local storage (Hive): Counters, tasks and preferences stay on your device and are never transmitted.\n\n"
+        "Cloud storage (Supabase): When you create an account, your profile, friends and challenges are securely stored on Supabase servers (GDPR-compliant infrastructure). We do not:\n"
         "• Share your data with third parties\n"
         "• Sell your personal information\n"
-        "• Track your activity outside the app\n\n"
-        "Your data remains on your device and is protected by your device's security measures.",
+        "• Track your activity outside the app",
     'privacyNotifTitle': '4. Notifications',
     'privacyNotifContent': "Twin'Am uses local notifications to:\n\n"
         "• Remind you about tasks and deadlines\n"
@@ -97,22 +100,19 @@ class WebL10n {
         "• Notify you of achievements\n\n"
         "These notifications are generated locally on your device. You can disable notifications at any time in your device settings or within the app.",
     'privacyThirdTitle': '5. Third-Party Services',
-    'privacyThirdContent': "Twin'Am uses Google AdMob to display advertisements. AdMob may collect:\n\n"
-        "• Device identifiers (advertising ID)\n"
-        "• IP address\n"
-        "• Device information\n"
-        "• Ad interaction data\n\n"
-        "This data is used for ad personalization and analytics. You can opt out of personalized ads in your device settings.\n\n"
-        "AdMob Privacy Policy: https://policies.google.com/privacy\n\n"
-        "All other app data remains stored locally on your device.",
+    'privacyThirdContent': "Twin'Am uses the following third-party services:\n\n"
+        "Supabase (authentication & cloud storage): Used for account management, friend list and social challenges. Data is stored on GDPR-compliant servers.\n"
+        "Supabase Privacy Policy: https://supabase.com/privacy\n\n"
+        "Google AdMob (advertising): Currently disabled. When active, AdMob may collect device identifiers, IP address and ad interaction data for personalized ads. You can opt out in your device settings.\n"
+        "AdMob Privacy Policy: https://policies.google.com/privacy",
     'privacyChildrenTitle': "6. Children's Privacy",
     'privacyChildrenContent': "Twin'Am does not knowingly collect information from children under 13. The app is designed for general audiences and does not require age verification.",
     'privacyDeletionTitle': '7. Data Deletion',
     'privacyDeletionContent': "You have complete control over your data:\n\n"
+        "• Delete account in-app: Settings > My Account > Delete my account. This permanently removes your profile, friends, challenges and all cloud data from Supabase, as well as all local data associated with challenges.\n"
         "• Delete individual counters or tasks within the app\n"
-        "• Clear all app data through your device settings\n"
         "• Uninstall the app to remove all local data\n\n"
-        "Since all data is stored locally, deleting the app will permanently remove all your information.",
+        "Account deletion is immediate and irreversible. All Supabase cloud data is deleted at the moment of deletion.",
     'privacyChangesTitle': '8. Changes to This Privacy Policy',
     'privacyChangesContent': "We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the \"Last updated\" date.",
     'privacyContactTitle': '9. Contact Us',
@@ -124,7 +124,7 @@ class WebL10n {
 
     // ── Terms Page ──
     'termsTitle': 'Terms of Service',
-    'termsDate': 'Last updated: April 6, 2026',
+    'termsDate': 'Last updated: April 16, 2026',
     'termsIntroTitle': 'Introduction',
     'termsIntroContent': "Welcome to Twin'Am. By downloading, installing, or using our mobile application, you agree to be bound by these Terms of Service. Please read them carefully.",
     'termsAcceptTitle': '1. Acceptance of Terms',
@@ -136,7 +136,8 @@ class WebL10n {
         "• Personal Twin companion for motivation\n"
         "• Statistics and progress visualization\n"
         "• Achievement system and gamification\n"
-        "• Local notifications and reminders",
+        "• Local notifications and reminders\n"
+        "• Social challenges with friends (requires account creation)",
     'termsUserTitle': '3. User Responsibilities',
     'termsUserContent': "You agree to:\n\n"
         "• Use the app for lawful purposes only\n"
@@ -144,12 +145,12 @@ class WebL10n {
         "• Not use the app in any way that could damage or impair the service\n"
         "• Maintain the security of your device\n"
         "• Be responsible for all data entered into the app",
-    'termsDataTitle': '4. Local Data Storage',
-    'termsDataContent': "Twin'Am stores all data locally on your device. You acknowledge that:\n\n"
-        "• You are responsible for backing up your data\n"
-        "• We are not responsible for data loss due to device issues\n"
-        "• Uninstalling the app will delete all local data\n"
-        "• Data is not synced across devices",
+    'termsDataTitle': '4. Data Storage',
+    'termsDataContent': "Twin'Am uses local storage (Hive) for counters and tasks, and cloud storage (Supabase) for your profile, friends and challenges. You acknowledge that:\n\n"
+        "• You are responsible for backing up local data\n"
+        "• Cloud data (profile, challenges) is managed by Supabase and subject to their terms\n"
+        "• Deleting your account removes all cloud data permanently and irreversibly\n"
+        "• Uninstalling the app removes all local data",
     'termsIPTitle': '5. Intellectual Property',
     'termsIPContent': "The Twin'Am app, including its design, features, graphics, and content, is owned by us and protected by copyright and other intellectual property laws. You may not:\n\n"
         "• Copy, modify, or distribute the app\n"
@@ -192,18 +193,25 @@ class WebL10n {
     'faq2A': 'When creating or editing a counter, enable the "Goal" option and set the number you want to reach each day.',
     'faq3Q': 'How to add a task?',
     'faq3A': 'Click the task icon in the Dashboard header, then tap "+" to create a new task with a title, description, deadline and priority.',
-    'faq4Q': 'Is my data synced?',
-    'faq4A': 'Currently, all your data is stored locally on your device. It is not synced to the cloud, which guarantees your privacy.',
+    'faq4Q': 'Is my data synced to the cloud?',
+    'faq4A': 'Counters and tasks are stored locally on your device only. However, if you create an account, your profile, friends and challenges are synced to the cloud via Supabase — this is required for social features. You can use the app without an account to keep everything local.',
     'faq5Q': 'How to disable notifications?',
     'faq5A': 'Go to Settings > Notifications and disable the notifications you don\'t want. You can also manage notifications in your device settings.',
     'faq6Q': 'How to change the app language?',
     'faq6A': 'Go to Settings > Language and select your preferred language. Twin\'Am supports English, French, Arabic, Spanish and German.',
-    'faq7Q': 'What happens if I uninstall the app?',
-    'faq7A': 'All your local data will be deleted. Make sure to export your data before uninstalling if you want to keep it.',
+    'faq7Q': 'What happens if I uninstall the app or delete my account?',
+    'faq7A': 'Uninstalling removes local data (counters, tasks). To delete your profile and all cloud data (friends, challenges), use Settings > My Account > Delete my account. This action is immediate and irreversible.',
     'faq8Q': 'How does the Twin system work?',
     'faq8A': 'Your Twin is a virtual companion that reacts to your progress. It\'s happy when you reach your goals, neutral when you make efforts, and sad when you need motivation. It sends personalized messages to encourage you.',
     'faq9Q': 'How to earn XP and level up?',
     'faq9A': 'You earn XP by reaching daily goals, completing tasks and maintaining streaks. The more consistent you are, the faster you level up!',
+    'faq10Q': 'How do social challenges work?',
+    'faq10A': 'Create an account, add friends, then go to the Challenges tab to send a challenge. Once your opponent accepts, both of you track the same habit with linked counters. You can follow each other\'s progress in real time.',
+    'faq11Q': 'How do I delete my account?',
+    'faq11A': 'Go to Settings > My Account > Delete my account and confirm. All your data (profile, friends, challenges) is permanently deleted from our servers. Local counters and tasks remain until you uninstall the app.',
+
+    'feat7Title': 'Social Challenges',
+    'feat7Desc': 'Challenge your friends to habit duels and track each other\'s progress in real time',
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -259,17 +267,20 @@ class WebL10n {
 
     // ── Privacy Page ──
     'privacyTitle': 'Politique de Confidentialité',
-    'privacyDate': 'Dernière mise à jour : 6 avril 2026',
+    'privacyDate': 'Dernière mise à jour : 16 avril 2026',
     'privacyIntroTitle': 'Introduction',
     'privacyIntroContent': "L'application mobile Twin'Am (\"Twin'Am\", \"nous\", \"notre\") développée et publiée par Hamath Kane s'engage à protéger votre vie privée. Cette Politique de Confidentialité explique comment Twin'Am collecte, utilise et protège vos informations lorsque vous utilisez notre application mobile disponible sur Google Play Store et Apple App Store.",
     'privacyCollectTitle': '1. Informations collectées',
-    'privacyCollectContent': "Twin'Am est conçu dans le respect de la vie privée. Toutes vos données sont stockées localement sur votre appareil via la base de données Hive. Nous collectons et stockons :\n\n"
+    'privacyCollectContent': "Twin'Am combine stockage local et cloud selon les fonctionnalités.\n\n"
+        "Stocké localement sur votre appareil (Hive) :\n"
         "• Données des compteurs (noms, valeurs, objectifs, icônes)\n"
         "• Informations des tâches (titres, descriptions, échéances, priorités)\n"
-        "• Préférences utilisateur (nom, langue, paramètres de thème)\n"
-        "• Progression des achievements et XP\n"
-        "• Préférences de notifications\n\n"
-        "Ces données sont stockées exclusivement sur votre appareil et ne sont pas transmises à nos serveurs.",
+        "• Préférences (thème, notifications, progression XP)\n\n"
+        "Stocké dans le cloud (Supabase) si vous créez un compte :\n"
+        "• Votre profil (nom d'utilisateur)\n"
+        "• Liste d'amis\n"
+        "• Données des défis (titre, type, progression, participants)\n\n"
+        "Utiliser l'application sans compte conserve toutes les données en local uniquement.",
     'privacyUseTitle': '2. Utilisation de vos informations',
     'privacyUseContent': "Vos données stockées localement sont utilisées pour :\n\n"
         "• Fournir les fonctionnalités principales (compteurs, tâches, statistiques)\n"
@@ -278,12 +289,12 @@ class WebL10n {
         "• Suivre vos progrès et achievements\n"
         "• Sauvegarder vos préférences et paramètres",
     'privacyStorageTitle': '3. Stockage et sécurité des données',
-    'privacyStorageContent': "Toutes les données sont stockées localement sur votre appareil via Hive, une base de données locale sécurisée. Nous ne :\n\n"
-        "• Transmettons pas vos données à des serveurs externes\n"
+    'privacyStorageContent': "Twin'Am utilise deux systèmes de stockage :\n\n"
+        "Stockage local (Hive) : compteurs, tâches et préférences restent sur votre appareil et ne sont jamais transmis.\n\n"
+        "Stockage cloud (Supabase) : si vous créez un compte, votre profil, vos amis et vos défis sont stockés sur les serveurs Supabase (infrastructure conforme RGPD). Nous ne :\n"
         "• Partageons pas vos données avec des tiers\n"
         "• Vendons pas vos informations personnelles\n"
-        "• Suivons pas votre activité en dehors de l'application\n\n"
-        "Vos données restent sur votre appareil et sont protégées par les mesures de sécurité de votre appareil.",
+        "• Suivons pas votre activité en dehors de l'application",
     'privacyNotifTitle': '4. Notifications',
     'privacyNotifContent': "Twin'Am utilise des notifications locales pour :\n\n"
         "• Vous rappeler vos tâches et échéances\n"
@@ -291,22 +302,19 @@ class WebL10n {
         "• Vous notifier de vos achievements\n\n"
         "Ces notifications sont générées localement sur votre appareil. Vous pouvez désactiver les notifications à tout moment dans les paramètres de votre appareil ou dans l'application.",
     'privacyThirdTitle': '5. Services tiers',
-    'privacyThirdContent': "Twin'Am utilise Google AdMob pour afficher des publicités. AdMob peut collecter :\n\n"
-        "• Identifiants de l'appareil (ID publicitaire)\n"
-        "• Adresse IP\n"
-        "• Informations sur l'appareil\n"
-        "• Données d'interaction avec les publicités\n\n"
-        "Ces données sont utilisées pour la personnalisation des publicités et les analyses. Vous pouvez désactiver les publicités personnalisées dans les paramètres de votre appareil.\n\n"
-        "Politique de confidentialité AdMob : https://policies.google.com/privacy\n\n"
-        "Toutes les autres données de l'application restent stockées localement sur votre appareil.",
+    'privacyThirdContent': "Twin'Am utilise les services tiers suivants :\n\n"
+        "Supabase (authentification et stockage cloud) : utilisé pour la gestion de compte, la liste d'amis et les défis sociaux. Les données sont stockées sur des serveurs conformes au RGPD.\n"
+        "Politique de confidentialité Supabase : https://supabase.com/privacy\n\n"
+        "Google AdMob (publicité) : actuellement désactivé. Lorsqu'actif, AdMob peut collecter des identifiants d'appareil, l'adresse IP et des données d'interaction publicitaire. Vous pouvez désactiver les publicités personnalisées dans les paramètres de votre appareil.\n"
+        "Politique de confidentialité AdMob : https://policies.google.com/privacy",
     'privacyChildrenTitle': '6. Confidentialité des enfants',
     'privacyChildrenContent': "Twin'Am ne collecte pas sciemment d'informations auprès d'enfants de moins de 13 ans. L'application est conçue pour un public général et ne nécessite pas de vérification d'âge.",
     'privacyDeletionTitle': '7. Suppression des données',
     'privacyDeletionContent': "Vous avez un contrôle total sur vos données :\n\n"
-        "• Supprimer des compteurs ou tâches individuels dans l'application\n"
-        "• Effacer toutes les données de l'application via les paramètres de votre appareil\n"
+        "• Supprimer le compte dans l'app : Paramètres > Mon compte > Supprimer mon compte. Cela supprime définitivement votre profil, vos amis, vos défis et toutes les données cloud Supabase, ainsi que les données locales liées aux défis.\n"
+        "• Supprimer des compteurs ou tâches individuellement dans l'application\n"
         "• Désinstaller l'application pour supprimer toutes les données locales\n\n"
-        "Puisque toutes les données sont stockées localement, la désinstallation de l'application supprimera définitivement toutes vos informations.",
+        "La suppression du compte est immédiate et irréversible. Toutes les données Supabase sont supprimées au moment de la demande.",
     'privacyChangesTitle': '8. Modifications de cette politique',
     'privacyChangesContent': "Nous pouvons mettre à jour cette Politique de Confidentialité de temps en temps. Nous vous informerons de tout changement en publiant la nouvelle politique sur cette page et en mettant à jour la date de \"Dernière mise à jour\".",
     'privacyContactTitle': '9. Nous contacter',
@@ -318,7 +326,7 @@ class WebL10n {
 
     // ── Terms Page ──
     'termsTitle': "Conditions d'Utilisation",
-    'termsDate': 'Dernière mise à jour : 6 avril 2026',
+    'termsDate': 'Dernière mise à jour : 16 avril 2026',
     'termsIntroTitle': 'Introduction',
     'termsIntroContent': "Bienvenue sur Twin'Am. En téléchargeant, installant ou utilisant notre application mobile, vous acceptez d'être lié par ces Conditions d'Utilisation. Veuillez les lire attentivement.",
     'termsAcceptTitle': "1. Acceptation des conditions",
@@ -330,7 +338,8 @@ class WebL10n {
         "• Compagnon Twin personnel pour la motivation\n"
         "• Statistiques et visualisation des progrès\n"
         "• Système d'achievements et gamification\n"
-        "• Notifications et rappels locaux",
+        "• Notifications et rappels locaux\n"
+        "• Défis sociaux avec des amis (nécessite la création d'un compte)",
     'termsUserTitle': "3. Responsabilités de l'utilisateur",
     'termsUserContent': "Vous acceptez de :\n\n"
         "• Utiliser l'application uniquement à des fins légales\n"
@@ -338,12 +347,12 @@ class WebL10n {
         "• Ne pas utiliser l'application d'une manière pouvant endommager le service\n"
         "• Maintenir la sécurité de votre appareil\n"
         "• Être responsable de toutes les données saisies dans l'application",
-    'termsDataTitle': '4. Stockage local des données',
-    'termsDataContent': "Twin'Am stocke toutes les données localement sur votre appareil. Vous reconnaissez que :\n\n"
-        "• Vous êtes responsable de la sauvegarde de vos données\n"
-        "• Nous ne sommes pas responsables de la perte de données due à des problèmes d'appareil\n"
-        "• La désinstallation de l'application supprimera toutes les données locales\n"
-        "• Les données ne sont pas synchronisées entre les appareils",
+    'termsDataTitle': '4. Stockage des données',
+    'termsDataContent': "Twin'Am utilise le stockage local (Hive) pour les compteurs et tâches, et le cloud (Supabase) pour le profil, les amis et les défis. Vous reconnaissez que :\n\n"
+        "• Vous êtes responsable de la sauvegarde des données locales\n"
+        "• Les données cloud (profil, défis) sont gérées par Supabase et soumises à leurs conditions\n"
+        "• La suppression du compte efface définitivement et irréversiblement toutes les données cloud\n"
+        "• La désinstallation de l'application supprime toutes les données locales",
     'termsIPTitle': '5. Propriété intellectuelle',
     'termsIPContent': "L'application Twin'Am, y compris son design, ses fonctionnalités, ses graphiques et son contenu, est notre propriété et est protégée par le droit d'auteur et d'autres lois sur la propriété intellectuelle. Vous ne pouvez pas :\n\n"
         "• Copier, modifier ou distribuer l'application\n"
@@ -386,18 +395,25 @@ class WebL10n {
     'faq2A': "Lors de la création ou modification d'un compteur, active l'option \"Objectif\" et définis le nombre que tu souhaites atteindre chaque jour.",
     'faq3Q': 'Comment ajouter une tâche ?',
     'faq3A': "Clique sur l'icône de tâches dans le header du Dashboard, puis sur le bouton \"+\" pour créer une nouvelle tâche avec un titre, une description, une échéance et une priorité.",
-    'faq4Q': 'Mes données sont-elles synchronisées ?',
-    'faq4A': "Actuellement, toutes tes données sont stockées localement sur ton appareil. Elles ne sont pas synchronisées dans le cloud, ce qui garantit ta vie privée.",
+    'faq4Q': 'Mes données sont-elles synchronisées dans le cloud ?',
+    'faq4A': "Les compteurs et tâches sont uniquement stockés localement. En revanche, si tu crées un compte, ton profil, tes amis et tes défis sont synchronisés via Supabase — nécessaire pour les fonctionnalités sociales. Tu peux utiliser l'app sans compte pour garder tout en local.",
     'faq5Q': 'Comment désactiver les notifications ?',
     'faq5A': "Va dans Paramètres > Notifications et désactive les notifications que tu ne souhaites pas recevoir. Tu peux aussi gérer les notifications dans les paramètres de ton appareil.",
     'faq6Q': "Comment changer la langue de l'app ?",
     'faq6A': "Va dans Paramètres > Langue et sélectionne ta langue préférée. Twin'Am prend en charge l'anglais, le français, l'arabe, l'espagnol et l'allemand.",
-    'faq7Q': "Que se passe-t-il si je désinstalle l'app ?",
-    'faq7A': "Toutes tes données locales seront supprimées. Assure-toi d'exporter tes données si tu souhaites les conserver avant de désinstaller l'app.",
+    'faq7Q': "Que se passe-t-il si je désinstalle l'app ou supprime mon compte ?",
+    'faq7A': "La désinstallation supprime les données locales (compteurs, tâches). Pour supprimer ton profil et toutes les données cloud (amis, défis), utilise Paramètres > Mon compte > Supprimer mon compte. Cette action est immédiate et irréversible.",
     'faq8Q': 'Comment fonctionne le système de Twin ?',
     'faq8A': "Ton Twin est un compagnon virtuel qui réagit à tes progrès. Il est heureux quand tu atteins tes objectifs, neutre quand tu fais des efforts, et triste quand tu as besoin de motivation. Il t'envoie des messages personnalisés pour t'encourager.",
     'faq9Q': "Comment gagner de l'XP et monter de niveau ?",
     'faq9A': "Tu gagnes de l'XP en atteignant tes objectifs quotidiens, en complétant des tâches et en maintenant des séries (streaks). Plus tu es régulier, plus tu montes de niveaux rapidement !",
+    'faq10Q': 'Comment fonctionnent les défis sociaux ?',
+    'faq10A': "Crée un compte, ajoute des amis, puis va dans l'onglet Défis pour envoyer un défi. Une fois accepté par ton adversaire, vous suivez la même habitude avec des compteurs liés. Vous pouvez voir la progression de l'autre en temps réel.",
+    'faq11Q': 'Comment supprimer mon compte ?',
+    'faq11A': "Va dans Paramètres > Mon compte > Supprimer mon compte et confirme. Toutes tes données (profil, amis, défis) sont définitivement supprimées de nos serveurs. Les compteurs et tâches locaux restent jusqu'à la désinstallation de l'app.",
+
+    'feat7Title': 'Défis Sociaux',
+    'feat7Desc': "Défie tes amis sur une habitude et suivez mutuellement votre progression en temps réel",
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -453,17 +469,20 @@ class WebL10n {
 
     // ── Privacy Page ──
     'privacyTitle': 'سياسة الخصوصية',
-    'privacyDate': 'آخر تحديث: 6 أبريل 2026',
+    'privacyDate': 'آخر تحديث: 16 أبريل 2026',
     'privacyIntroTitle': 'مقدمة',
     'privacyIntroContent': "تطبيق Twin'Am (\"Twin'Am\"، \"نحن\"، \"لنا\") المطور والمنشور من قبل حمث كاني ملتزم بحماية خصوصيتك. توضح سياسة الخصوصية هذه كيف يجمع Twin'Am معلوماتك ويستخدمها ويحميها عند استخدام تطبيقنا المتاح على Google Play Store و Apple App Store.",
     'privacyCollectTitle': '1. المعلومات التي نجمعها',
-    'privacyCollectContent': "صُمم Twin'Am مع مراعاة الخصوصية. جميع بياناتك مخزنة محلياً على جهازك عبر قاعدة بيانات Hive. نجمع ونخزن:\n\n"
+    'privacyCollectContent': "يجمع Twin'Am بين التخزين المحلي والسحابي حسب الميزة.\n\n"
+        "مخزّن محلياً على جهازك (Hive):\n"
         "• بيانات العدادات (الأسماء، القيم، الأهداف، الأيقونات)\n"
         "• معلومات المهام (العناوين، الأوصاف، المواعيد، الأولويات)\n"
-        "• تفضيلات المستخدم (الاسم، اللغة، إعدادات المظهر)\n"
-        "• تقدم الإنجازات ونقاط الخبرة\n"
-        "• تفضيلات الإشعارات\n\n"
-        "هذه البيانات مخزنة حصرياً على جهازك ولا تُنقل إلى خوادمنا.",
+        "• التفضيلات (المظهر، الإشعارات، تقدم نقاط الخبرة)\n\n"
+        "مخزّن في السحابة (Supabase) عند إنشاء حساب:\n"
+        "• ملفك الشخصي (اسم المستخدم)\n"
+        "• قائمة الأصدقاء\n"
+        "• بيانات التحديات (العنوان، النوع، التقدم، المشاركون)\n\n"
+        "استخدام التطبيق بدون حساب يحتفظ بجميع البيانات محلياً فقط.",
     'privacyUseTitle': '2. كيف نستخدم معلوماتك',
     'privacyUseContent': "تُستخدم بياناتك المخزنة محلياً من أجل:\n\n"
         "• توفير الوظائف الأساسية (العدادات، المهام، الإحصائيات)\n"
@@ -472,12 +491,12 @@ class WebL10n {
         "• تتبع تقدمك وإنجازاتك\n"
         "• حفظ تفضيلاتك وإعداداتك",
     'privacyStorageTitle': '3. تخزين البيانات وأمانها',
-    'privacyStorageContent': "جميع البيانات مخزنة محلياً على جهازك عبر Hive. نحن لا:\n\n"
-        "• ننقل بياناتك إلى خوادم خارجية\n"
+    'privacyStorageContent': "يستخدم Twin'Am نظامَي تخزين:\n\n"
+        "التخزين المحلي (Hive): تبقى العدادات والمهام والتفضيلات على جهازك ولا تُنقل أبداً.\n\n"
+        "التخزين السحابي (Supabase): عند إنشاء حساب، يُخزَّن ملفك الشخصي وأصدقاؤك وتحدياتك على خوادم Supabase (بنية تحتية متوافقة مع GDPR). نحن لا:\n"
         "• نشارك بياناتك مع أطراف ثالثة\n"
         "• نبيع معلوماتك الشخصية\n"
-        "• نتتبع نشاطك خارج التطبيق\n\n"
-        "تبقى بياناتك على جهازك ومحمية بإجراءات أمان جهازك.",
+        "• نتتبع نشاطك خارج التطبيق",
     'privacyNotifTitle': '4. الإشعارات',
     'privacyNotifContent': "يستخدم Twin'Am إشعارات محلية من أجل:\n\n"
         "• تذكيرك بمهامك ومواعيدك\n"
@@ -485,21 +504,19 @@ class WebL10n {
         "• إعلامك بإنجازاتك\n\n"
         "تُنشأ هذه الإشعارات محلياً على جهازك. يمكنك تعطيلها في أي وقت من إعدادات جهازك أو داخل التطبيق.",
     'privacyThirdTitle': '5. خدمات الطرف الثالث',
-    'privacyThirdContent': "يستخدم Twin'Am خدمة Google AdMob لعرض الإعلانات. قد يجمع AdMob:\n\n"
-        "• معرّفات الجهاز (معرّف الإعلان)\n"
-        "• عنوان IP\n"
-        "• معلومات الجهاز\n"
-        "• بيانات التفاعل مع الإعلانات\n\n"
-        "تُستخدم هذه البيانات لتخصيص الإعلانات والتحليلات. يمكنك إلغاء الإعلانات المخصصة من إعدادات جهازك.\n\n"
+    'privacyThirdContent': "يستخدم Twin'Am الخدمات التالية:\n\n"
+        "Supabase (المصادقة والتخزين السحابي): يُستخدم لإدارة الحسابات وقائمة الأصدقاء والتحديات الاجتماعية. تُخزَّن البيانات على خوادم متوافقة مع GDPR.\n"
+        "سياسة خصوصية Supabase: https://supabase.com/privacy\n\n"
+        "Google AdMob (الإعلانات): معطّل حالياً. عند تفعيله، قد يجمع AdMob معرّفات الجهاز وعنوان IP وبيانات التفاعل مع الإعلانات. يمكنك إلغاء الإعلانات المخصصة من إعدادات جهازك.\n"
         "سياسة خصوصية AdMob: https://policies.google.com/privacy",
     'privacyChildrenTitle': '6. خصوصية الأطفال',
     'privacyChildrenContent': "لا يجمع Twin'Am معلومات من الأطفال دون 13 عاماً عن قصد. التطبيق مصمم لجمهور عام ولا يتطلب التحقق من العمر.",
     'privacyDeletionTitle': '7. حذف البيانات',
     'privacyDeletionContent': "لديك سيطرة كاملة على بياناتك:\n\n"
+        "• حذف الحساب من التطبيق: الإعدادات > حسابي > حذف حسابي. يؤدي ذلك إلى حذف ملفك الشخصي وأصدقائك وتحدياتك وجميع بيانات Supabase السحابية نهائياً، إضافة إلى البيانات المحلية المرتبطة بالتحديات.\n"
         "• حذف عدادات أو مهام فردية داخل التطبيق\n"
-        "• مسح جميع بيانات التطبيق عبر إعدادات جهازك\n"
-        "• إلغاء تثبيت التطبيق لإزالة جميع البيانات\n\n"
-        "بما أن جميع البيانات مخزنة محلياً، فإن حذف التطبيق سيزيل جميع معلوماتك نهائياً.",
+        "• إلغاء تثبيت التطبيق لإزالة جميع البيانات المحلية\n\n"
+        "حذف الحساب فوري ولا يمكن التراجع عنه. تُحذف جميع بيانات Supabase في لحظة الطلب.",
     'privacyChangesTitle': '8. تغييرات على هذه السياسة',
     'privacyChangesContent': "قد نحدّث سياسة الخصوصية هذه من وقت لآخر. سنُعلمك بأي تغييرات عبر نشر السياسة الجديدة على هذه الصفحة وتحديث تاريخ \"آخر تحديث\".",
     'privacyContactTitle': '9. اتصل بنا',
@@ -511,7 +528,7 @@ class WebL10n {
 
     // ── Terms Page ──
     'termsTitle': 'شروط الاستخدام',
-    'termsDate': 'آخر تحديث: 6 أبريل 2026',
+    'termsDate': 'آخر تحديث: 16 أبريل 2026',
     'termsIntroTitle': 'مقدمة',
     'termsIntroContent': "مرحباً بك في Twin'Am. بتحميل أو تثبيت أو استخدام تطبيقنا، فإنك توافق على الالتزام بشروط الاستخدام هذه. يرجى قراءتها بعناية.",
     'termsAcceptTitle': '1. قبول الشروط',
@@ -523,7 +540,8 @@ class WebL10n {
         "• رفيق توأم شخصي للتحفيز\n"
         "• إحصائيات وتصور التقدم\n"
         "• نظام إنجازات وتلعيب\n"
-        "• إشعارات وتذكيرات محلية",
+        "• إشعارات وتذكيرات محلية\n"
+        "• تحديات اجتماعية مع الأصدقاء (تتطلب إنشاء حساب)",
     'termsUserTitle': '3. مسؤوليات المستخدم',
     'termsUserContent': "أنت توافق على:\n\n"
         "• استخدام التطبيق لأغراض قانونية فقط\n"
@@ -531,12 +549,12 @@ class WebL10n {
         "• عدم استخدام التطبيق بطريقة قد تضر بالخدمة\n"
         "• الحفاظ على أمان جهازك\n"
         "• تحمل مسؤولية جميع البيانات المدخلة في التطبيق",
-    'termsDataTitle': '4. تخزين البيانات المحلي',
-    'termsDataContent': "يخزن Twin'Am جميع البيانات محلياً على جهازك. أنت تُقر بأن:\n\n"
-        "• أنت مسؤول عن نسخ بياناتك احتياطياً\n"
-        "• لسنا مسؤولين عن فقدان البيانات بسبب مشاكل الجهاز\n"
-        "• إلغاء تثبيت التطبيق سيحذف جميع البيانات\n"
-        "• البيانات غير متزامنة بين الأجهزة",
+    'termsDataTitle': '4. تخزين البيانات',
+    'termsDataContent': "يستخدم Twin'Am التخزين المحلي (Hive) للعدادات والمهام، والتخزين السحابي (Supabase) للملف الشخصي والأصدقاء والتحديات. أنت تُقر بأن:\n\n"
+        "• أنت مسؤول عن نسخ البيانات المحلية احتياطياً\n"
+        "• البيانات السحابية (الملف، التحديات) تُدار بواسطة Supabase وفق شروطهم\n"
+        "• حذف الحساب يمسح جميع البيانات السحابية نهائياً ولا يمكن التراجع عنه\n"
+        "• إلغاء التثبيت يحذف جميع البيانات المحلية",
     'termsIPTitle': '5. الملكية الفكرية',
     'termsIPContent': "تطبيق Twin'Am، بما في ذلك تصميمه وميزاته ورسوماته ومحتواه، ملكيتنا ومحمي بقوانين حقوق النشر والملكية الفكرية. لا يجوز لك:\n\n"
         "• نسخ أو تعديل أو توزيع التطبيق\n"
@@ -578,18 +596,25 @@ class WebL10n {
     'faq2A': 'عند إنشاء أو تعديل عداد، فعّل خيار "الهدف" وحدد الرقم الذي تريد الوصول إليه يومياً.',
     'faq3Q': 'كيف أضيف مهمة؟',
     'faq3A': 'اضغط على أيقونة المهام في رأس الشاشة الرئيسية، ثم اضغط "+" لإنشاء مهمة جديدة بعنوان ووصف وموعد وأولوية.',
-    'faq4Q': 'هل بياناتي متزامنة؟',
-    'faq4A': 'حالياً، جميع بياناتك مخزنة محلياً على جهازك. لا تتم مزامنتها مع السحابة، مما يضمن خصوصيتك.',
+    'faq4Q': 'هل بياناتي متزامنة مع السحابة؟',
+    'faq4A': 'العدادات والمهام مخزنة محلياً فقط. أما إذا أنشأت حساباً، فإن ملفك الشخصي وأصدقاءك وتحدياتك تتزامن عبر Supabase — وهو ضروري للميزات الاجتماعية. يمكنك استخدام التطبيق بدون حساب للاحتفاظ بكل شيء محلياً.',
     'faq5Q': 'كيف أعطّل الإشعارات؟',
     'faq5A': 'اذهب إلى الإعدادات > الإشعارات وعطّل ما لا تريده. يمكنك أيضاً إدارتها من إعدادات جهازك.',
     'faq6Q': 'كيف أغيّر لغة التطبيق؟',
     'faq6A': "اذهب إلى الإعدادات > اللغة واختر لغتك المفضلة. يدعم Twin'Am الإنجليزية والفرنسية والعربية والإسبانية والألمانية.",
-    'faq7Q': 'ماذا يحدث إذا حذفت التطبيق؟',
-    'faq7A': 'ستُحذف جميع بياناتك المحلية. تأكد من تصدير بياناتك قبل الحذف إذا أردت الاحتفاظ بها.',
+    'faq7Q': 'ماذا يحدث إذا حذفت التطبيق أو حسابي؟',
+    'faq7A': 'حذف التطبيق يزيل البيانات المحلية (العدادات، المهام). لحذف ملفك الشخصي وجميع البيانات السحابية (الأصدقاء، التحديات)، استخدم الإعدادات > حسابي > حذف حسابي. هذا الإجراء فوري ولا يمكن التراجع عنه.',
     'faq8Q': 'كيف يعمل نظام التوأم؟',
     'faq8A': 'توأمك هو رفيق افتراضي يتفاعل مع تقدمك. يكون سعيداً عند تحقيق أهدافك، محايداً عند بذل الجهد، وحزيناً عندما تحتاج للتحفيز.',
     'faq9Q': 'كيف أكسب نقاط خبرة وأرتقي بمستواي؟',
     'faq9A': 'تكسب نقاط خبرة بتحقيق أهدافك اليومية وإكمال المهام والحفاظ على سلاسل متتالية. كلما كنت أكثر انتظاماً، كلما ارتقيت أسرع!',
+    'faq10Q': 'كيف تعمل التحديات الاجتماعية؟',
+    'faq10A': 'أنشئ حساباً، أضف أصدقاء، ثم اذهب إلى تبويب التحديات لإرسال تحدٍّ. بعد قبول خصمك، يتتبع كلاكما نفس العادة بعدادات مرتبطة ويمكنكما متابعة تقدم بعضكما في الوقت الفعلي.',
+    'faq11Q': 'كيف أحذف حسابي؟',
+    'faq11A': 'اذهب إلى الإعدادات > حسابي > حذف حسابي وأكّد. ستُحذف جميع بياناتك (الملف الشخصي، الأصدقاء، التحديات) نهائياً من خوادمنا. تبقى العدادات والمهام المحلية حتى تحذف التطبيق.',
+
+    'feat7Title': 'التحديات الاجتماعية',
+    'feat7Desc': 'تحدّى أصدقاءك على عادة وتابعوا تقدم بعضكم في الوقت الفعلي',
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -645,17 +670,20 @@ class WebL10n {
 
     // ── Privacy Page ──
     'privacyTitle': 'Política de Privacidad',
-    'privacyDate': 'Última actualización: 6 de abril de 2026',
+    'privacyDate': 'Última actualización: 16 de abril de 2026',
     'privacyIntroTitle': 'Introducción',
     'privacyIntroContent': "La aplicación móvil Twin'Am (\"Twin'Am\", \"nosotros\", \"nuestro\") desarrollada y publicada por Hamath Kane se compromete a proteger su privacidad. Esta Política de Privacidad explica cómo Twin'Am recopila, usa y protege su información cuando utiliza nuestra aplicación disponible en Google Play Store y Apple App Store.",
     'privacyCollectTitle': '1. Información que recopilamos',
-    'privacyCollectContent': "Twin'Am está diseñado con la privacidad en mente. Todos sus datos se almacenan localmente en su dispositivo. Recopilamos y almacenamos:\n\n"
+    'privacyCollectContent': "Twin'Am combina almacenamiento local y en la nube según la función.\n\n"
+        "Almacenado localmente en su dispositivo (Hive):\n"
         "• Datos de contadores (nombres, valores, objetivos, iconos)\n"
-        "• Información de tareas (títulos, descripciones, fechas límite, prioridades)\n"
-        "• Preferencias del usuario (nombre, idioma, configuración de tema)\n"
-        "• Progreso de logros y XP\n"
-        "• Preferencias de notificaciones\n\n"
-        "Estos datos se almacenan exclusivamente en su dispositivo y no se transmiten a nuestros servidores.",
+        "• Información de tareas (títulos, descripciones, fechas, prioridades)\n"
+        "• Preferencias (tema, notificaciones, progreso XP)\n\n"
+        "Almacenado en la nube (Supabase) al crear una cuenta:\n"
+        "• Su perfil (nombre de usuario)\n"
+        "• Lista de amigos\n"
+        "• Datos de desafíos (título, tipo, progreso, participantes)\n\n"
+        "Usar la app sin cuenta mantiene todos los datos solo en local.",
     'privacyUseTitle': '2. Cómo usamos su información',
     'privacyUseContent': "Sus datos almacenados localmente se usan para:\n\n"
         "• Proporcionar funcionalidad principal (contadores, tareas, estadísticas)\n"
@@ -664,12 +692,12 @@ class WebL10n {
         "• Seguir su progreso y logros\n"
         "• Guardar sus preferencias y configuraciones",
     'privacyStorageTitle': '3. Almacenamiento y seguridad',
-    'privacyStorageContent': "Todos los datos se almacenan localmente en su dispositivo. No:\n\n"
-        "• Transmitimos sus datos a servidores externos\n"
+    'privacyStorageContent': "Twin'Am utiliza dos sistemas de almacenamiento:\n\n"
+        "Almacenamiento local (Hive): contadores, tareas y preferencias permanecen en su dispositivo y nunca se transmiten.\n\n"
+        "Almacenamiento en la nube (Supabase): al crear una cuenta, su perfil, amigos y desafíos se almacenan en servidores Supabase (infraestructura compatible con GDPR). No:\n"
         "• Compartimos sus datos con terceros\n"
         "• Vendemos su información personal\n"
-        "• Rastreamos su actividad fuera de la app\n\n"
-        "Sus datos permanecen en su dispositivo protegidos por las medidas de seguridad de su dispositivo.",
+        "• Rastreamos su actividad fuera de la app",
     'privacyNotifTitle': '4. Notificaciones',
     'privacyNotifContent': "Twin'Am usa notificaciones locales para:\n\n"
         "• Recordarle sus tareas y fechas límite\n"
@@ -677,21 +705,19 @@ class WebL10n {
         "• Notificarle de sus logros\n\n"
         "Estas notificaciones se generan localmente. Puede desactivarlas en cualquier momento desde la configuración de su dispositivo o dentro de la app.",
     'privacyThirdTitle': '5. Servicios de terceros',
-    'privacyThirdContent': "Twin'Am usa Google AdMob para mostrar anuncios. AdMob puede recopilar:\n\n"
-        "• Identificadores del dispositivo\n"
-        "• Dirección IP\n"
-        "• Información del dispositivo\n"
-        "• Datos de interacción con anuncios\n\n"
-        "Puede optar por no recibir anuncios personalizados en la configuración de su dispositivo.\n\n"
+    'privacyThirdContent': "Twin'Am utiliza los siguientes servicios de terceros:\n\n"
+        "Supabase (autenticación y almacenamiento en la nube): usado para gestión de cuentas, lista de amigos y desafíos sociales. Los datos se almacenan en servidores compatibles con GDPR.\n"
+        "Política de privacidad de Supabase: https://supabase.com/privacy\n\n"
+        "Google AdMob (publicidad): actualmente desactivado. Cuando esté activo, AdMob puede recopilar identificadores del dispositivo, dirección IP y datos de interacción con anuncios. Puede optar por no recibir anuncios personalizados en la configuración de su dispositivo.\n"
         "Política de privacidad de AdMob: https://policies.google.com/privacy",
     'privacyChildrenTitle': '6. Privacidad de menores',
     'privacyChildrenContent': "Twin'Am no recopila intencionalmente información de menores de 13 años. La app está diseñada para público general.",
     'privacyDeletionTitle': '7. Eliminación de datos',
     'privacyDeletionContent': "Tiene control total sobre sus datos:\n\n"
+        "• Eliminar cuenta en la app: Ajustes > Mi cuenta > Eliminar mi cuenta. Esto elimina permanentemente su perfil, amigos, desafíos y todos los datos en la nube de Supabase, así como los datos locales asociados a desafíos.\n"
         "• Eliminar contadores o tareas individuales dentro de la app\n"
-        "• Borrar todos los datos de la app desde la configuración de su dispositivo\n"
         "• Desinstalar la app para eliminar todos los datos locales\n\n"
-        "Al ser datos locales, desinstalar la app eliminará permanentemente toda su información.",
+        "La eliminación de la cuenta es inmediata e irreversible. Todos los datos de Supabase se eliminan en el momento de la solicitud.",
     'privacyChangesTitle': '8. Cambios en esta política',
     'privacyChangesContent': "Podemos actualizar esta Política de Privacidad periódicamente. Le notificaremos de cualquier cambio publicando la nueva política en esta página.",
     'privacyContactTitle': '9. Contáctenos',
@@ -703,7 +729,7 @@ class WebL10n {
 
     // ── Terms Page ──
     'termsTitle': 'Términos de Servicio',
-    'termsDate': 'Última actualización: 6 de abril de 2026',
+    'termsDate': 'Última actualización: 16 de abril de 2026',
     'termsIntroTitle': 'Introducción',
     'termsIntroContent': "Bienvenido a Twin'Am. Al descargar, instalar o usar nuestra aplicación, acepta estar sujeto a estos Términos de Servicio.",
     'termsAcceptTitle': '1. Aceptación de términos',
@@ -715,7 +741,8 @@ class WebL10n {
         "• Compañero Twin personal para motivación\n"
         "• Estadísticas y visualización del progreso\n"
         "• Sistema de logros y gamificación\n"
-        "• Notificaciones y recordatorios locales",
+        "• Notificaciones y recordatorios locales\n"
+        "• Desafíos sociales con amigos (requiere creación de cuenta)",
     'termsUserTitle': '3. Responsabilidades del usuario',
     'termsUserContent': "Acepta:\n\n"
         "• Usar la app solo para fines legales\n"
@@ -723,12 +750,12 @@ class WebL10n {
         "• No usar la app de manera que pueda dañar el servicio\n"
         "• Mantener la seguridad de su dispositivo\n"
         "• Ser responsable de todos los datos ingresados",
-    'termsDataTitle': '4. Almacenamiento local',
-    'termsDataContent': "Twin'Am almacena todos los datos localmente. Usted reconoce que:\n\n"
-        "• Es responsable de respaldar sus datos\n"
-        "• No somos responsables por pérdida de datos\n"
-        "• Desinstalar la app eliminará todos los datos\n"
-        "• Los datos no se sincronizan entre dispositivos",
+    'termsDataTitle': '4. Almacenamiento de datos',
+    'termsDataContent': "Twin'Am usa almacenamiento local (Hive) para contadores y tareas, y almacenamiento en la nube (Supabase) para perfil, amigos y desafíos. Usted reconoce que:\n\n"
+        "• Es responsable de respaldar los datos locales\n"
+        "• Los datos en la nube (perfil, desafíos) son gestionados por Supabase sujeto a sus términos\n"
+        "• Eliminar la cuenta borra todos los datos en la nube de forma permanente e irreversible\n"
+        "• Desinstalar la app elimina todos los datos locales",
     'termsIPTitle': '5. Propiedad intelectual',
     'termsIPContent': "La app Twin'Am es nuestra propiedad y está protegida por leyes de propiedad intelectual. No puede:\n\n"
         "• Copiar, modificar o distribuir la app\n"
@@ -770,18 +797,25 @@ class WebL10n {
     'faq2A': 'Al crear o editar un contador, activa la opción "Objetivo" y define el número que deseas alcanzar cada día.',
     'faq3Q': '¿Cómo añadir una tarea?',
     'faq3A': 'Pulsa el icono de tareas en el Dashboard, luego "+" para crear una nueva tarea con título, descripción, fecha límite y prioridad.',
-    'faq4Q': '¿Mis datos están sincronizados?',
-    'faq4A': 'Actualmente, todos tus datos están almacenados localmente en tu dispositivo. No se sincronizan en la nube, lo que garantiza tu privacidad.',
+    'faq4Q': '¿Mis datos se sincronizan con la nube?',
+    'faq4A': 'Los contadores y tareas se almacenan solo localmente. Sin embargo, si creas una cuenta, tu perfil, amigos y desafíos se sincronizan vía Supabase — necesario para las funciones sociales. Puedes usar la app sin cuenta para mantener todo en local.',
     'faq5Q': '¿Cómo desactivar las notificaciones?',
     'faq5A': 'Ve a Ajustes > Notificaciones y desactiva las que no desees. También puedes gestionarlas desde los ajustes de tu dispositivo.',
     'faq6Q': '¿Cómo cambiar el idioma de la app?',
     'faq6A': "Ve a Ajustes > Idioma y selecciona tu preferencia. Twin'Am soporta inglés, francés, árabe, español y alemán.",
-    'faq7Q': '¿Qué pasa si desinstalo la app?',
-    'faq7A': 'Todos tus datos locales se eliminarán. Asegúrate de exportar tus datos antes de desinstalar si deseas conservarlos.',
+    'faq7Q': '¿Qué pasa si desinstalo la app o elimino mi cuenta?',
+    'faq7A': 'Desinstalar elimina los datos locales (contadores, tareas). Para eliminar tu perfil y todos los datos en la nube (amigos, desafíos), usa Ajustes > Mi cuenta > Eliminar mi cuenta. Esta acción es inmediata e irreversible.',
     'faq8Q': '¿Cómo funciona el sistema Twin?',
     'faq8A': 'Tu Twin es un compañero virtual que reacciona a tu progreso. Está feliz cuando alcanzas tus objetivos, neutral cuando te esfuerzas y triste cuando necesitas motivación.',
     'faq9Q': '¿Cómo ganar XP y subir de nivel?',
     'faq9A': 'Ganas XP alcanzando objetivos diarios, completando tareas y manteniendo rachas. ¡Cuanto más constante seas, más rápido subes!',
+    'faq10Q': '¿Cómo funcionan los desafíos sociales?',
+    'faq10A': 'Crea una cuenta, añade amigos y ve a la pestaña Desafíos para enviar un desafío. Una vez aceptado, ambos rastrean el mismo hábito con contadores vinculados y pueden ver el progreso del otro en tiempo real.',
+    'faq11Q': '¿Cómo elimino mi cuenta?',
+    'faq11A': 'Ve a Ajustes > Mi cuenta > Eliminar mi cuenta y confirma. Todos tus datos (perfil, amigos, desafíos) se eliminan permanentemente de nuestros servidores. Los contadores y tareas locales permanecen hasta que desinstales la app.',
+
+    'feat7Title': 'Desafíos Sociales',
+    'feat7Desc': 'Desafía a tus amigos en un hábito y seguiros el progreso mutuamente en tiempo real',
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -837,17 +871,20 @@ class WebL10n {
 
     // ── Privacy Page ──
     'privacyTitle': 'Datenschutzerklärung',
-    'privacyDate': 'Letzte Aktualisierung: 6. April 2026',
+    'privacyDate': 'Letzte Aktualisierung: 16. April 2026',
     'privacyIntroTitle': 'Einleitung',
     'privacyIntroContent': "Die mobile Anwendung Twin'Am (\"Twin'Am\", \"wir\", \"unser\"), entwickelt und veröffentlicht von Hamath Kane, verpflichtet sich zum Schutz Ihrer Privatsphäre. Diese Datenschutzerklärung erläutert, wie Twin'Am Ihre Informationen sammelt, nutzt und schützt, wenn Sie unsere App im Google Play Store und Apple App Store nutzen.",
     'privacyCollectTitle': '1. Gesammelte Informationen',
-    'privacyCollectContent': "Twin'Am wurde mit Datenschutz im Sinn entwickelt. Alle Daten werden lokal auf Ihrem Gerät gespeichert. Wir sammeln und speichern:\n\n"
+    'privacyCollectContent': "Twin'Am kombiniert lokale und Cloud-Speicherung je nach Funktion.\n\n"
+        "Lokal auf Ihrem Gerät gespeichert (Hive):\n"
         "• Zählerdaten (Namen, Werte, Ziele, Symbole)\n"
         "• Aufgabeninformationen (Titel, Beschreibungen, Fristen, Prioritäten)\n"
-        "• Benutzereinstellungen (Name, Sprache, Design)\n"
-        "• Erfolgs- und XP-Fortschritt\n"
-        "• Benachrichtigungseinstellungen\n\n"
-        "Diese Daten werden ausschließlich auf Ihrem Gerät gespeichert und nicht an unsere Server übertragen.",
+        "• Einstellungen (Design, Benachrichtigungen, XP-Fortschritt)\n\n"
+        "In der Cloud gespeichert (Supabase) bei Konto-Erstellung:\n"
+        "• Ihr Profil (Benutzername)\n"
+        "• Freundesliste\n"
+        "• Herausforderungsdaten (Titel, Typ, Fortschritt, Teilnehmer)\n\n"
+        "Die App ohne Konto zu nutzen hält alle Daten nur lokal.",
     'privacyUseTitle': '2. Verwendung Ihrer Informationen',
     'privacyUseContent': "Ihre lokal gespeicherten Daten werden verwendet für:\n\n"
         "• Bereitstellung der Kernfunktionen (Zähler, Aufgaben, Statistiken)\n"
@@ -856,12 +893,12 @@ class WebL10n {
         "• Verfolgung Ihrer Fortschritte und Erfolge\n"
         "• Speichern Ihrer Einstellungen und Präferenzen",
     'privacyStorageTitle': '3. Datenspeicherung und Sicherheit',
-    'privacyStorageContent': "Alle Daten werden lokal auf Ihrem Gerät über Hive gespeichert. Wir:\n\n"
-        "• Übertragen Ihre Daten nicht an externe Server\n"
+    'privacyStorageContent': "Twin'Am verwendet zwei Speichersysteme:\n\n"
+        "Lokaler Speicher (Hive): Zähler, Aufgaben und Einstellungen bleiben auf Ihrem Gerät und werden niemals übertragen.\n\n"
+        "Cloud-Speicher (Supabase): Bei Konto-Erstellung werden Ihr Profil, Freunde und Herausforderungen auf Supabase-Servern gespeichert (DSGVO-konforme Infrastruktur). Wir:\n"
         "• Teilen Ihre Daten nicht mit Dritten\n"
         "• Verkaufen Ihre persönlichen Informationen nicht\n"
-        "• Verfolgen Ihre Aktivitäten nicht außerhalb der App\n\n"
-        "Ihre Daten bleiben auf Ihrem Gerät und sind durch die Sicherheitsmaßnahmen Ihres Geräts geschützt.",
+        "• Verfolgen Ihre Aktivitäten nicht außerhalb der App",
     'privacyNotifTitle': '4. Benachrichtigungen',
     'privacyNotifContent': "Twin'Am nutzt lokale Benachrichtigungen um:\n\n"
         "• Sie an Aufgaben und Fristen zu erinnern\n"
@@ -869,21 +906,19 @@ class WebL10n {
         "• Sie über Erfolge zu benachrichtigen\n\n"
         "Diese Benachrichtigungen werden lokal erzeugt. Sie können sie jederzeit in den Geräteeinstellungen oder in der App deaktivieren.",
     'privacyThirdTitle': '5. Drittanbieter-Dienste',
-    'privacyThirdContent': "Twin'Am nutzt Google AdMob zur Anzeige von Werbung. AdMob kann sammeln:\n\n"
-        "• Gerätekennungen (Werbe-ID)\n"
-        "• IP-Adresse\n"
-        "• Geräteinformationen\n"
-        "• Werbeinteraktionsdaten\n\n"
-        "Sie können personalisierte Werbung in Ihren Geräteeinstellungen deaktivieren.\n\n"
+    'privacyThirdContent': "Twin'Am verwendet folgende Drittanbieter-Dienste:\n\n"
+        "Supabase (Authentifizierung & Cloud-Speicher): Wird für Kontoverwaltung, Freundesliste und soziale Herausforderungen genutzt. Daten werden auf DSGVO-konformen Servern gespeichert.\n"
+        "Supabase-Datenschutzrichtlinie: https://supabase.com/privacy\n\n"
+        "Google AdMob (Werbung): Derzeit deaktiviert. Bei Aktivierung kann AdMob Gerätekennungen, IP-Adresse und Werbeinteraktionsdaten sammeln. Sie können personalisierte Werbung in Ihren Geräteeinstellungen deaktivieren.\n"
         "AdMob-Datenschutzrichtlinie: https://policies.google.com/privacy",
     'privacyChildrenTitle': '6. Datenschutz für Kinder',
     'privacyChildrenContent': "Twin'Am sammelt wissentlich keine Daten von Kindern unter 13 Jahren. Die App ist für ein allgemeines Publikum konzipiert.",
     'privacyDeletionTitle': '7. Datenlöschung',
     'privacyDeletionContent': "Sie haben volle Kontrolle über Ihre Daten:\n\n"
+        "• Konto in der App löschen: Einstellungen > Mein Konto > Konto löschen. Dadurch werden Ihr Profil, Freunde, Herausforderungen und alle Supabase-Cloud-Daten dauerhaft gelöscht, sowie lokale Daten der Herausforderungen.\n"
         "• Einzelne Zähler oder Aufgaben in der App löschen\n"
-        "• Alle App-Daten über die Geräteeinstellungen löschen\n"
         "• App deinstallieren, um alle lokalen Daten zu entfernen\n\n"
-        "Da alle Daten lokal gespeichert sind, werden durch Deinstallation alle Informationen dauerhaft gelöscht.",
+        "Die Kontolöschung ist sofort und unwiderruflich. Alle Supabase-Daten werden im Moment der Anfrage gelöscht.",
     'privacyChangesTitle': '8. Änderungen dieser Richtlinie',
     'privacyChangesContent': "Wir können diese Datenschutzerklärung gelegentlich aktualisieren. Wir informieren Sie über Änderungen durch Veröffentlichung der neuen Richtlinie auf dieser Seite.",
     'privacyContactTitle': '9. Kontakt',
@@ -895,7 +930,7 @@ class WebL10n {
 
     // ── Terms Page ──
     'termsTitle': 'Nutzungsbedingungen',
-    'termsDate': 'Letzte Aktualisierung: 6. April 2026',
+    'termsDate': 'Letzte Aktualisierung: 16. April 2026',
     'termsIntroTitle': 'Einleitung',
     'termsIntroContent': "Willkommen bei Twin'Am. Durch das Herunterladen, Installieren oder Nutzen unserer App stimmen Sie diesen Nutzungsbedingungen zu.",
     'termsAcceptTitle': '1. Annahme der Bedingungen',
@@ -907,7 +942,8 @@ class WebL10n {
         "• Persönlicher Twin-Begleiter für Motivation\n"
         "• Statistiken und Fortschrittsvisualisierung\n"
         "• Erfolgs-System und Gamification\n"
-        "• Lokale Benachrichtigungen und Erinnerungen",
+        "• Lokale Benachrichtigungen und Erinnerungen\n"
+        "• Soziale Herausforderungen mit Freunden (erfordert Konto-Erstellung)",
     'termsUserTitle': '3. Benutzerverantwortung',
     'termsUserContent': "Sie stimmen zu:\n\n"
         "• Die App nur für legale Zwecke zu nutzen\n"
@@ -915,12 +951,12 @@ class WebL10n {
         "• Die App nicht so zu nutzen, dass der Dienst geschädigt wird\n"
         "• Die Sicherheit Ihres Geräts zu gewährleisten\n"
         "• Für alle eingegebenen Daten verantwortlich zu sein",
-    'termsDataTitle': '4. Lokale Datenspeicherung',
-    'termsDataContent': "Twin'Am speichert alle Daten lokal auf Ihrem Gerät. Sie erkennen an:\n\n"
-        "• Sie sind für die Datensicherung verantwortlich\n"
-        "• Wir haften nicht für Datenverlust durch Geräteprobleme\n"
-        "• Deinstallation löscht alle lokalen Daten\n"
-        "• Daten werden nicht zwischen Geräten synchronisiert",
+    'termsDataTitle': '4. Datenspeicherung',
+    'termsDataContent': "Twin'Am nutzt lokalen Speicher (Hive) für Zähler und Aufgaben, und Cloud-Speicher (Supabase) für Profil, Freunde und Herausforderungen. Sie erkennen an:\n\n"
+        "• Sie sind für die Sicherung lokaler Daten verantwortlich\n"
+        "• Cloud-Daten (Profil, Herausforderungen) werden von Supabase gemäß deren Bedingungen verwaltet\n"
+        "• Kontolöschung entfernt alle Cloud-Daten dauerhaft und unwiderruflich\n"
+        "• Deinstallation löscht alle lokalen Daten",
     'termsIPTitle': '5. Geistiges Eigentum',
     'termsIPContent': "Die Twin'Am App ist unser Eigentum und durch Urheberrecht geschützt. Sie dürfen nicht:\n\n"
         "• Die App kopieren, modifizieren oder verbreiten\n"
@@ -962,17 +998,24 @@ class WebL10n {
     'faq2A': 'Beim Erstellen oder Bearbeiten eines Zählers aktiviere die Option "Ziel" und lege die Zahl fest, die du täglich erreichen möchtest.',
     'faq3Q': 'Wie füge ich eine Aufgabe hinzu?',
     'faq3A': 'Tippe auf das Aufgaben-Symbol im Dashboard-Header, dann auf "+" um eine neue Aufgabe mit Titel, Beschreibung, Frist und Priorität zu erstellen.',
-    'faq4Q': 'Werden meine Daten synchronisiert?',
-    'faq4A': 'Derzeit werden alle Daten lokal auf deinem Gerät gespeichert. Sie werden nicht mit der Cloud synchronisiert, was deine Privatsphäre garantiert.',
+    'faq4Q': 'Werden meine Daten mit der Cloud synchronisiert?',
+    'faq4A': 'Zähler und Aufgaben werden nur lokal gespeichert. Wenn du ein Konto erstellst, werden Profil, Freunde und Herausforderungen über Supabase synchronisiert — notwendig für soziale Funktionen. Du kannst die App ohne Konto nutzen, um alles lokal zu halten.',
     'faq5Q': 'Wie deaktiviere ich Benachrichtigungen?',
     'faq5A': 'Gehe zu Einstellungen > Benachrichtigungen und deaktiviere die unerwünschten. Du kannst sie auch in den Geräteeinstellungen verwalten.',
     'faq6Q': 'Wie ändere ich die App-Sprache?',
     'faq6A': "Gehe zu Einstellungen > Sprache und wähle deine bevorzugte Sprache. Twin'Am unterstützt Englisch, Französisch, Arabisch, Spanisch und Deutsch.",
-    'faq7Q': 'Was passiert, wenn ich die App deinstalliere?',
-    'faq7A': 'Alle lokalen Daten werden gelöscht. Exportiere deine Daten vorher, wenn du sie behalten möchtest.',
+    'faq7Q': 'Was passiert, wenn ich die App deinstalliere oder mein Konto lösche?',
+    'faq7A': 'Deinstallation entfernt lokale Daten (Zähler, Aufgaben). Um Profil und alle Cloud-Daten (Freunde, Herausforderungen) zu löschen, nutze Einstellungen > Mein Konto > Konto löschen. Diese Aktion ist sofort und unwiderruflich.',
     'faq8Q': 'Wie funktioniert das Twin-System?',
     'faq8A': 'Dein Twin ist ein virtueller Begleiter, der auf deinen Fortschritt reagiert. Er ist glücklich bei erreichten Zielen, neutral bei Bemühungen und traurig, wenn du Motivation brauchst.',
     'faq9Q': 'Wie verdiene ich XP und steige auf?',
     'faq9A': 'Du verdienst XP durch Erreichen täglicher Ziele, Erledigen von Aufgaben und Aufrechterhalten von Serien. Je regelmäßiger du bist, desto schneller steigst du auf!',
+    'faq10Q': 'Wie funktionieren soziale Herausforderungen?',
+    'faq10A': 'Erstelle ein Konto, füge Freunde hinzu und gehe zum Herausforderungen-Tab. Sobald dein Gegner akzeptiert, verfolgt ihr beide dieselbe Gewohnheit mit verknüpften Zählern und könnt euren gegenseitigen Fortschritt in Echtzeit sehen.',
+    'faq11Q': 'Wie lösche ich mein Konto?',
+    'faq11A': 'Gehe zu Einstellungen > Mein Konto > Konto löschen und bestätige. Alle deine Daten (Profil, Freunde, Herausforderungen) werden dauerhaft von unseren Servern gelöscht. Lokale Zähler und Aufgaben bleiben bis zur Deinstallation bestehen.',
+
+    'feat7Title': 'Soziale Herausforderungen',
+    'feat7Desc': 'Fordere deine Freunde zu Gewohnheits-Duellen heraus und verfolgt gegenseitig euren Fortschritt in Echtzeit',
   };
 }

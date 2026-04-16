@@ -379,6 +379,12 @@ class HomePage extends StatelessWidget {
                 l.t('feat6Desc'),
                 isMobile,
               ),
+              _buildFeatureCard(
+                '\u{1F91D}',
+                l.t('feat7Title'),
+                l.t('feat7Desc'),
+                isMobile,
+              ),
             ],
           ),
         ],

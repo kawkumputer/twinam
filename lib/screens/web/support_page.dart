@@ -74,7 +74,7 @@ class SupportPage extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               
-              for (int i = 1; i <= 9; i++)
+              for (int i = 1; i <= 11; i++)
                 _buildFAQItem(l.t('faq${i}Q'), l.t('faq${i}A'), isMobile),
               
               const SizedBox(height: 60),
