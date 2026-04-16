@@ -1,9 +1,25 @@
+import 'dart:convert';
+import 'dart:math';
+import 'package:crypto/crypto.dart' as crypto_pkg;
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/twin_user.dart';
 import 'supabase_service.dart';
 
 class AuthService {
   final _client = SupabaseService.client;
+
+  // ─── IMPORTANT: fill these in from Google Cloud Console ───────────────────
+  // 1. Create OAuth 2.0 credentials (Web + iOS) at console.cloud.google.com
+  // 2. Enable Google provider in Supabase Dashboard → Auth → Providers
+  // 3. Put google-services.json in android/app/
+  // 4. Add reversed iOS client ID to Info.plist CFBundleURLSchemes
+  // ──────────────────────────────────────────────────────────────────────────
+  static const _googleWebClientId =
+      'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com';
+  static const _googleIosClientId =
+      'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com';
 
   Future<TwinUser> signUp({
     required String email,
@@ -49,6 +65,79 @@ class AuthService {
     );
     if (res.user == null) throw 'Email ou mot de passe incorrect';
     return await getProfile(res.user!.id);
+  }
+
+  Future<TwinUser> signInWithGoogle() async {
+    final googleSignIn = GoogleSignIn(
+      clientId: _googleIosClientId,
+      serverClientId: _googleWebClientId,
+    );
+    final googleUser = await googleSignIn.signIn();
+    if (googleUser == null) throw 'Connexion annulée';
+    final googleAuth = await googleUser.authentication;
+    final idToken = googleAuth.idToken;
+    if (idToken == null) throw 'Token Google manquant';
+    final res = await _client.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+      accessToken: googleAuth.accessToken,
+    );
+    if (res.user == null) throw 'Erreur de connexion Google';
+    final username = googleUser.email
+        .split('@')[0]
+        .replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_');
+    return await _getOrCreateProfile(
+        res.user!, username, googleUser.displayName);
+  }
+
+  // ─── IMPORTANT: Apple Sign-In setup ───────────────────────────────────────
+  // 1. Enable Apple provider in Supabase Dashboard → Auth → Providers
+  // 2. Apple Developer Portal → Identifiers → create a Service ID
+  // 3. Apple Developer Portal → Keys → create key with Sign in with Apple
+  // 4. Xcode → Signing & Capabilities → add "Sign in with Apple"
+  // ──────────────────────────────────────────────────────────────────────────
+  Future<TwinUser> signInWithApple() async {
+    final rawNonce = _generateNonce();
+    final hashedNonce = _sha256ofString(rawNonce);
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      nonce: hashedNonce,
+    );
+    final idToken = credential.identityToken;
+    if (idToken == null) throw 'Token Apple manquant';
+    final res = await _client.auth.signInWithIdToken(
+      provider: OAuthProvider.apple,
+      idToken: idToken,
+      nonce: rawNonce,
+    );
+    if (res.user == null) throw 'Erreur de connexion Apple';
+    final email = res.user!.email ?? '';
+    final username = email.isNotEmpty
+        ? email.split('@')[0].replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '_')
+        : 'user_${res.user!.id.substring(0, 8)}';
+    final displayName = [
+      credential.givenName,
+      credential.familyName,
+    ].where((n) => n != null && n.isNotEmpty).join(' ');
+    return await _getOrCreateProfile(
+        res.user!, username, displayName.isEmpty ? null : displayName);
+  }
+
+  String _generateNonce([int length = 32]) {
+    const charset =
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final random = Random.secure();
+    return List.generate(
+        length, (_) => charset[random.nextInt(charset.length)]).join();
+  }
+
+  String _sha256ofString(String input) {
+    final bytes = utf8.encode(input);
+    final digest = crypto_pkg.sha256.convert(bytes);
+    return digest.toString();
   }
 
   Future<void> signOut() async {

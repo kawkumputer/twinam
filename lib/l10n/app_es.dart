@@ -383,6 +383,7 @@ const Map<String, String> es = {
   'signOut': 'Cerrar sesión',
   'createAccount': 'Crear cuenta',
   'continueWithoutAccount': 'Continuar sin cuenta',
+  'orSignInWith': 'o iniciar sesión con',
   'noAccount': '¿Sin cuenta aún?',
   'alreadyHaveAccount': '¿Ya tienes cuenta?',
   'emailInvalid': 'Introduce un correo válido',

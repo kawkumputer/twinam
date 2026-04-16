@@ -142,6 +142,42 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> signInWithGoogle() async {
+    _loading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      _currentUser = await _authService.signInWithGoogle();
+      _status = AuthStatus.authenticated;
+      _loading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = _parseError(e);
+      _loading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> signInWithApple() async {
+    _loading = true;
+    _error = null;
+    notifyListeners();
+    try {
+      _currentUser = await _authService.signInWithApple();
+      _status = AuthStatus.authenticated;
+      _loading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _error = _parseError(e);
+      _loading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> signOut() async {
     await _authService.signOut();
   }

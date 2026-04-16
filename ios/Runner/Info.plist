@@ -87,5 +87,20 @@
 			<dict><key>SKAdNetworkIdentifier</key><string>9rd848q2bk.skadnetwork</string></dict>
 			<dict><key>SKAdNetworkIdentifier</key><string>x8jxxk4c84.skadnetwork</string></dict>
 		</array>
+		<!-- Google Sign-In: replace YOUR_REVERSED_IOS_CLIENT_ID with com.googleusercontent.apps.XXXXX -->
+		<key>GIDClientID</key>
+		<string>YOUR_IOS_CLIENT_ID.apps.googleusercontent.com</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<!-- Reversed iOS client ID from Google Cloud Console -->
+					<string>com.googleusercontent.apps.YOUR_IOS_CLIENT_ID</string>
+				</array>
+			</dict>
+		</array>
 	</dict>
 </plist>

@@ -391,6 +391,7 @@ const Map<String, String> fr = {
   'signOut': 'Se déconnecter',
   'createAccount': 'Créer un compte',
   'continueWithoutAccount': 'Continuer sans compte',
+  'orSignInWith': 'ou se connecter avec',
   'noAccount': 'Pas encore de compte ?',
   'alreadyHaveAccount': 'Déjà un compte ?',
   'emailInvalid': 'Entrez un email valide',

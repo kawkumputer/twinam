@@ -385,6 +385,7 @@ const Map<String, String> en = {
   'signOut': 'Sign out',
   'createAccount': 'Create account',
   'continueWithoutAccount': 'Continue without account',
+  'orSignInWith': 'or sign in with',
   'noAccount': 'No account yet?',
   'alreadyHaveAccount': 'Already have an account?',
   'emailInvalid': 'Enter a valid email',
