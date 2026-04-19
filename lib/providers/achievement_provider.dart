@@ -27,6 +27,12 @@ class AchievementProvider extends ChangeNotifier {
   int get level => _storage.level;
   bool get didLevelUp => _didLevelUp;
   int? get milestone => _milestone;
+  int get xpToday => _getXpToday();
+  int? get lastXpGain => _lastXpGain;
+  String? get lastXpLabel => _lastXpLabel;
+
+  int? _lastXpGain;
+  String? _lastXpLabel;
 
   // Sound
   bool get soundEnabled => _storage.soundEnabled;
@@ -45,6 +51,7 @@ class AchievementProvider extends ChangeNotifier {
   }
 
   static int _xpForLevel(int lvl) => ((lvl - 1) * (lvl - 1) * 50);
+  static int xpForLevelPublic(int lvl) => _xpForLevel(lvl);
 
   static const List<String> levelTitles = [
     'Newbie',        // 1
@@ -80,14 +87,43 @@ class AchievementProvider extends ChangeNotifier {
     return levelEmojis[idx];
   }
 
-  void _addXp(int amount) {
+  int _getXpToday() {
+    final today = _dayKey(DateTime.now());
+    if (_storage.lastXpDay != today) return 0;
+    return _storage.xpToday;
+  }
+
+  static String _dayKey(DateTime d) => '${d.year}-${d.month}-${d.day}';
+
+  void addXp(int amount, {String? label}) {
     _storage.xp = xp + amount;
+    _lastXpGain = amount;
+    _lastXpLabel = label;
+    // Track daily XP
+    final today = _dayKey(DateTime.now());
+    if (_storage.lastXpDay != today) {
+      _storage.lastXpDay = today;
+      _storage.xpToday = amount;
+    } else {
+      _storage.xpToday = _storage.xpToday + amount;
+    }
     // Check level up
     while (xp >= xpForNextLevel && level < 99) {
       _storage.level = level + 1;
       _didLevelUp = true;
     }
     notifyListeners();
+  }
+
+  void _addXp(int amount, {String? label}) => addXp(amount, label: label);
+
+  /// Award daily login bonus (10 XP, once per day)
+  bool checkDailyLoginBonus() {
+    final today = _dayKey(DateTime.now());
+    if (_storage.lastLoginDay == today) return false;
+    _storage.lastLoginDay = today;
+    addXp(10, label: 'dailyBonus');
+    return true;
   }
 
   void clearLevelUp() {
@@ -126,12 +162,35 @@ class AchievementProvider extends ChangeNotifier {
     _storage.achievementsData = data;
   }
 
+  static const Map<AchievementType, int> _achievementXp = {
+    AchievementType.firstTap: 5,
+    AchievementType.first100: 20,
+    AchievementType.first1000: 50,
+    AchievementType.first10000: 100,
+    AchievementType.streak3: 15,
+    AchievementType.streak7: 30,
+    AchievementType.streak14: 60,
+    AchievementType.streak30: 120,
+    AchievementType.streak100: 300,
+    AchievementType.goalFirst: 20,
+    AchievementType.goal10: 50,
+    AchievementType.goal50: 150,
+    AchievementType.counter5: 25,
+    AchievementType.counter10: 50,
+    AchievementType.nightOwl: 15,
+    AchievementType.earlyBird: 15,
+    AchievementType.weekendWarrior: 15,
+  };
+
   bool _tryUnlock(AchievementType type) {
     final index = _achievements.indexWhere((a) => a.type == type);
     if (index == -1 || _achievements[index].isUnlocked) return false;
     _achievements[index] = _achievements[index].unlock();
     _lastUnlocked = _achievements[index];
     _saveAchievements();
+    // Award XP for unlocking achievement
+    final bonus = _achievementXp[type] ?? 10;
+    addXp(bonus, label: 'achievement');
     notifyListeners();
     return true;
   }
@@ -139,7 +198,7 @@ class AchievementProvider extends ChangeNotifier {
   void recordTap() {
     _storage.totalTaps = totalTaps + 1;
     _recordDayActive();
-    _addXp(1);
+    _addXp(1, label: 'tap');
 
     final taps = totalTaps;
     if (taps >= 1) _tryUnlock(AchievementType.firstTap);
@@ -158,7 +217,7 @@ class AchievementProvider extends ChangeNotifier {
     const milestones = [50, 100, 500, 1000, 5000, 10000];
     if (milestones.contains(counterValue)) {
       _milestone = counterValue;
-      _addXp(counterValue ~/ 10);
+      _addXp(counterValue ~/ 10, label: 'milestone');
       notifyListeners();
     }
   }
@@ -182,11 +241,26 @@ class AchievementProvider extends ChangeNotifier {
 
   void recordGoalCompleted() {
     _storage.goalsCompleted = goalsCompleted + 1;
-    _addXp(25);
+    _addXp(25, label: 'goal');
     final goals = goalsCompleted;
     if (goals >= 1) _tryUnlock(AchievementType.goalFirst);
     if (goals >= 10) _tryUnlock(AchievementType.goal10);
     if (goals >= 50) _tryUnlock(AchievementType.goal50);
+  }
+
+  /// Award XP when a Twin Friends challenge is won
+  void recordChallengeWon() {
+    addXp(100, label: 'challengeWon');
+  }
+
+  /// Award XP when a Twin Friends challenge is completed (participant)
+  void recordChallengeCompleted() {
+    addXp(40, label: 'challengeCompleted');
+  }
+
+  void clearLastXpGain() {
+    _lastXpGain = null;
+    _lastXpLabel = null;
   }
 
   void _recordDayActive() {

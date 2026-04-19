@@ -355,7 +355,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildProfileCard(BuildContext context, AppLocalizations l10n) {
     final ap = context.watch<AchievementProvider>();
     return GestureDetector(
-      onTap: () => Navigator.of(context).pushNamed('/achievements'),
+      onTap: () => Navigator.of(context).pushNamed('/level'),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(

@@ -96,6 +96,15 @@ class StorageService {
   int get level => _settings.get('level', defaultValue: 1) as int;
   set level(int value) => _settings.put('level', value);
 
+  int get xpToday => _settings.get('xpToday', defaultValue: 0) as int;
+  set xpToday(int value) => _settings.put('xpToday', value);
+
+  String get lastXpDay => _settings.get('lastXpDay', defaultValue: '') as String;
+  set lastXpDay(String value) => _settings.put('lastXpDay', value);
+
+  String get lastLoginDay => _settings.get('lastLoginDay', defaultValue: '') as String;
+  set lastLoginDay(String value) => _settings.put('lastLoginDay', value);
+
   // Sound
   bool get soundEnabled => _settings.get('soundEnabled', defaultValue: true) as bool;
   set soundEnabled(bool value) => _settings.put('soundEnabled', value);

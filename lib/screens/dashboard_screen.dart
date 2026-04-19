@@ -76,6 +76,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _notificationPermissionChecked = true;
           _requestNotificationPermission();
         }
+        // Daily login bonus (once per day)
+        if (mounted) {
+          final earned = achievementProvider.checkDailyLoginBonus();
+          if (earned && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.translate('dailyBonusEarned')),
+                backgroundColor: const Color(0xFF2196F3),
+                duration: const Duration(seconds: 3),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            );
+          }
+        }
       }
       if (achievementProvider.didLevelUp && mounted) {
         achievementProvider.clearLevelUp();
@@ -256,37 +273,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    // Level and XP bar
-                    Row(
-                      children: [
-                        Text(
-                          '${achievementProvider.levelEmoji} ${l10n.translate('level')} ${achievementProvider.level}',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: const Color(0xFF2196F3),
+                    // Level and XP bar (tappable → /level)
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pushNamed('/level'),
+                      child: Row(
+                        children: [
+                          Text(
+                            '${achievementProvider.levelEmoji} ${l10n.translate('level')} ${achievementProvider.level}',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF2196F3),
+                                ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: achievementProvider.levelProgress,
+                                minHeight: 5,
+                                backgroundColor: const Color(0xFF2196F3).withValues(alpha: 0.1),
+                                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2196F3)),
                               ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: achievementProvider.levelProgress,
-                              minHeight: 5,
-                              backgroundColor: const Color(0xFF2196F3).withValues(alpha: 0.1),
-                              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF2196F3)),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '${achievementProvider.xp} XP',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                                fontSize: 10,
-                              ),
-                        ),
-                      ],
+                          const SizedBox(width: 6),
+                          Text(
+                            '${achievementProvider.xp} XP',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                                  fontSize: 10,
+                                ),
+                          ),
+                          const SizedBox(width: 2),
+                          Icon(
+                            Icons.chevron_right_rounded,
+                            size: 14,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
