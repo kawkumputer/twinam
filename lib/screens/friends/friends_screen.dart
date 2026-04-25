@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
+import '../../providers/achievement_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
+import '../../services/auth_service.dart';
 import '../../services/supabase_service.dart';
 import '../../theme/app_theme.dart';
-import '../../l10n/app_localizations.dart';
 import '../auth/login_screen.dart';
 import '../challenges/create_challenge_screen.dart';
 
@@ -25,12 +27,16 @@ class _FriendsScreenState extends State<FriendsScreen>
   List<Map<String, dynamic>> _pendingReceived = [];
   List<Map<String, dynamic>> _pendingSent = [];
   bool _loadingFriends = true;
+  List<Map<String, dynamic>> _leaderboard = [];
+  bool _loadingLeaderboard = false;
+  final _authService = AuthService();
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _loadFriends();
+    _loadLeaderboard();
   }
 
   @override
@@ -38,6 +44,20 @@ class _FriendsScreenState extends State<FriendsScreen>
     _tabController.dispose();
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadLeaderboard() async {
+    if (SupabaseService.currentUser == null) return;
+    setState(() => _loadingLeaderboard = true);
+    try {
+      final data = await _authService.fetchLeaderboard();
+      setState(() {
+        _leaderboard = data;
+        _loadingLeaderboard = false;
+      });
+    } catch (_) {
+      setState(() => _loadingLeaderboard = false);
+    }
   }
 
   Future<void> _loadFriends() async {
@@ -259,16 +279,12 @@ class _FriendsScreenState extends State<FriendsScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
           tabs: [
             Tab(text: l10n.translate('friends')),
-            Tab(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(l10n.translate('addFriend')),
-                ],
-              ),
-            ),
+            Tab(text: l10n.translate('addFriend')),
+            Tab(text: '🏆 ${l10n.translate('leaderboard')}'),
           ],
         ),
       ),
@@ -277,6 +293,7 @@ class _FriendsScreenState extends State<FriendsScreen>
         children: [
           _buildFriendsTab(l10n, theme),
           _buildSearchTab(l10n, theme),
+          _buildLeaderboardTab(l10n, theme),
         ],
       ),
     );
@@ -472,6 +489,225 @@ class _FriendsScreenState extends State<FriendsScreen>
                 );
               },
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLeaderboardTab(AppLocalizations l10n, ThemeData theme) {
+    if (_loadingLeaderboard) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final uid = SupabaseService.currentUser?.id;
+    final ap = context.read<AchievementProvider>();
+
+    if (_leaderboard.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: _loadLeaderboard,
+        child: ListView(
+          children: [
+            const SizedBox(height: 80),
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('🏆', style: TextStyle(fontSize: 56)),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.translate('leaderboardEmpty'),
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadLeaderboard,
+      child: ListView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 40),
+        itemCount: _leaderboard.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return _LeaderboardHeader(l10n: l10n);
+          }
+          final rank = index;
+          final entry = _leaderboard[index - 1];
+          final isMe = entry['id'] == uid;
+          final entryXp = isMe ? ap.xp : (entry['xp'] as int? ?? 0);
+          final entryLevel = isMe ? ap.level : (entry['level'] as int? ?? 1);
+          return _LeaderboardRow(
+            rank: rank,
+            profile: entry,
+            xp: entryXp,
+            level: entryLevel,
+            isMe: isMe,
+            l10n: l10n,
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _LeaderboardHeader extends StatelessWidget {
+  final AppLocalizations l10n;
+  const _LeaderboardHeader({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Text(
+        l10n.translate('leaderboardTitle'),
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+      ),
+    );
+  }
+}
+
+class _LeaderboardRow extends StatelessWidget {
+  final int rank;
+  final Map<String, dynamic> profile;
+  final int xp;
+  final int level;
+  final bool isMe;
+  final AppLocalizations l10n;
+
+  const _LeaderboardRow({
+    required this.rank,
+    required this.profile,
+    required this.xp,
+    required this.level,
+    required this.isMe,
+    required this.l10n,
+  });
+
+  String get _rankEmoji {
+    switch (rank) {
+      case 1: return '🥇';
+      case 2: return '🥈';
+      case 3: return '🥉';
+      default: return '#$rank';
+    }
+  }
+
+  String get _levelEmoji {
+    final idx = (level - 1).clamp(0, AchievementProvider.levelEmojis.length - 1);
+    return AchievementProvider.levelEmojis[idx];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final username = profile['username'] as String? ?? '?';
+    final colorIndex = username.codeUnitAt(0) % AppTheme.counterColors.length;
+    final avatarColor = isMe
+        ? const Color(0xFF2196F3)
+        : AppTheme.counterColors[colorIndex];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: isMe
+            ? const Color(0xFF2196F3).withValues(alpha: 0.1)
+            : theme.cardTheme.color ?? theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isMe
+              ? const Color(0xFF2196F3).withValues(alpha: 0.35)
+              : avatarColor.withValues(alpha: 0.18),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Rank
+          SizedBox(
+            width: 36,
+            child: rank <= 3
+                ? Text(_rankEmoji, style: const TextStyle(fontSize: 22), textAlign: TextAlign.center)
+                : Text(
+                    _rankEmoji,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+          ),
+          const SizedBox(width: 8),
+          // Avatar
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: avatarColor.withValues(alpha: 0.18),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                username[0].toUpperCase(),
+                style: TextStyle(
+                  color: avatarColor,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Name + level
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      isMe ? l10n.translate('leaderboardYou') : '@$username',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: isMe ? const Color(0xFF2196F3) : null,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  '$_levelEmoji ${l10n.translate('level')} $level',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // XP
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '$xp XP',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: isMe
+                      ? const Color(0xFF2196F3)
+                      : theme.colorScheme.onSurface,
+                ),
+              ),
+            ],
           ),
         ],
       ),

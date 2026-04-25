@@ -13,6 +13,7 @@ import '../widgets/banner_ad_widget.dart';
 import '../services/notification_service.dart';
 import '../services/twin_notification_service.dart';
 import '../theme/app_theme.dart';
+import '../models/counter.dart';
 import '../models/task.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -112,6 +113,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (mounted) {
         achievementProvider.checkCounterCount(counters.length);
         achievementProvider.checkStreaks(counters);
+      }
+      // Sync XP to Supabase immediately on app open (best-effort for leaderboard)
+      if (mounted) {
+        achievementProvider.syncXpNow();
       }
       // Schedule Twin notifications (guarded internally by date)
       if (mounted) {
@@ -466,6 +471,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 16),
               ListTile(
+                leading: const Icon(Icons.palette_rounded, color: Color(0xFF9C27B0)),
+                title: Text(l10n.translate('customize')),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showCustomizeSheet(context, counter, provider);
+                },
+              ),
+              ListTile(
                 leading: const Icon(Icons.edit_rounded),
                 title: Text(l10n.translate('editCounter')),
                 onTap: () {
@@ -503,6 +516,173 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  static const _quickEmojis = [
+    '🔢','⚡','🔥','💧','🏃','💪','📚','🎯','🧘','💤',
+    '🥗','💊','🚴','🎸','🧹','💰','☕','🌿','✍️','😴',
+    '🏋️','🤸','🎨','🎮','🧠','❤️','🌙','⭐','🏆','🎵',
+  ];
+
+  void _showCustomizeSheet(
+    BuildContext context,
+    Counter counter,
+    CounterProvider provider,
+  ) {
+    final settings = context.read<SettingsProvider>();
+    final l10n = AppLocalizations.of(settings.locale);
+    String selectedEmoji = counter.emoji;
+    int selectedColorIndex = AppTheme.counterColors
+        .indexWhere((c) => c.toARGB32() == counter.colorValue);
+    if (selectedColorIndex == -1) selectedColorIndex = 0;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          final theme = Theme.of(context);
+          return Padding(
+            padding: EdgeInsets.fromLTRB(
+              20, 16, 20,
+              20 + MediaQuery.of(ctx).viewInsets.bottom,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Handle
+                Center(
+                  child: Container(
+                    width: 40, height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                // Title with live preview
+                Row(
+                  children: [
+                    Container(
+                      width: 44, height: 44,
+                      decoration: BoxDecoration(
+                        color: AppTheme.counterColors[selectedColorIndex].withValues(alpha: 0.18),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(selectedEmoji, style: const TextStyle(fontSize: 22)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      counter.name,
+                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                // Color palette
+                Text(l10n.translate('color'),
+                    style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: List.generate(AppTheme.counterColors.length, (i) {
+                    final col = AppTheme.counterColors[i];
+                    final isSelected = i == selectedColorIndex;
+                    return GestureDetector(
+                      onTap: () => setSheetState(() => selectedColorIndex = i),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        width: 36, height: 36,
+                        decoration: BoxDecoration(
+                          color: col,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isSelected ? theme.colorScheme.onSurface : Colors.transparent,
+                            width: isSelected ? 3 : 0,
+                          ),
+                          boxShadow: isSelected
+                              ? [BoxShadow(color: col.withValues(alpha: 0.5), blurRadius: 8)]
+                              : null,
+                        ),
+                        child: isSelected
+                            ? const Icon(Icons.check_rounded, color: Colors.white, size: 18)
+                            : null,
+                      ),
+                    );
+                  }),
+                ),
+                const SizedBox(height: 20),
+                // Emoji grid
+                Text(l10n.translate('icon'),
+                    style: theme.textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _quickEmojis.map((e) {
+                    final isSelected = e == selectedEmoji;
+                    return GestureDetector(
+                      onTap: () => setSheetState(() => selectedEmoji = e),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        width: 44, height: 44,
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? AppTheme.counterColors[selectedColorIndex].withValues(alpha: 0.18)
+                              : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected
+                                ? AppTheme.counterColors[selectedColorIndex]
+                                : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(e, style: const TextStyle(fontSize: 22)),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 24),
+                // Save button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final updated = counter.copyWith(
+                        emoji: selectedEmoji,
+                        colorValue: AppTheme.counterColors[selectedColorIndex].toARGB32(),
+                      );
+                      provider.updateCounter(updated);
+                      Navigator.pop(ctx);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.counterColors[selectedColorIndex],
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 0,
+                    ),
+                    child: Text(l10n.translate('save'),
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

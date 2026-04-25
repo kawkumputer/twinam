@@ -155,6 +155,42 @@ class Counter {
     }
   }
 
+  Counter copyWith({
+    String? name,
+    String? emoji,
+    int? value,
+    int? goal,
+    GoalDirection? goalDirection,
+    ResetFrequency? resetFrequency,
+    int? step,
+    int? colorValue,
+    bool? reminderEnabled,
+    int? reminderHour,
+    int? reminderMinute,
+    String? challengeId,
+    List<int>? reminderDays,
+  }) {
+    return Counter(
+      id: id,
+      name: name ?? this.name,
+      emoji: emoji ?? this.emoji,
+      value: value ?? this.value,
+      goal: goal ?? this.goal,
+      goalDirection: goalDirection ?? this.goalDirection,
+      resetFrequency: resetFrequency ?? this.resetFrequency,
+      step: step ?? this.step,
+      colorValue: colorValue ?? this.colorValue,
+      reminderEnabled: reminderEnabled ?? this.reminderEnabled,
+      reminderHour: reminderHour ?? this.reminderHour,
+      reminderMinute: reminderMinute ?? this.reminderMinute,
+      challengeId: challengeId ?? this.challengeId,
+      reminderDays: reminderDays ?? List<int>.from(this.reminderDays),
+      createdAt: createdAt,
+      lastResetAt: lastResetAt,
+      history: history,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,

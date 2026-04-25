@@ -24,6 +24,7 @@ import 'screens/create_task_screen.dart';
 import 'screens/challenges/challenges_screen.dart';
 import 'screens/friends/friends_screen.dart';
 import 'screens/level_screen.dart';
+import 'services/auth_service.dart';
 import 'services/notification_service.dart';
 import 'services/storage_service.dart';
 import 'services/upgrader_messages.dart';
@@ -45,7 +46,7 @@ class TwinAmApp extends StatelessWidget {
           create: (_) => CounterProvider(storageService),
         ),
         ChangeNotifierProvider(
-          create: (_) => AchievementProvider(storageService),
+          create: (_) => AchievementProvider(storageService, AuthService()),
         ),
         ChangeNotifierProvider(
           create: (_) => TaskProvider(storageService),

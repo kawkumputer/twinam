@@ -1,17 +1,36 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/achievement.dart';
 import '../models/counter.dart';
+import '../services/auth_service.dart';
 import '../services/storage_service.dart';
 
 class AchievementProvider extends ChangeNotifier {
   final StorageService _storage;
+  final AuthService _authService;
   List<Achievement> _achievements = [];
   Achievement? _lastUnlocked;
   bool _didLevelUp = false;
   int? _milestone;
+  Timer? _syncTimer;
 
-  AchievementProvider(this._storage) {
+  AchievementProvider(this._storage, this._authService) {
     _loadAchievements();
+  }
+
+  /// Debounced sync: waits 8s after last XP change before calling Supabase.
+  /// This avoids spamming the API on every counter tap.
+  void _scheduleSyncXp() {
+    _syncTimer?.cancel();
+    _syncTimer = Timer(const Duration(seconds: 8), () {
+      _authService.syncXp(xp, level);
+    });
+  }
+
+  /// Immediate sync — call on app open so leaderboard is always fresh.
+  void syncXpNow() {
+    _syncTimer?.cancel();
+    _authService.syncXp(xp, level);
   }
 
   List<Achievement> get achievements => _achievements;
@@ -112,6 +131,7 @@ class AchievementProvider extends ChangeNotifier {
       _storage.level = level + 1;
       _didLevelUp = true;
     }
+    _scheduleSyncXp();
     notifyListeners();
   }
 

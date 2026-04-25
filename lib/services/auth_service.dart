@@ -182,6 +182,53 @@ class AuthService {
     await _client.auth.signOut();
   }
 
+  /// Sync local XP and level to Supabase (for leaderboard)
+  Future<void> syncXp(int xp, int level) async {
+    final uid = _client.auth.currentUser?.id;
+    if (uid == null) return;
+    try {
+      await _client
+          .from('profiles')
+          .update({'xp': xp, 'level': level})
+          .eq('id', uid);
+    } catch (e) {
+      // Silent fail – leaderboard sync is best-effort
+    }
+  }
+
+  /// Fetch leaderboard: current user + their accepted friends, ordered by XP
+  Future<List<Map<String, dynamic>>> fetchLeaderboard() async {
+    final uid = _client.auth.currentUser?.id;
+    if (uid == null) return [];
+
+    // Get accepted friend IDs
+    final friendships = List<Map<String, dynamic>>.from(
+      await _client
+          .from('friendships')
+          .select('requester_id, addressee_id')
+          .or('requester_id.eq.$uid,addressee_id.eq.$uid')
+          .eq('status', 'accepted') as List,
+    );
+    final friendIds = friendships
+        .map((f) => f['requester_id'] == uid
+            ? f['addressee_id'] as String
+            : f['requester_id'] as String)
+        .toList();
+
+    // Include self
+    final allIds = [uid, ...friendIds];
+
+    final profiles = List<Map<String, dynamic>>.from(
+      await _client
+          .from('profiles')
+          .select('id, username, display_name, xp, level')
+          .inFilter('id', allIds)
+          .order('xp', ascending: false) as List,
+    );
+
+    return profiles;
+  }
+
   Future<TwinUser> getProfile(String userId) async {
     final data = await _client
         .from('profiles')
