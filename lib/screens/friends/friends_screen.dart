@@ -3,15 +3,18 @@ import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/achievement_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/challenge_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/supabase_service.dart';
 import '../../theme/app_theme.dart';
 import '../auth/login_screen.dart';
+import '../challenges/challenge_tab_body.dart';
 import '../challenges/create_challenge_screen.dart';
 
 class FriendsScreen extends StatefulWidget {
-  const FriendsScreen({super.key});
+  final int initialTab;
+  const FriendsScreen({super.key, this.initialTab = 0});
 
   @override
   State<FriendsScreen> createState() => _FriendsScreenState();
@@ -34,7 +37,11 @@ class _FriendsScreenState extends State<FriendsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(
+      length: 4,
+      vsync: this,
+      initialIndex: widget.initialTab,
+    );
     _loadFriends();
     _loadLeaderboard();
   }
@@ -283,6 +290,27 @@ class _FriendsScreenState extends State<FriendsScreen>
           tabAlignment: TabAlignment.start,
           tabs: [
             Tab(text: l10n.translate('friends')),
+            Tab(
+              child: Consumer<ChallengeProvider>(
+                builder: (context, cp, child) {
+                  final uid = SupabaseService.currentUser?.id;
+                  final badge = cp.pending
+                      .where((c) => c.participants.any(
+                          (p) => p.userId == uid && p.status == 'invited'))
+                      .length;
+                  if (badge == 0) {
+                    return Text('⚡ ${l10n.translate('challenges')}');
+                  }
+                  return Badge(
+                    label: Text('$badge'),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Text('⚡ ${l10n.translate('challenges')}'),
+                    ),
+                  );
+                },
+              ),
+            ),
             Tab(text: l10n.translate('addFriend')),
             Tab(text: '🏆 ${l10n.translate('leaderboard')}'),
           ],
@@ -292,6 +320,7 @@ class _FriendsScreenState extends State<FriendsScreen>
         controller: _tabController,
         children: [
           _buildFriendsTab(l10n, theme),
+          ChallengeTabBody(friends: _friends),
           _buildSearchTab(l10n, theme),
           _buildLeaderboardTab(l10n, theme),
         ],

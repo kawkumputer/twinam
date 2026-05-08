@@ -21,7 +21,6 @@ import 'screens/daily_verdict_screen.dart';
 import 'screens/stats_screen.dart';
 import 'screens/tasks_screen.dart';
 import 'screens/create_task_screen.dart';
-import 'screens/challenges/challenges_screen.dart';
 import 'screens/friends/friends_screen.dart';
 import 'screens/level_screen.dart';
 import 'services/auth_service.dart';
@@ -135,9 +134,10 @@ class TwinAmApp extends StatelessWidget {
                 case '/tasks':
                   return _buildRoute(const TasksScreen(), locale: locale);
                 case '/friends':
-                  return _buildRoute(const FriendsScreen(), locale: locale);
+                  final tab = routeSettings.arguments as int? ?? 0;
+                  return _buildRoute(FriendsScreen(initialTab: tab), locale: locale);
                 case '/challenges':
-                  return _buildRoute(const ChallengesScreen(), locale: locale);
+                  return _buildRoute(const FriendsScreen(initialTab: 1), locale: locale);
                 case '/level':
                   return _buildRoute(const LevelScreen(), locale: locale);
                 case '/create-task':

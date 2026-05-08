@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../models/challenge_model.dart';
 import '../../models/counter.dart';
-import '../../providers/auth_provider.dart';
 import '../../providers/challenge_provider.dart';
 import '../../providers/counter_provider.dart';
 import '../../providers/settings_provider.dart';
@@ -13,58 +12,29 @@ import '../../l10n/app_localizations.dart';
 import '../../widgets/twin_avatar_widget.dart';
 import 'create_challenge_screen.dart';
 
-class ChallengesScreen extends StatefulWidget {
-  const ChallengesScreen({super.key});
+class ChallengeTabBody extends StatefulWidget {
+  final List<Map<String, dynamic>> friends;
+  final VoidCallback? onRefresh;
+
+  const ChallengeTabBody({
+    super.key,
+    required this.friends,
+    this.onRefresh,
+  });
 
   @override
-  State<ChallengesScreen> createState() => _ChallengesScreenState();
+  State<ChallengeTabBody> createState() => _ChallengeTabBodyState();
 }
 
-class _ChallengesScreenState extends State<ChallengesScreen>
+class _ChallengeTabBodyState extends State<ChallengeTabBody>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  List<Map<String, dynamic>> _friends = [];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadAndCleanup();
-      _loadFriends();
-    });
-  }
-
-  Future<void> _loadAndCleanup() async {
-    await context.read<ChallengeProvider>().load();
-    if (!mounted) return;
-    final ids = context.read<ChallengeProvider>().challengeIds;
-    await context.read<CounterProvider>().cleanupOrphanedChallengeCounters(ids);
-  }
-
-  Future<void> _loadFriends() async {
-    final uid = SupabaseService.currentUser?.id;
-    if (uid == null) return;
-    try {
-      final client = SupabaseService.client;
-      final rows = List<Map<String, dynamic>>.from(
-        await client
-            .from('friendships')
-            .select('requester_id, addressee_id')
-            .or('requester_id.eq.$uid,addressee_id.eq.$uid')
-            .eq('status', 'accepted') as List,
-      );
-      final ids = rows
-          .map((f) => f['requester_id'] == uid
-              ? f['addressee_id'] as String
-              : f['requester_id'] as String)
-          .toList();
-      if (ids.isEmpty) return;
-      final profiles = List<Map<String, dynamic>>.from(
-        await client.from('profiles').select().inFilter('id', ids) as List,
-      );
-      if (mounted) setState(() => _friends = profiles);
-    } catch (_) {}
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadAndCleanup());
   }
 
   @override
@@ -73,69 +43,60 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     super.dispose();
   }
 
+  Future<void> _loadAndCleanup() async {
+    if (!mounted) return;
+    await context.read<ChallengeProvider>().load();
+    if (!mounted) return;
+    final ids = context.read<ChallengeProvider>().challengeIds;
+    await context.read<CounterProvider>().cleanupOrphanedChallengeCounters(ids);
+  }
+
+  Future<void> _refresh() => _loadAndCleanup();
+
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
     final l10n = AppLocalizations.of(settings.locale);
-    final auth = context.watch<AuthProvider>();
     final challenges = context.watch<ChallengeProvider>();
     final theme = Theme.of(context);
-
-    if (!auth.isLoggedIn) {
-      return Scaffold(
-        appBar: AppBar(title: Text(l10n.translate('challenges'))),
-        body: Center(child: Text(l10n.translate('connectToSeeChallenges'))),
-      );
-    }
-
     final uid = SupabaseService.currentUser?.id;
 
+    if (challenges.loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     final invitations = challenges.pending
-        .where((c) => c.participants.any(
-            (p) => p.userId == uid && p.status == 'invited'))
+        .where((c) =>
+            c.participants.any((p) => p.userId == uid && p.status == 'invited'))
         .toList();
+    final outgoing =
+        challenges.pending.where((c) => c.creatorId == uid).toList();
 
-    final outgoing = challenges.pending
-        .where((c) => c.creatorId == uid)
-        .toList();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.translate('challenges')),
-        actions: [
-          if (invitations.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: Badge(
-                label: Text('${invitations.length}'),
-                child: const Icon(Icons.notifications_outlined),
-              ),
-            ),
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded),
-            onPressed: _loadAndCleanup,
+    return Column(
+      children: [
+        Material(
+          color: theme.scaffoldBackgroundColor,
+          child: TabBar(
+            controller: _tabController,
+            tabs: [
+              Tab(text: l10n.translate('invitations')),
+              Tab(text: l10n.translate('active')),
+              Tab(text: l10n.translate('finished')),
+            ],
           ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: l10n.translate('invitations')),
-            Tab(text: l10n.translate('active')),
-            Tab(text: l10n.translate('finished')),
-          ],
         ),
-      ),
-      body: challenges.loading
-          ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                _buildInvitationsTab(
-                    invitations, outgoing, l10n, theme, challenges),
-                _buildActiveTab(challenges.active, l10n, theme, challenges),
-                _buildFinishedTab(challenges.completed, l10n, theme),
-              ],
-            ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _buildInvitationsTab(
+                  invitations, outgoing, l10n, theme, challenges),
+              _buildActiveTab(challenges.active, l10n, theme),
+              _buildFinishedTab(challenges.completed, l10n, theme),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -146,34 +107,34 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     ThemeData theme,
     ChallengeProvider challenges,
   ) {
-    if (invitations.isEmpty && outgoing.isEmpty && _friends.isEmpty) {
-      return _emptyState(Icons.inbox_outlined, l10n.translate('noInvitations'));
+    if (invitations.isEmpty && outgoing.isEmpty && widget.friends.isEmpty) {
+      return _emptyScrollable(Icons.inbox_outlined, l10n.translate('noInvitations'));
     }
-    return ListView(
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
       children: [
-        // ── Incoming invitations ────────────────────────────────
         ...invitations.map((c) => _InvitationCard(
-          challenge: c,
-          onAccept: () async {
-            await challenges.respond(c.id, true);
-            if (!mounted) return;
-            final counter = Counter(
-              id: const Uuid().v4(),
-              name: '⚡ ${c.title}',
-              emoji: '⚡',
-              goal: c.targetValue,
-              challengeId: c.id,
-              resetFrequency: c.challengeType == 'streak'
-                  ? ResetFrequency.daily
-                  : ResetFrequency.never,
-            );
-            context.read<CounterProvider>().addCounter(counter);
-          },
-          onReject: () => challenges.respond(c.id, false),
-          l10n: l10n,
-        )),
-        // ── Outgoing sent challenges ─────────────────────────────
+              challenge: c,
+              onAccept: () async {
+                await challenges.respond(c.id, true);
+                if (!mounted) return;
+                final counter = Counter(
+                  id: const Uuid().v4(),
+                  name: '⚡ ${c.title}',
+                  emoji: '⚡',
+                  goal: c.targetValue,
+                  challengeId: c.id,
+                  resetFrequency: c.challengeType == 'streak'
+                      ? ResetFrequency.daily
+                      : ResetFrequency.never,
+                );
+                context.read<CounterProvider>().addCounter(counter);
+              },
+              onReject: () => challenges.respond(c.id, false),
+              l10n: l10n,
+            )),
         if (outgoing.isNotEmpty) ...[
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -184,31 +145,32 @@ class _ChallengesScreenState extends State<ChallengesScreen>
             ),
           ),
           ...outgoing.map((c) => _OutgoingChallengeCard(
-            challenge: c,
-            onDelete: () => _confirmDelete(c, challenges, l10n),
-            onEdit: () => _showEditDialog(c, challenges, l10n),
-            l10n: l10n,
-          )),
+                challenge: c,
+                onDelete: () => _confirmDelete(c, challenges, l10n),
+                onEdit: () => _showEditDialog(c, challenges, l10n),
+                l10n: l10n,
+              )),
         ],
-        // ── Challenge a friend ─────────────────────────────────
-        if (_friends.isNotEmpty) ...[
+        if (widget.friends.isNotEmpty) ...[
           if (invitations.isNotEmpty || outgoing.isNotEmpty)
             const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               children: [
-                const Icon(Icons.bolt_rounded, size: 15, color: AppTheme.warningColor),
+                const Icon(Icons.bolt_rounded,
+                    size: 15, color: AppTheme.warningColor),
                 const SizedBox(width: 6),
                 Text(
                   l10n.translate('friends'),
                   style: theme.textTheme.titleSmall?.copyWith(
-                      color: AppTheme.warningColor, fontWeight: FontWeight.w700),
+                      color: AppTheme.warningColor,
+                      fontWeight: FontWeight.w700),
                 ),
               ],
             ),
           ),
-          ..._friends.map((f) {
+          ...widget.friends.map((f) {
             final uname = f['username'] as String? ?? '?';
             final dname = f['display_name'] as String?;
             final ci = uname.codeUnitAt(0) % AppTheme.counterColors.length;
@@ -221,23 +183,31 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(color: col.withValues(alpha: 0.2)),
                 boxShadow: [
-                  BoxShadow(color: col.withValues(alpha: 0.06), blurRadius: 10, offset: const Offset(0, 3)),
+                  BoxShadow(
+                      color: col.withValues(alpha: 0.06),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3)),
                 ],
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 46, height: 46,
+                    width: 46,
+                    height: 46,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [col, col.withValues(alpha: 0.65)],
-                        begin: Alignment.topLeft, end: Alignment.bottomRight,
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
                       shape: BoxShape.circle,
                     ),
                     child: Center(
                       child: Text(uname[0].toUpperCase(),
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 19)),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 19)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -246,11 +216,14 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('@$uname', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                        Text('@$uname',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 15)),
                         if (dname != null && dname.isNotEmpty)
                           Text(dname,
                               style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5))),
+                                  color: theme.colorScheme.onSurface
+                                      .withValues(alpha: 0.5))),
                       ],
                     ),
                   ),
@@ -265,13 +238,16 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                         .then((_) => challenges.load()),
                     icon: const Icon(Icons.bolt_rounded, size: 14),
                     label: Text(l10n.translate('launchChallenge'),
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                        style: const TextStyle(
+                            fontSize: 11, fontWeight: FontWeight.w700)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.warningColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 8),
                       elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ],
@@ -280,6 +256,67 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           }),
         ],
       ],
+    ),
+    );
+  }
+
+  Widget _buildActiveTab(
+    List<Challenge> active,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
+    if (active.isEmpty) {
+      return _emptyScrollable(
+          Icons.emoji_events_outlined, l10n.translate('noActiveChallenges'));
+    }
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: active.length,
+        itemBuilder: (_, i) => _ChallengeCard(challenge: active[i], l10n: l10n),
+      ),
+    );
+  }
+
+  Widget _buildFinishedTab(
+    List<Challenge> finished,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
+    if (finished.isEmpty) {
+      return _emptyScrollable(
+          Icons.history_rounded, l10n.translate('noFinishedChallenges'));
+    }
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: finished.length,
+        itemBuilder: (_, i) => _ChallengeCard(challenge: finished[i], l10n: l10n),
+      ),
+    );
+  }
+
+  Widget _emptyScrollable(IconData icon, String text) {
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 56, color: Colors.grey),
+                const SizedBox(height: 12),
+                Text(text,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.grey)),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -351,63 +388,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
       ),
     );
   }
-
-  Widget _buildActiveTab(
-    List<Challenge> active,
-    AppLocalizations l10n,
-    ThemeData theme,
-    ChallengeProvider challenges,
-  ) {
-    if (active.isEmpty) {
-      return _emptyState(
-          Icons.emoji_events_outlined, l10n.translate('noActiveChallenges'));
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: active.length,
-      itemBuilder: (_, i) => _ChallengeCard(
-        challenge: active[i],
-        l10n: l10n,
-      ),
-    );
-  }
-
-  Widget _buildFinishedTab(
-    List<Challenge> finished,
-    AppLocalizations l10n,
-    ThemeData theme,
-  ) {
-    if (finished.isEmpty) {
-      return _emptyState(
-          Icons.history_rounded, l10n.translate('noFinishedChallenges'));
-    }
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: finished.length,
-      itemBuilder: (_, i) => _ChallengeCard(
-        challenge: finished[i],
-        l10n: l10n,
-      ),
-    );
-  }
-
-  Widget _emptyState(IconData icon, String text) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 56, color: Colors.grey),
-          const SizedBox(height: 12),
-          Text(text,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.grey)),
-        ],
-      ),
-    );
-  }
 }
 
-// ─── Invitation Card ────────────────────────────────────────────────────────
+// ─── Invitation Card ─────────────────────────────────────────────────────────
 
 class _InvitationCard extends StatelessWidget {
   final Challenge challenge;
@@ -424,9 +407,9 @@ class _InvitationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final challenger = challenge.participants
-        .firstWhere((p) => p.userId == challenge.creatorId,
-            orElse: () => challenge.participants.first);
+    final challenger = challenge.participants.firstWhere(
+        (p) => p.userId == challenge.creatorId,
+        orElse: () => challenge.participants.first);
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
@@ -465,8 +448,7 @@ class _InvitationCard extends StatelessWidget {
                   icon: const Icon(Icons.close,
                       size: 16, color: AppTheme.dangerColor),
                   label: Text(l10n.translate('reject'),
-                      style:
-                          const TextStyle(color: AppTheme.dangerColor)),
+                      style: const TextStyle(color: AppTheme.dangerColor)),
                   onPressed: onReject,
                 ),
                 const SizedBox(width: 8),
@@ -484,7 +466,7 @@ class _InvitationCard extends StatelessWidget {
   }
 }
 
-// ─── Outgoing Pending Challenge Card ────────────────────────────────────────
+// ─── Outgoing Pending Challenge Card ─────────────────────────────────────────
 
 class _OutgoingChallengeCard extends StatelessWidget {
   final Challenge challenge;
@@ -501,9 +483,9 @@ class _OutgoingChallengeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final opponent = challenge.participants
-        .firstWhere((p) => p.userId != challenge.creatorId,
-            orElse: () => challenge.participants.first);
+    final opponent = challenge.participants.firstWhere(
+        (p) => p.userId != challenge.creatorId,
+        orElse: () => challenge.participants.first);
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
       child: Padding(
@@ -557,23 +539,19 @@ class _OutgoingChallengeCard extends StatelessWidget {
   }
 }
 
-// ─── Active / Finished Challenge Card ───────────────────────────────────────
+// ─── Active / Finished Challenge Card ────────────────────────────────────────
 
 class _ChallengeCard extends StatelessWidget {
   final Challenge challenge;
   final AppLocalizations l10n;
 
-  const _ChallengeCard({
-    required this.challenge,
-    required this.l10n,
-  });
+  const _ChallengeCard({required this.challenge, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
     final uid = SupabaseService.currentUser?.id;
-    final me = challenge.participants
-        .firstWhere((p) => p.userId == uid,
-            orElse: () => challenge.participants.first);
+    final me = challenge.participants.firstWhere((p) => p.userId == uid,
+        orElse: () => challenge.participants.first);
     final opponentList =
         challenge.participants.where((p) => p.userId != uid).toList();
     final opponentLeft = opponentList.isEmpty;
@@ -597,39 +575,42 @@ class _ChallengeCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-            Text(challenge.title,
-                style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w700)),
-            if (challenge.description != null) ...[      
-              const SizedBox(height: 4),
-              Text(challenge.description!,
-                  style: const TextStyle(color: Colors.grey, fontSize: 13)),
-            ],
-            const SizedBox(height: 6),
-            _ChipRow(challenge: challenge, l10n: l10n),
-            const SizedBox(height: 12),
-            _ProgressRow(
-              label: l10n.translate('you'),
-              value: me.currentValue,
-              target: challenge.targetValue,
-              twinState: TwinAvatarWidget.fromScore(
-                  challenge.targetValue > 0
-                      ? (me.currentValue / challenge.targetValue).clamp(0.0, 1.0)
-                      : 0.0),
-            ),
-            const SizedBox(height: 8),
-            if (opponentLeft)
-              _OpponentLeftRow(l10n: l10n)
-            else
-              _ProgressRow(
-                label: '@${opponent!.username ?? '?'}',
-                value: opponent.currentValue,
-                target: challenge.targetValue,
-                twinState: TwinAvatarWidget.fromScore(
-                    challenge.targetValue > 0
-                        ? (opponent.currentValue / challenge.targetValue).clamp(0.0, 1.0)
-                        : 0.0),
-              ),
+                Text(challenge.title,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w700)),
+                if (challenge.description != null) ...[
+                  const SizedBox(height: 4),
+                  Text(challenge.description!,
+                      style: const TextStyle(
+                          color: Colors.grey, fontSize: 13)),
+                ],
+                const SizedBox(height: 6),
+                _ChipRow(challenge: challenge, l10n: l10n),
+                const SizedBox(height: 12),
+                _ProgressRow(
+                  label: l10n.translate('you'),
+                  value: me.currentValue,
+                  target: challenge.targetValue,
+                  twinState: TwinAvatarWidget.fromScore(
+                      challenge.targetValue > 0
+                          ? (me.currentValue / challenge.targetValue)
+                              .clamp(0.0, 1.0)
+                          : 0.0),
+                ),
+                const SizedBox(height: 8),
+                if (opponentLeft)
+                  _OpponentLeftRow(l10n: l10n)
+                else
+                  _ProgressRow(
+                    label: '@${opponent!.username ?? '?'}',
+                    value: opponent.currentValue,
+                    target: challenge.targetValue,
+                    twinState: TwinAvatarWidget.fromScore(
+                        challenge.targetValue > 0
+                            ? (opponent.currentValue / challenge.targetValue)
+                                .clamp(0.0, 1.0)
+                            : 0.0),
+                  ),
               ],
             ),
           ),
@@ -638,6 +619,8 @@ class _ChallengeCard extends StatelessWidget {
     );
   }
 }
+
+// ─── Progress Row ─────────────────────────────────────────────────────────────
 
 class _ProgressRow extends StatelessWidget {
   final String label;
@@ -723,6 +706,8 @@ class _ProgressRow extends StatelessWidget {
   }
 }
 
+// ─── Opponent Left Row ────────────────────────────────────────────────────────
+
 class _OpponentLeftRow extends StatelessWidget {
   final AppLocalizations l10n;
   const _OpponentLeftRow({required this.l10n});
@@ -754,6 +739,8 @@ class _OpponentLeftRow extends StatelessWidget {
   }
 }
 
+// ─── Chip Row ─────────────────────────────────────────────────────────────────
+
 class _ChipRow extends StatelessWidget {
   final Challenge challenge;
   final AppLocalizations l10n;
@@ -766,7 +753,8 @@ class _ChipRow extends StatelessWidget {
       'streak': l10n.translate('challengeTypeStreak'),
       'goal_count': l10n.translate('challengeTypeGoalCount'),
       'total_value': l10n.translate('challengeTypeTotalValue'),
-    }[challenge.challengeType] ?? challenge.challengeType;
+    }[challenge.challengeType] ??
+        challenge.challengeType;
 
     return Wrap(
       spacing: 6,
