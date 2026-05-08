@@ -201,7 +201,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             icon: Icons.info_outline_rounded,
             iconColor: const Color(0xFFFFB74D),
             title: l10n.translate('about'),
-            subtitle: '${l10n.translate('version')} 1.1.1',
+            subtitle: '${l10n.translate('version')} 1.1.2',
           ),
 
           // ── Account section (only when logged in) ──────────────
