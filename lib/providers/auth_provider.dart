@@ -54,6 +54,9 @@ class AuthProvider extends ChangeNotifier {
       _status = _currentUser != null
           ? AuthStatus.authenticated
           : AuthStatus.unauthenticated;
+      if (_status == AuthStatus.authenticated && !kIsWeb) {
+        SocialNotificationService().init();
+      }
     } catch (_) {
       _status = AuthStatus.unauthenticated;
     }

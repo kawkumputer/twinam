@@ -31,10 +31,8 @@ void main() async {
 
     if (!kIsWeb) {
       try {
-        if (Firebase.apps.isEmpty) {
-          await Firebase.initializeApp()
-              .timeout(const Duration(seconds: 10));
-        }
+        await Firebase.initializeApp()
+            .timeout(const Duration(seconds: 10));
         FirebaseMessaging.onBackgroundMessage(_fcmBackgroundHandler);
         debugPrint('[Firebase] Initialized. Apps: ${Firebase.apps.length}');
       } catch (e) {

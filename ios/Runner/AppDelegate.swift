@@ -1,6 +1,5 @@
 import Flutter
 import UIKit
-import Firebase
 
 @main
 @objc class AppDelegate: FlutterAppDelegate {
@@ -8,8 +7,14 @@ import Firebase
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    FirebaseApp.configure()
     GeneratedPluginRegistrant.register(with: self)
+
+    // Register for remote notifications to receive APNs token
+    if #available(iOS 10.0, *) {
+      UNUserNotificationCenter.current().delegate = self
+    }
+    application.registerForRemoteNotifications()
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

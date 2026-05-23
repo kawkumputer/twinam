@@ -70,9 +70,16 @@ class SocialNotificationService {
         return;
       }
 
-      debugPrint('[SocialNotif] Getting APNs token...');
-      final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-      debugPrint('[SocialNotif] APNs token: ${apnsToken != null ? "present (${apnsToken.length} chars)" : "NULL"}');
+      // On iOS, APNs token must be available before FCM can issue a token.
+      // Retry a few times with delay to wait for APNs registration.
+      String? apnsToken;
+      for (int i = 0; i < 5; i++) {
+        apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+        if (apnsToken != null) break;
+        debugPrint('[SocialNotif] APNs token not ready, retry ${i + 1}/5...');
+        await Future.delayed(const Duration(seconds: 2));
+      }
+      debugPrint('[SocialNotif] APNs token: ${apnsToken != null ? "present" : "NULL after retries"}');
 
       debugPrint('[SocialNotif] Getting FCM token...');
       final token = await FirebaseMessaging.instance.getToken()
