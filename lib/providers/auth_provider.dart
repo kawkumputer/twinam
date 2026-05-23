@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/twin_user.dart';
 import '../services/auth_service.dart';
 import '../services/supabase_service.dart';
+import '../services/social_notification_service.dart';
 
 enum AuthStatus { unknown, authenticated, unauthenticated }
 
@@ -79,6 +80,7 @@ class AuthProvider extends ChangeNotifier {
       _status = AuthStatus.authenticated;
       _loading = false;
       notifyListeners();
+      if (!kIsWeb) SocialNotificationService().init();
       return true;
     } catch (e) {
       if (e.toString() == 'EMAIL_CONFIRMATION_REQUIRED') {
@@ -133,6 +135,7 @@ class AuthProvider extends ChangeNotifier {
       _status = AuthStatus.authenticated;
       _loading = false;
       notifyListeners();
+      if (!kIsWeb) SocialNotificationService().init();
       return true;
     } catch (e) {
       _error = _parseError(e);
@@ -151,6 +154,7 @@ class AuthProvider extends ChangeNotifier {
       _status = AuthStatus.authenticated;
       _loading = false;
       notifyListeners();
+      if (!kIsWeb) SocialNotificationService().init();
       return true;
     } catch (e) {
       _error = _parseError(e);
@@ -169,6 +173,7 @@ class AuthProvider extends ChangeNotifier {
       _status = AuthStatus.authenticated;
       _loading = false;
       notifyListeners();
+      if (!kIsWeb) SocialNotificationService().init();
       return true;
     } catch (e) {
       _error = _parseError(e);
@@ -179,6 +184,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
+    if (!kIsWeb) await SocialNotificationService().dispose();
     await _authService.signOut();
   }
 

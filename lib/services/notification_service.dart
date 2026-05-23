@@ -62,6 +62,10 @@ class NotificationService {
       nav.pushNamed('/counter', arguments: counterId);
     } else if (payload == 'tasks') {
       nav.pushNamed('/tasks');
+    } else if (payload == 'friends') {
+      nav.pushNamed('/friends');
+    } else if (payload == 'challenges') {
+      nav.pushNamed('/friends', arguments: 1);
     }
     // 'dashboard' → app is already open, no navigation needed
   }
@@ -677,5 +681,70 @@ class NotificationService {
 
   tz.TZDateTime _toTZDateTime(DateTime dateTime) {
     return tz.TZDateTime.from(dateTime, tz.local);
+  }
+
+  // ── Social Notifications ────────────────────────────────────────────────────
+
+  Future<void> showFriendRequestNotification(String senderName) async {
+    final id = senderName.hashCode.abs() % 100000 + 30000;
+    try {
+      await _plugin.show(
+        id,
+        '👥 $senderName',
+        'Veut être ton ami · Wants to be friends',
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'social_friend_requests',
+            'Friend Requests',
+            channelDescription: 'Friend request notifications',
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+            color: const Color(0xFF4CAF50),
+          ),
+          iOS: const DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+        ),
+        payload: 'friends',
+      );
+      debugPrint('[Notif] Friend request notification shown for: $senderName');
+    } catch (e) {
+      debugPrint('[Notif] Failed to show friend request notification: $e');
+    }
+  }
+
+  Future<void> showChallengeInviteNotification(
+      String challengerName, String challengeTitle) async {
+    final id = (challengerName + challengeTitle).hashCode.abs() % 100000 + 40000;
+    try {
+      await _plugin.show(
+        id,
+        '⚡ $challengerName te défie !',
+        challengeTitle,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            'social_challenges',
+            'Challenge Invitations',
+            channelDescription: 'Challenge invitation notifications',
+            importance: Importance.high,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+            color: const Color(0xFFFF9800),
+          ),
+          iOS: const DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+        ),
+        payload: 'challenges',
+      );
+      debugPrint('[Notif] Challenge invite notification shown: $challengerName → $challengeTitle');
+    } catch (e) {
+      debugPrint('[Notif] Failed to show challenge invite notification: $e');
+    }
   }
 }

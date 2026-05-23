@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1021266610984",
+    "project_id": "twinam-app",
+    "storage_bucket": "twinam-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1021266610984:android:0e351096201e45ded8de1d",
+        "android_client_info": {
+          "package_name": "com.twinam.twinam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPCE2AP--UsDC9Pwk7VKXMpXPQ19pN7_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
