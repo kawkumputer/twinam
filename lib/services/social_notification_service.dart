@@ -57,6 +57,7 @@ class SocialNotificationService {
 
   Future<void> _requestPermissionAndSaveToken(String uid) async {
     try {
+      debugPrint('[SocialNotif] Requesting FCM permission...');
       final settings = await FirebaseMessaging.instance.requestPermission(
         alert: true,
         badge: true,
@@ -64,18 +65,33 @@ class SocialNotificationService {
       );
       debugPrint('[SocialNotif] FCM permission: ${settings.authorizationStatus}');
 
+      if (settings.authorizationStatus == AuthorizationStatus.denied) {
+        debugPrint('[SocialNotif] FCM permission denied by user');
+        return;
+      }
+
+      debugPrint('[SocialNotif] Getting APNs token...');
+      final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+      debugPrint('[SocialNotif] APNs token: ${apnsToken != null ? "present (${apnsToken.length} chars)" : "NULL"}');
+
+      debugPrint('[SocialNotif] Getting FCM token...');
       final token = await FirebaseMessaging.instance.getToken()
-          .timeout(const Duration(seconds: 10), onTimeout: () => null);
+          .timeout(const Duration(seconds: 15), onTimeout: () => null);
+      debugPrint('[SocialNotif] FCM token: ${token != null ? "present (${token.length} chars)" : "NULL"}');
+
       if (token != null) {
         await _saveToken(uid, token);
+      } else {
+        debugPrint('[SocialNotif] FCM token is null — APNs may not be configured or permission denied');
       }
 
       _tokenRefreshSub =
           FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+        debugPrint('[SocialNotif] FCM token refreshed');
         _saveToken(uid, newToken);
       });
-    } catch (e) {
-      debugPrint('[SocialNotif] Failed to get/save FCM token: $e');
+    } catch (e, s) {
+      debugPrint('[SocialNotif] Failed to get/save FCM token: $e\n$s');
     }
   }
 
