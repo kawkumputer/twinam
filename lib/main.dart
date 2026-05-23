@@ -23,33 +23,57 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  await dotenv.load(fileName: '.env');
-  await SupabaseService.initialize();
-
-  if (!kIsWeb) {
-    await Firebase.initializeApp();
-    FirebaseMessaging.onBackgroundMessage(_fcmBackgroundHandler);
-  }
-
   final storageService = StorageService();
-  await storageService.init();
 
-  // Initialize services with platform checks
-  if (!kIsWeb) {
-    // Mobile-only services
-    final notificationService = NotificationService();
-    await notificationService.init();
+  try {
+    await dotenv.load(fileName: '.env');
+    await SupabaseService.initialize();
 
-    final widgetService = WidgetService();
-    await widgetService.initialize();
+    if (!kIsWeb) {
+      try {
+        await Firebase.initializeApp()
+            .timeout(const Duration(seconds: 10));
+        FirebaseMessaging.onBackgroundMessage(_fcmBackgroundHandler);
+      } catch (e) {
+        debugPrint('[Firebase] Init failed: $e');
+      }
+    }
 
-    final adMobService = AdMobService();
-    await adMobService.initialize();
+    await storageService.init();
 
-    TwinNotificationService().init();
-    SocialNotificationService().initIfLoggedIn();
+    if (!kIsWeb) {
+      try {
+        await NotificationService()
+            .init()
+            .timeout(const Duration(seconds: 10));
+      } catch (e) {
+        debugPrint('[NotificationService] Init failed: $e');
+      }
+
+      try {
+        await WidgetService()
+            .initialize()
+            .timeout(const Duration(seconds: 5));
+      } catch (e) {
+        debugPrint('[WidgetService] Init failed: $e');
+      }
+
+      try {
+        await AdMobService()
+            .initialize()
+            .timeout(const Duration(seconds: 10));
+      } catch (e) {
+        debugPrint('[AdMobService] Init failed: $e');
+      }
+
+      TwinNotificationService().init();
+      SocialNotificationService().initIfLoggedIn();
+    }
+  } catch (e, s) {
+    debugPrint('[Main] Init error: $e\n$s');
+  } finally {
+    FlutterNativeSplash.remove();
   }
 
-  FlutterNativeSplash.remove();
   runApp(TwinAmApp(storageService: storageService));
 }
