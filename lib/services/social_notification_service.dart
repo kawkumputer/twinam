@@ -64,7 +64,8 @@ class SocialNotificationService {
       );
       debugPrint('[SocialNotif] FCM permission: ${settings.authorizationStatus}');
 
-      final token = await FirebaseMessaging.instance.getToken();
+      final token = await FirebaseMessaging.instance.getToken()
+          .timeout(const Duration(seconds: 10), onTimeout: () => null);
       if (token != null) {
         await _saveToken(uid, token);
       }

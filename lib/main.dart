@@ -47,7 +47,7 @@ void main() async {
     await adMobService.initialize();
 
     TwinNotificationService().init();
-    await SocialNotificationService().initIfLoggedIn();
+    SocialNotificationService().initIfLoggedIn();
   }
 
   FlutterNativeSplash.remove();
