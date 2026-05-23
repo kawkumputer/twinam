@@ -71,6 +71,9 @@ void main() async {
 
       TwinNotificationService().init();
       SocialNotificationService().initIfLoggedIn();
+
+      // Direct FCM token debug — runs regardless of SocialNotificationService
+      _debugFCMToken();
     }
   } catch (e, s) {
     debugPrint('[Main] Init error: $e\n$s');
@@ -79,4 +82,73 @@ void main() async {
   }
 
   runApp(TwinAmApp(storageService: storageService));
+}
+
+/// Standalone debug function to verify FCM token generation.
+/// Saves debug info to fcm_token field so we can see status from Supabase dashboard.
+Future<void> _debugFCMToken() async {
+  try {
+    final firebaseApps = Firebase.apps.length;
+    debugPrint('[FCM-DEBUG] Firebase apps: $firebaseApps');
+
+    final messaging = FirebaseMessaging.instance;
+
+    // Check notification settings
+    final settings = await messaging.getNotificationSettings();
+    final authStatus = settings.authorizationStatus.toString();
+    debugPrint('[FCM-DEBUG] Auth status: $authStatus');
+
+    // Try to get APNs token (iOS only)
+    String? apns;
+    for (int i = 0; i < 10; i++) {
+      apns = await messaging.getAPNSToken();
+      if (apns != null) break;
+      debugPrint('[FCM-DEBUG] APNs attempt ${i + 1}/10 - null, waiting 2s...');
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    debugPrint('[FCM-DEBUG] APNs token: ${apns != null ? "OK" : "NULL after retries"}');
+
+    // Get FCM token
+    String? fcmToken;
+    if (apns != null) {
+      fcmToken = await messaging.getToken();
+      debugPrint('[FCM-DEBUG] FCM token: ${fcmToken != null ? "OK" : "NULL"}');
+    }
+
+    // Save result (token or debug info) so we can see it in Supabase
+    final user = SupabaseService.currentUser;
+    if (user != null) {
+      final valueToSave = fcmToken ?? 'DEBUG:firebase=$firebaseApps|auth=$authStatus|apns=${apns != null ? "ok" : "null"}';
+      await SupabaseService.client
+          .from('profiles')
+          .update({'fcm_token': valueToSave})
+          .eq('id', user.id);
+      debugPrint('[FCM-DEBUG] Saved to DB: ${fcmToken != null ? "real token" : valueToSave}');
+    } else {
+      debugPrint('[FCM-DEBUG] No user logged in — waiting for auth...');
+      // Listen for auth and retry once
+      SupabaseService.authStateChanges.first.then((_) async {
+        await Future.delayed(const Duration(seconds: 3));
+        final u = SupabaseService.currentUser;
+        if (u != null) {
+          final token = await messaging.getToken();
+          final val = token ?? 'DEBUG:delayed|apns=${apns != null ? "ok" : "null"}';
+          await SupabaseService.client.from('profiles').update({'fcm_token': val}).eq('id', u.id);
+          debugPrint('[FCM-DEBUG] Delayed save: $val');
+        }
+      });
+    }
+  } catch (e, s) {
+    debugPrint('[FCM-DEBUG] ERROR: $e\n$s');
+    // Try to save error to DB
+    try {
+      final user = SupabaseService.currentUser;
+      if (user != null) {
+        await SupabaseService.client
+            .from('profiles')
+            .update({'fcm_token': 'ERROR:${e.toString().substring(0, 50)}'})
+            .eq('id', user.id);
+      }
+    } catch (_) {}
+  }
 }
