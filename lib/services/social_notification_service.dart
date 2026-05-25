@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'crypto_service.dart';
 import 'notification_service.dart';
 import 'supabase_service.dart';
 
@@ -221,8 +222,9 @@ class SocialNotificationService {
                   (creatorProfile['display_name'] as String?)?.isNotEmpty == true
                       ? creatorProfile['display_name'] as String
                       : (creatorProfile['username'] as String?) ?? 'Someone';
-              final title =
+              final rawTitle =
                   (challenge['title'] as String?) ?? 'Challenge';
+              final title = CryptoService.decrypt(rawTitle);
               NotificationService()
                   .showChallengeInviteNotification(name, title);
             } catch (_) {

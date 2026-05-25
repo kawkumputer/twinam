@@ -35,9 +35,11 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          CHALLENGE_KEY: ${{ secrets.CHALLENGE_KEY }}
         run: |
           echo "SUPABASE_URL=$SUPABASE_URL" > .env
           echo "SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY" >> .env
+          echo "CHALLENGE_KEY=$CHALLENGE_KEY" >> .env
 
       - name: Install Apple certificate and provisioning profile
         env:

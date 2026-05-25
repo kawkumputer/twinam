@@ -110,6 +110,32 @@ async function sendFCMPush(
   console.log('[FCM] Push sent successfully');
 }
 
+// ── AES-CBC decrypt (mirrors Flutter CryptoService) ─────────────────────────
+
+async function decryptTitle(value: string, challengeKey: string): Promise<string> {
+  if (!value.startsWith('ENC.')) return value;
+  const body = value.substring(4);
+  const dotIdx = body.indexOf('.');
+  if (dotIdx === -1) return value;
+  try {
+    const ivBase64 = body.substring(0, dotIdx);
+    const cipherBase64 = body.substring(dotIdx + 1);
+    const rawKey = challengeKey.length >= 32
+      ? challengeKey.substring(0, 32)
+      : challengeKey.padEnd(32, '0');
+    const keyBytes = new TextEncoder().encode(rawKey);
+    const key = await crypto.subtle.importKey(
+      'raw', keyBytes, { name: 'AES-CBC' }, false, ['decrypt'],
+    );
+    const iv = Uint8Array.from(atob(ivBase64), (c) => c.charCodeAt(0));
+    const cipher = Uint8Array.from(atob(cipherBase64), (c) => c.charCodeAt(0));
+    const decrypted = await crypto.subtle.decrypt({ name: 'AES-CBC', iv }, key, cipher);
+    return new TextDecoder().decode(decrypted);
+  } catch {
+    return value;
+  }
+}
+
 // ── Main handler ──────────────────────────────────────────────────────────────
 
 serve(async (req) => {
@@ -118,6 +144,7 @@ serve(async (req) => {
     const projectId = Deno.env.get('FIREBASE_PROJECT_ID');
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const challengeKey = Deno.env.get('CHALLENGE_KEY') ?? 'TwinAmDefaultKey_000000000000000';
 
     if (!serviceAccountJson || !projectId) {
       return new Response('Missing Firebase config', { status: 500 });
@@ -179,7 +206,8 @@ serve(async (req) => {
         (creator?.display_name as string | null)?.trim() ||
         (creator?.username as string | null) ||
         'Someone';
-      const challengeTitle = (challenge?.title as string | null) || 'Challenge';
+      const rawTitle = (challenge?.title as string | null) || 'Challenge';
+      const challengeTitle = await decryptTitle(rawTitle, challengeKey);
 
       title = `⚡ ${creatorName} te défie !`;
       body = challengeTitle;
