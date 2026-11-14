@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -309,7 +310,7 @@ class _StatsScreenState extends State<StatsScreen> {
             value,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: color,
+                  color: context.readable(color, minContrast: 3),
                 ),
           ),
         ],
@@ -382,6 +383,7 @@ class _StatsScreenState extends State<StatsScreen> {
   }
 
   Widget _buildHeatmap(BuildContext context, Counter counter, Color color) {
+    final l10n = AppLocalizations.of(context.read<SettingsProvider>().locale);
     final now = DateTime.now();
     const totalDays = 35; // 5 weeks
     final startDate = now.subtract(const Duration(days: totalDays - 1));
@@ -415,7 +417,7 @@ class _StatsScreenState extends State<StatsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '📅 Activity',
+            '📅 ${l10n.translate('activity')}',
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),

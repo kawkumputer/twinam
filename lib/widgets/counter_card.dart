@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import 'package:flutter/services.dart';
 import '../models/counter.dart';
 
@@ -60,7 +61,7 @@ class _CounterCardState extends State<CounterCard> with SingleTickerProviderStat
         ),
         child: Icon(
           Icons.add_rounded,
-          color: color,
+          color: context.readable(color, minContrast: 3),
           size: iconSize,
         ),
       ),
@@ -90,9 +91,18 @@ class _CounterCardState extends State<CounterCard> with SingleTickerProviderStat
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
-              color: color.withValues(alpha: isDark ? 0.2 : 0.1),
+              color: color.withValues(alpha: isDark ? 0.2 : 0.18),
               width: 1.5,
             ),
+            boxShadow: isDark
+                ? null
+                : [
+                    BoxShadow(
+                      color: const Color(0xFF1E2A3A).withValues(alpha: 0.05),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
           ),
           child: Stack(
             children: [
@@ -130,7 +140,7 @@ class _CounterCardState extends State<CounterCard> with SingleTickerProviderStat
                       '${counter.value}',
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.w800,
-                            color: color,
+                            color: context.readable(color, minContrast: 3),
                           ),
                     ),
                     const Spacer(),
@@ -176,9 +186,9 @@ class _CounterCardState extends State<CounterCard> with SingleTickerProviderStat
                             color: const Color(0xFF66BB6A).withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.check_rounded,
-                            color: Color(0xFF66BB6A),
+                            color: context.readable(const Color(0xFF66BB6A), minContrast: 3),
                             size: 16,
                           ),
                         )
@@ -190,8 +200,8 @@ class _CounterCardState extends State<CounterCard> with SingleTickerProviderStat
                           ),
                           child: Text(
                             '${(counter.progress * 100).toInt()}%',
-                            style: const TextStyle(
-                              color: Color(0xFF80DEEA),
+                            style: TextStyle(
+                              color: context.readable(const Color(0xFF80DEEA)),
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                             ),

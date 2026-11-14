@@ -76,16 +76,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           const SizedBox(height: 12),
 
-          // Dark mode
+          // Theme: auto (follows the phone), light or dark
           _buildSettingsTile(
             context,
-            icon: Icons.dark_mode_rounded,
+            icon: Icons.contrast_rounded,
             iconColor: const Color(0xFF2196F3),
-            title: l10n.translate('darkMode'),
-            trailing: Switch.adaptive(
-              value: settings.isDarkMode,
-              onChanged: (_) => settings.toggleDarkMode(),
-              activeTrackColor: const Color(0xFF2196F3),
+            title: l10n.translate('theme'),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: DropdownButton<ThemeMode>(
+                value: settings.themeMode,
+                underline: const SizedBox(),
+                isDense: true,
+                borderRadius: BorderRadius.circular(14),
+                items: [
+                  DropdownMenuItem(value: ThemeMode.system, child: Text(l10n.translate('themeSystem'))),
+                  DropdownMenuItem(value: ThemeMode.light, child: Text(l10n.translate('themeLight'))),
+                  DropdownMenuItem(value: ThemeMode.dark, child: Text(l10n.translate('themeDark'))),
+                ],
+                onChanged: (mode) {
+                  if (mode != null) settings.setThemeMode(mode);
+                },
+              ),
             ),
           ),
 
@@ -148,7 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: Switch.adaptive(
               value: context.watch<AchievementProvider>().soundEnabled,
               onChanged: (_) => context.read<AchievementProvider>().toggleSound(),
-              activeTrackColor: const Color(0xFFFF8A65),
+              activeTrackColor: const Color(0xFF2196F3),
             ),
           ),
 

@@ -79,8 +79,16 @@ class StorageService implements PurchaseStorage {
   }
 
   // Settings
-  bool get isDarkMode => _settings.get('isDarkMode', defaultValue: true) as bool;
-  set isDarkMode(bool value) => _settings.put('isDarkMode', value);
+  /// 'system', 'light' ou 'dark'. Ancien réglage `isDarkMode` repris s'il avait été choisi.
+  String get themeMode {
+    final mode = _settings.get('themeMode') as String?;
+    if (mode != null) return mode;
+    final legacy = _settings.get('isDarkMode') as bool?;
+    if (legacy == null) return 'system';
+    return legacy ? 'dark' : 'light';
+  }
+
+  set themeMode(String value) => _settings.put('themeMode', value);
 
   String get locale => _settings.get('locale', defaultValue: 'en') as String;
   set locale(String value) => _settings.put('locale', value);

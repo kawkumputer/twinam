@@ -67,7 +67,12 @@ class TwinAmApp extends StatelessWidget {
       ],
       child: Consumer<SettingsProvider>(
         builder: (context, settings, _) {
-          final isDark = settings.themeMode == ThemeMode.dark;
+          final isDark = switch (settings.themeMode) {
+            ThemeMode.dark => true,
+            ThemeMode.light => false,
+            ThemeMode.system =>
+              MediaQuery.platformBrightnessOf(context) == Brightness.dark,
+          };
           return AnnotatedRegion<SystemUiOverlayStyle>(
             value: SystemUiOverlayStyle(
               statusBarColor: Colors.transparent,

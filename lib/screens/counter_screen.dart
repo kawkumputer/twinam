@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
@@ -255,7 +256,7 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
                           fontSize: 96,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -2,
-                          color: counterColor,
+                          color: context.readable(counterColor, minContrast: 3),
                         ),
                   ),
                 ),
@@ -313,7 +314,7 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
                           '${counter.currentStreak} ${l10n.translate('days')}',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: const Color(0xFFFFB74D),
+                                color: context.readable(const Color(0xFFFFB74D)),
                               ),
                         ),
                       ],

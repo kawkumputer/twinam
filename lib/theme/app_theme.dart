@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,6 +47,26 @@ class AppTheme {
     '🍕', '🍺', '🚬', '📱', '🔢', '☀️', '🎁', '🌈',
   ];
 
+  /// Couleur utilisable pour du texte ou une icône. En mode sombre, inchangée.
+  /// En mode clair, les teintes pastel (ambre, cyan, vert clair) sont assombries
+  /// jusqu'au contraste [minContrast] sur le fond des cartes (4.5 = texte normal,
+  /// 3 = grands chiffres et icônes). Les fonds et barres gardent la couleur d'origine.
+  static Color readable(Color color, Brightness brightness, {double minContrast = 4.5}) {
+    if (brightness == Brightness.dark) return color;
+    const background = Colors.white;
+    var hsl = HSLColor.fromColor(color);
+    while (_contrast(hsl.toColor(), background) < minContrast && hsl.lightness > 0.05) {
+      hsl = hsl.withLightness(math.max(0, hsl.lightness - 0.02));
+    }
+    return hsl.toColor();
+  }
+
+  static double _contrast(Color a, Color b) {
+    final la = a.computeLuminance();
+    final lb = b.computeLuminance();
+    return (math.max(la, lb) + 0.05) / (math.min(la, lb) + 0.05);
+  }
+
   static ThemeData lightTheme() {
     return ThemeData(
       useMaterial3: true,
@@ -54,7 +76,7 @@ class AppTheme {
         secondary: secondaryColor,
         brightness: Brightness.light,
       ),
-      scaffoldBackgroundColor: const Color(0xFFEEF1F6),
+      scaffoldBackgroundColor: const Color(0xFFECEFF4),
       textTheme: GoogleFonts.poppinsTextTheme(),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -77,7 +99,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        color: const Color(0xFFF8F9FC),
+        color: Colors.white,
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: primaryColor,
@@ -222,4 +244,10 @@ class AppTheme {
       ),
     );
   }
+}
+
+extension ReadableColor on BuildContext {
+  /// Raccourci de [AppTheme.readable] avec la luminosité du thème courant.
+  Color readable(Color color, {double minContrast = 4.5}) =>
+      AppTheme.readable(color, Theme.of(this).brightness, minContrast: minContrast);
 }

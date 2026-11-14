@@ -342,7 +342,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.all(16),
+                // marge basse : le bouton + flottant ne doit pas cacher la dernière ligne
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
                 sliver: SliverGrid(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
@@ -786,7 +787,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Text(l10n.translate('milestone'),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFFFFB74D),
+                    color: context.readable(const Color(0xFFFFB74D)),
                   ),
             ),
             const SizedBox(height: 12),

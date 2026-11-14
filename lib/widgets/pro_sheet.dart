@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../config/features.dart';
+import '../theme/app_theme.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/settings_provider.dart';
 import '../services/purchase_service.dart';
@@ -73,12 +74,31 @@ class _ProSheet extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Center(
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/happy-avatar.jpeg',
-                  width: 96,
-                  height: 96,
-                  fit: BoxFit.cover,
+              // Anneau aux couleurs des jumeaux : évite l'effet « disque blanc » en mode sombre
+              child: Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [AppTheme.primaryColor, AppTheme.secondaryColor],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.35),
+                      blurRadius: 24,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/happy-avatar.jpeg',
+                    width: 96,
+                    height: 96,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),

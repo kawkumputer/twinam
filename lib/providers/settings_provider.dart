@@ -6,16 +6,18 @@ class SettingsProvider extends ChangeNotifier {
 
   SettingsProvider(this._storage);
 
-  bool get isDarkMode => _storage.isDarkMode;
   String get locale => _storage.locale;
   String get userName => _storage.userName;
   bool get hasUserName => _storage.userName.isNotEmpty;
   bool get onboardingCompleted => _storage.onboardingCompleted;
 
-  ThemeMode get themeMode => isDarkMode ? ThemeMode.dark : ThemeMode.light;
+  ThemeMode get themeMode => ThemeMode.values.firstWhere(
+        (m) => m.name == _storage.themeMode,
+        orElse: () => ThemeMode.system,
+      );
 
-  void toggleDarkMode() {
-    _storage.isDarkMode = !isDarkMode;
+  void setThemeMode(ThemeMode mode) {
+    _storage.themeMode = mode.name;
     notifyListeners();
   }
 
