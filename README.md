@@ -90,7 +90,12 @@ lib/
     animated_counter.dart      # Rolling digit counter animation
 ```
 
-## Monetization Plan
+## Monetization
 
-- **Free**: 3 counters, 7-day history, basic achievements, ads
-- **Premium** (1.99€/mo or 9.99€/yr): unlimited counters, full history, all achievements, themes, widgets, no ads
+One-time in-app purchase **Twin'Am Pro** (`com.twinam.twinam.pro`, non-consumable, no subscription, no ads):
+
+- **Free**: 3 counters, last 7 days of stats, Twin avatar, daily verdict, XP/levels, achievements, tasks, reminders, widgets
+- **Pro** (6.99 USD, 2.99 USD in African storefronts): unlimited counters, month view and 5-week activity map
+
+Code: `lib/services/purchase_service.dart` (same pattern as Learn Pulaar / Pulaar Arabe), `lib/widgets/pro_sheet.dart`.
+The friends/challenges feature (Supabase + Firebase) is hidden behind `kSocialEnabled` in `lib/config/features.dart`.

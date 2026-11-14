@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/achievement_provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
+import '../services/purchase_service.dart';
+import '../widgets/pro_sheet.dart';
 import '../theme/app_theme.dart';
-import '../widgets/banner_ad_widget.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -25,6 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final settings = context.watch<SettingsProvider>();
     final l10n = AppLocalizations.of(settings.locale);
     final auth = context.watch<AuthProvider>();
+    final isPro = context.watch<PurchaseService>().isPro;
 
     return Scaffold(
       appBar: AppBar(
@@ -36,6 +37,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // User profile stats
           _buildProfileCard(context, l10n),
           const SizedBox(height: 20),
+
+          // Twin'Am Pro
+          GestureDetector(
+            onTap: isPro ? null : () => showProSheet(context),
+            child: _buildSettingsTile(
+              context,
+              icon: Icons.workspace_premium_rounded,
+              iconColor: const Color(0xFFFFB300),
+              title: l10n.translate('proTitle'),
+              subtitle: isPro
+                  ? l10n.translate('proActive')
+                  : l10n.translate('proSettingsDesc'),
+              trailing: isPro
+                  ? const Icon(Icons.check_circle_rounded, color: Color(0xFF66BB6A))
+                  : const Icon(Icons.chevron_right_rounded, size: 24),
+            ),
+          ),
+
+          const SizedBox(height: 12),
 
           // Name
           _buildSettingsTile(
@@ -150,58 +170,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 32),
           ],
 
-          // Support Us section header (Android only)
-          if (defaultTargetPlatform == TargetPlatform.android) ...[
-            Padding(
-              padding: const EdgeInsets.only(left: 4, bottom: 12),
-              child: Text(
-                l10n.translate('supportTwinAm'),
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                ),
-              ),
-            ),
-
-            // Buy Me a Coffee
-            GestureDetector(
-              onTap: () => _launchUrl('https://buymeacoffee.com/hamathkane'),
-              child: _buildSettingsTile(
-                context,
-                icon: Icons.coffee_rounded,
-                iconColor: const Color(0xFFFFDD57),
-                title: 'Buy Me a Coffee',
-                subtitle: 'Support development ☕',
-                trailing: const Icon(Icons.open_in_new_rounded, size: 20),
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // PayPal
-            GestureDetector(
-              onTap: () => _launchUrl('https://paypal.me/HamathKane'),
-              child: _buildSettingsTile(
-                context,
-                icon: Icons.payment_rounded,
-                iconColor: const Color(0xFF0070BA),
-                title: 'PayPal',
-                subtitle: 'One-time donation 💙',
-                trailing: const Icon(Icons.open_in_new_rounded, size: 20),
-              ),
-            ),
-
-            const SizedBox(height: 32),
-          ],
-
           // About
           _buildSettingsTile(
             context,
             icon: Icons.info_outline_rounded,
             iconColor: const Color(0xFFFFB74D),
             title: l10n.translate('about'),
-            subtitle: '${l10n.translate('version')} 1.1.2',
+            subtitle: '${l10n.translate('version')} 1.2.0',
           ),
 
           // ── Account section (only when logged in) ──────────────
@@ -254,7 +229,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 35),
         ],
       ),
-      bottomNavigationBar: const BannerAdWidget(),
     );
   }
 
@@ -505,12 +479,5 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
-  }
-
-  Future<void> _launchUrl(String urlString) async {
-    final url = Uri.parse(urlString);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
   }
 }

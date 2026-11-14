@@ -6,7 +6,8 @@ import '../l10n/app_localizations.dart';
 import '../models/counter.dart';
 import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
-import '../widgets/banner_ad_widget.dart';
+import '../services/purchase_service.dart';
+import '../widgets/pro_sheet.dart';
 
 class StatsScreen extends StatefulWidget {
   final String counterId;
@@ -25,6 +26,7 @@ class _StatsScreenState extends State<StatsScreen> {
     final l10n = AppLocalizations.of(settings.locale);
     final provider = context.watch<CounterProvider>();
     final counter = provider.getCounter(widget.counterId);
+    final isPro = context.watch<PurchaseService>().isPro;
 
     if (counter == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -47,7 +49,8 @@ class _StatsScreenState extends State<StatsScreen> {
               children: [
                 _buildPeriodChip(context, l10n.translate('thisWeek'), 0, counterColor),
                 const SizedBox(width: 10),
-                _buildPeriodChip(context, l10n.translate('thisMonth'), 1, counterColor),
+                _buildPeriodChip(context, l10n.translate('thisMonth'), 1, counterColor,
+                    locked: !isPro),
               ],
             ),
 
@@ -202,19 +205,56 @@ class _StatsScreenState extends State<StatsScreen> {
 
             const SizedBox(height: 28),
 
-            // Activity heatmap
-            _buildHeatmap(context, counter, counterColor),
+            // Activity heatmap (Pro)
+            if (isPro)
+              _buildHeatmap(context, counter, counterColor)
+            else
+              _buildLockedHeatmap(context, l10n, counterColor),
           ],
         ),
       ),
-      bottomNavigationBar: const BannerAdWidget(),
     );
   }
 
-  Widget _buildPeriodChip(BuildContext context, String label, int index, Color color) {
+  Widget _buildLockedHeatmap(BuildContext context, AppLocalizations l10n, Color color) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () => showProSheet(context, reason: ProReason.stats),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardTheme.color,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.lock_rounded, color: color),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                l10n.translate('proUnlockActivity'),
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPeriodChip(BuildContext context, String label, int index, Color color,
+      {bool locked = false}) {
     final isSelected = _selectedPeriod == index;
     return GestureDetector(
-      onTap: () => setState(() => _selectedPeriod = index),
+      onTap: () {
+        if (locked) {
+          showProSheet(context, reason: ProReason.stats);
+          return;
+        }
+        setState(() => _selectedPeriod = index);
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -223,12 +263,25 @@ class _StatsScreenState extends State<StatsScreen> {
           borderRadius: BorderRadius.circular(12),
           border: isSelected ? Border.all(color: color, width: 1.5) : null,
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (locked) ...[
+              Icon(
+                Icons.lock_rounded,
+                size: 14,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );

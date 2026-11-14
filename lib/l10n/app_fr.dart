@@ -453,4 +453,21 @@ const Map<String, String> fr = {
   'deleteAccountWarning': 'Cette action est irréversible.\n\nTout sera supprimé définitivement :\n• Ton profil et tes amis\n• Tes défis et ta progression',
   'deleteAccountConfirm': 'Oui, supprimer',
   'deleteAccountSuccess': 'Compte supprimé.',
+
+  // Twin'Am Pro
+  'add': 'Ajouter',
+  'proTitle': 'Twin\'Am Pro',
+  'proSubtitle': 'Un seul paiement. À vie. Sans abonnement.',
+  'proPerkCounters': 'Compteurs illimités',
+  'proPerkStats': 'Statistiques complètes : vue du mois et carte d\'activité sur 5 semaines',
+  'proPerkSupport': 'Soutenir un développeur indépendant, jamais de pub',
+  'proBuy': 'Débloquer pour {price}',
+  'proBuyNoPrice': 'Débloquer Pro',
+  'proRestore': 'Restaurer l\'achat',
+  'proStoreUnavailable': 'La boutique est indisponible pour le moment. Réessaie plus tard.',
+  'proActive': 'Pro est activé. Merci !',
+  'proLimitCounters': 'La version gratuite comprend {n} compteurs.',
+  'proLimitStats': 'La version gratuite affiche les 7 derniers jours.',
+  'proSettingsDesc': 'Compteurs illimités et statistiques complètes',
+  'proUnlockActivity': 'Débloquer la carte d\'activité sur 5 semaines',
 };

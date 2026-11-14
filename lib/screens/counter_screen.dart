@@ -1,16 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 import '../providers/achievement_provider.dart';
 import '../providers/counter_provider.dart';
 import '../providers/settings_provider.dart';
 import '../models/counter.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../widgets/animated_counter.dart';
-import '../services/admob_service.dart';
 import '../services/audio_service.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -48,12 +45,6 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
           setState(() => _showConfetti = false);
         }
       });
-  }
-
-  void _onExit() {
-    if (!kIsWeb) {
-      AdMobService().showInterstitialAdOnScreenExit();
-    }
   }
 
   @override
@@ -134,9 +125,6 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
 
     return PopScope(
       canPop: true,
-      onPopInvokedWithResult: (didPop, _) {
-        if (didPop) _onExit();
-      },
       child: Scaffold(
       body: Stack(
         children: [
@@ -164,7 +152,6 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
                     children: [
                       IconButton(
                         onPressed: () {
-                          _onExit();
                           Navigator.of(context).pop();
                         },
                         icon: const Icon(Icons.arrow_back_rounded),
@@ -424,7 +411,6 @@ class _CounterScreenState extends State<CounterScreen> with TickerProviderStateM
             ),
         ],
       ),
-      bottomNavigationBar: const BannerAdWidget(),
     ),
     );
   }

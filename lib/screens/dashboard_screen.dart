@@ -9,7 +9,8 @@ import '../providers/settings_provider.dart';
 import '../providers/task_provider.dart';
 import '../widgets/counter_card.dart';
 import '../widgets/twin_avatar_widget.dart';
-import '../widgets/banner_ad_widget.dart';
+import '../widgets/pro_sheet.dart';
+import '../config/features.dart';
 import '../services/notification_service.dart';
 import '../services/twin_notification_service.dart';
 import '../theme/app_theme.dart';
@@ -115,7 +116,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         achievementProvider.checkStreaks(counters);
       }
       // Sync XP to Supabase immediately on app open (best-effort for leaderboard)
-      if (mounted) {
+      if (kSocialEnabled && mounted) {
         achievementProvider.syncXpNow();
       }
       // Schedule Twin notifications (guarded internally by date)
@@ -189,30 +190,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         IconButton(
                           onPressed: () {
-                            Navigator.of(context).pushNamed('/settings');
-                          },
-                          icon: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: Icon(
-                              Icons.settings_rounded,
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    // Action buttons row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          onPressed: () {
                             Navigator.of(context).pushNamed('/achievements');
                           },
                           icon: Container(
@@ -241,19 +218,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ),
                         ),
+                        if (kSocialEnabled)
+                          IconButton(
+                            onPressed: () {
+                              Navigator.of(context).pushNamed('/friends');
+                            },
+                            icon: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Icon(
+                                Icons.people_rounded,
+                                color: AppTheme.primaryColor,
+                                size: 20,
+                              ),
+                            ),
+                          ),
                         IconButton(
                           onPressed: () {
-                            Navigator.of(context).pushNamed('/friends');
+                            Navigator.of(context).pushNamed('/settings');
                           },
                           icon: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: AppTheme.primaryColor.withValues(alpha: 0.12),
+                              color: Theme.of(context).colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(14),
                             ),
-                            child: const Icon(
-                              Icons.people_rounded,
-                              color: AppTheme.primaryColor,
+                            child: Icon(
+                              Icons.settings_rounded,
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               size: 20,
                             ),
                           ),
@@ -323,13 +318,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
 
-            // Tasks section - always visible
+            // Tasks section - only when something is due today or overdue,
+            // so the counters stay above the fold the rest of the time.
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               sliver: Consumer<TaskProvider>(
                 builder: (context, taskProvider, _) {
+                  final hasUrgent = taskProvider.tasks.any((t) =>
+                      (t.isOverdue || t.isDueToday) &&
+                      t.status != TaskStatus.done);
                   return SliverToBoxAdapter(
-                    child: _TasksSummaryCard(taskProvider: taskProvider),
+                    child: hasUrgent
+                        ? _TasksSummaryCard(taskProvider: taskProvider)
+                        : const SizedBox.shrink(),
                   );
                 },
               ),
@@ -397,27 +398,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const BannerAdWidget(),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            heroTag: 'fab_task',
-            onPressed: () => Navigator.of(context).pushNamed('/create-task'),
-            backgroundColor: const Color(0xFFFF9800),
-            mini: true,
-            tooltip: l10n.translate('newTask'),
-            child: const Icon(Icons.task_alt_rounded, color: Colors.white, size: 20),
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'fab_add',
+        onPressed: () => _showAddSheet(context, counters.length, l10n),
+        tooltip: l10n.translate('add'),
+        child: const Icon(Icons.add_rounded),
+      ),
+    );
+  }
+
+  /// One "+" button: choose between a counter and a task.
+  void _showAddSheet(BuildContext context, int counterCount, AppLocalizations l10n) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.add_circle_rounded, color: Color(0xFF2196F3)),
+                title: Text(l10n.translate('newCounter')),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  openCreateCounter(context, counterCount);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.task_alt_rounded, color: Color(0xFFFF9800)),
+                title: Text(l10n.translate('newTask')),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  Navigator.of(context).pushNamed('/create-task');
+                },
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          FloatingActionButton.extended(
-            heroTag: 'fab_counter',
-            onPressed: () => Navigator.of(context).pushNamed('/create'),
-            icon: const Icon(Icons.add_rounded),
-            label: Text(l10n.translate('newCounter')),
-          ),
-        ],
+        ),
       ),
     );
   }

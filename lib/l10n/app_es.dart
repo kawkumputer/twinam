@@ -481,4 +481,21 @@ const Map<String, String> es = {
   'deleteChallenge': 'Eliminar desafío',
   'deleteChallengeConfirm': '¿Eliminar este desafío? Esta acción no se puede deshacer.',
   'editChallenge': 'Editar desafío',
+
+  // Twin'Am Pro
+  'add': 'Añadir',
+  'proTitle': 'Twin\'Am Pro',
+  'proSubtitle': 'Un solo pago. Para siempre. Sin suscripción.',
+  'proPerkCounters': 'Contadores ilimitados',
+  'proPerkStats': 'Estadísticas completas: vista mensual y mapa de actividad de 5 semanas',
+  'proPerkSupport': 'Apoya a un desarrollador independiente, nunca anuncios',
+  'proBuy': 'Desbloquear por {price}',
+  'proBuyNoPrice': 'Desbloquear Pro',
+  'proRestore': 'Restaurar compra',
+  'proStoreUnavailable': 'La tienda no está disponible ahora. Inténtalo más tarde.',
+  'proActive': 'Pro está activo. ¡Gracias!',
+  'proLimitCounters': 'La versión gratuita incluye {n} contadores.',
+  'proLimitStats': 'La versión gratuita muestra los últimos 7 días.',
+  'proSettingsDesc': 'Contadores ilimitados y estadísticas completas',
+  'proUnlockActivity': 'Desbloquear el mapa de actividad de 5 semanas',
 };

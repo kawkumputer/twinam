@@ -13,7 +13,6 @@ import '../providers/counter_provider.dart';
 import '../providers/achievement_provider.dart';
 import '../providers/task_provider.dart';
 import '../providers/settings_provider.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../l10n/app_localizations.dart';
 import '../widgets/twin_avatar_widget.dart';
 
@@ -464,7 +463,6 @@ class _DailyVerdictScreenState extends State<DailyVerdictScreen>
           ),
         ),
       ),
-      bottomNavigationBar: const BannerAdWidget(),
     );
   }
 

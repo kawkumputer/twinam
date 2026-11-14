@@ -447,4 +447,21 @@ const Map<String, String> en = {
   'deleteAccountWarning': 'This action is irreversible.\n\nAll of the following will be permanently deleted:\n• Your profile and friends\n• Your challenges and progress',
   'deleteAccountConfirm': 'Yes, delete',
   'deleteAccountSuccess': 'Account deleted.',
+
+  // Twin'Am Pro
+  'add': 'Add',
+  'proTitle': 'Twin\'Am Pro',
+  'proSubtitle': 'One payment. Yours forever. No subscription.',
+  'proPerkCounters': 'Unlimited counters',
+  'proPerkStats': 'Full stats: month view and 5-week activity map',
+  'proPerkSupport': 'Support an independent developer, no ads ever',
+  'proBuy': 'Unlock for {price}',
+  'proBuyNoPrice': 'Unlock Pro',
+  'proRestore': 'Restore purchase',
+  'proStoreUnavailable': 'The store is not available right now. Try again later.',
+  'proActive': 'Pro is active. Thank you!',
+  'proLimitCounters': 'The free version includes {n} counters.',
+  'proLimitStats': 'The free version shows the last 7 days.',
+  'proSettingsDesc': 'Unlimited counters and full stats',
+  'proUnlockActivity': 'Unlock the 5-week activity map',
 };

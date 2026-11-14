@@ -4,9 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/task.dart';
 import '../providers/task_provider.dart';
 import '../providers/settings_provider.dart';
-import '../widgets/banner_ad_widget.dart';
 import '../l10n/app_localizations.dart';
-import '../services/admob_service.dart';
 import 'package:intl/intl.dart';
 
 class CreateTaskScreen extends StatefulWidget {
@@ -293,7 +291,6 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const BannerAdWidget(),
     );
   }
 
@@ -351,7 +348,6 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       await taskProvider.addTask(newTask);
       if (mounted) {
         HapticFeedback.mediumImpact();
-        AdMobService().showInterstitialAdOnGoalReached();
         Navigator.pushReplacementNamed(context, '/tasks');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.translate('taskCreated'))),

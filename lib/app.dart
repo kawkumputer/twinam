@@ -23,7 +23,9 @@ import 'screens/tasks_screen.dart';
 import 'screens/create_task_screen.dart';
 import 'screens/friends/friends_screen.dart';
 import 'screens/level_screen.dart';
+import 'config/features.dart';
 import 'services/auth_service.dart';
+import 'services/purchase_service.dart';
 import 'services/notification_service.dart';
 import 'services/storage_service.dart';
 import 'services/upgrader_messages.dart';
@@ -31,13 +33,19 @@ import 'theme/app_theme.dart';
 
 class TwinAmApp extends StatelessWidget {
   final StorageService storageService;
+  final PurchaseService purchaseService;
 
-  const TwinAmApp({super.key, required this.storageService});
+  const TwinAmApp({
+    super.key,
+    required this.storageService,
+    required this.purchaseService,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider.value(value: purchaseService),
         ChangeNotifierProvider(
           create: (_) => SettingsProvider(storageService),
         ),
@@ -133,10 +141,10 @@ class TwinAmApp extends StatelessWidget {
                   return _buildRoute(const DailyVerdictScreen(), locale: locale);
                 case '/tasks':
                   return _buildRoute(const TasksScreen(), locale: locale);
-                case '/friends':
+                case '/friends' when kSocialEnabled:
                   final tab = routeSettings.arguments as int? ?? 0;
                   return _buildRoute(FriendsScreen(initialTab: tab), locale: locale);
-                case '/challenges':
+                case '/challenges' when kSocialEnabled:
                   return _buildRoute(const FriendsScreen(initialTab: 1), locale: locale);
                 case '/level':
                   return _buildRoute(const LevelScreen(), locale: locale);

@@ -1,22 +1,38 @@
 import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/counter.dart';
+import 'purchase_service.dart';
 
-class StorageService {
+class StorageService implements PurchaseStorage {
   static const String _countersBox = 'counters';
   static const String _settingsBox = 'settings';
   static const String _tasksBox = 'tasks';
+  // Kept apart from settings so "reset all data" never removes a purchase.
+  static const String _purchaseBox = 'purchase';
 
   late Box<String> _counters;
   late Box<dynamic> _settings;
   late Box<String> _tasks;
+  late Box<dynamic> _purchase;
 
   Future<void> init() async {
     await Hive.initFlutter();
     _counters = await Hive.openBox<String>(_countersBox);
     _settings = await Hive.openBox<dynamic>(_settingsBox);
     _tasks = await Hive.openBox<String>(_tasksBox);
+    _purchase = await Hive.openBox<dynamic>(_purchaseBox);
   }
+
+  // In-app purchase (Twin'Am Pro)
+  @override
+  bool get proPurchased => _purchase.get('pro', defaultValue: false) as bool;
+  @override
+  Future<void> setProPurchased(bool value) => _purchase.put('pro', value);
+
+  @override
+  String? get storeCountry => _purchase.get('country') as String?;
+  @override
+  Future<void> setStoreCountry(String value) => _purchase.put('country', value);
 
   // Counters
   List<Counter> getAllCounters() {

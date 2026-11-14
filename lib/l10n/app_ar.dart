@@ -481,4 +481,21 @@ const Map<String, String> ar = {
   'deleteChallenge': 'حذف التحدي',
   'deleteChallengeConfirm': 'حذف هذا التحدي؟ لا يمكن التراجع عن هذا الإجراء.',
   'editChallenge': 'تعديل التحدي',
+
+  // Twin'Am Pro
+  'add': 'إضافة',
+  'proTitle': 'Twin\'Am Pro',
+  'proSubtitle': 'دفعة واحدة. مدى الحياة. بدون اشتراك.',
+  'proPerkCounters': 'عدّادات غير محدودة',
+  'proPerkStats': 'إحصاءات كاملة: عرض الشهر وخريطة النشاط لخمسة أسابيع',
+  'proPerkSupport': 'ادعم مطوّرًا مستقلًا، بدون إعلانات أبدًا',
+  'proBuy': 'افتح مقابل {price}',
+  'proBuyNoPrice': 'افتح Pro',
+  'proRestore': 'استعادة الشراء',
+  'proStoreUnavailable': 'المتجر غير متاح حاليًا. حاول لاحقًا.',
+  'proActive': 'Pro مفعّل. شكرًا لك!',
+  'proLimitCounters': 'تتضمن النسخة المجانية {n} عدّادات.',
+  'proLimitStats': 'تعرض النسخة المجانية آخر 7 أيام.',
+  'proSettingsDesc': 'عدّادات غير محدودة وإحصاءات كاملة',
+  'proUnlockActivity': 'افتح خريطة النشاط لخمسة أسابيع',
 };

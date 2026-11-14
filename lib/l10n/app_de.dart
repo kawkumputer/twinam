@@ -444,4 +444,21 @@ const Map<String, String> de = {
   'deleteChallenge': 'Herausforderung löschen',
   'deleteChallengeConfirm': 'Diese Herausforderung löschen? Aktion kann nicht rückgängig gemacht werden.',
   'editChallenge': 'Herausforderung bearbeiten',
+
+  // Twin'Am Pro
+  'add': 'Hinzufügen',
+  'proTitle': 'Twin\'Am Pro',
+  'proSubtitle': 'Einmal zahlen. Für immer. Kein Abo.',
+  'proPerkCounters': 'Unbegrenzte Zähler',
+  'proPerkStats': 'Vollständige Statistiken: Monatsansicht und 5-Wochen-Aktivitätskarte',
+  'proPerkSupport': 'Unterstütze einen unabhängigen Entwickler, niemals Werbung',
+  'proBuy': 'Freischalten für {price}',
+  'proBuyNoPrice': 'Pro freischalten',
+  'proRestore': 'Kauf wiederherstellen',
+  'proStoreUnavailable': 'Der Store ist gerade nicht verfügbar. Versuche es später erneut.',
+  'proActive': 'Pro ist aktiv. Danke!',
+  'proLimitCounters': 'Die kostenlose Version enthält {n} Zähler.',
+  'proLimitStats': 'Die kostenlose Version zeigt die letzten 7 Tage.',
+  'proSettingsDesc': 'Unbegrenzte Zähler und vollständige Statistiken',
+  'proUnlockActivity': 'Die 5-Wochen-Aktivitätskarte freischalten',
 };
